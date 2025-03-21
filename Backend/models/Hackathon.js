@@ -4,11 +4,16 @@ const HackathonSchema = new mongoose.Schema({
   teacher_id: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
   title: { type: String, required: true },
   description: { type: String, required: true },
+  judging_parameters: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "JudgingParameter" },
+  ],
   image_url: { type: String }, // URL for the hackathon poster
   file_attachment_url: { type: String }, // URL for terms & conditions file
   start_date: { type: Date, required: true },
   end_date: { type: Date, required: true },
   sponsors: [{ type: String }], // List of sponsor names
+  is_public: { type: Boolean, default: true }, // Public or Private Hackathon
+  passkey: { type: String, select: false }, // Hashed passkey (Only for private hackathons)
   status: {
     type: String,
     enum: ["upcoming", "ongoing", "completed"],
