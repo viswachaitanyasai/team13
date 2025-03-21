@@ -17,8 +17,8 @@ function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/teacher-login" element={<TeacherLogin/>} />
-      <Route path="/teacher-login/dashboard" element={<DashBoard/>} />
-      <Route path="/teacher-login/dashboard/create-hackathon" element={<CreateHackathon/>} />
+      <Route path="/teacher-login/otp-verification/dashboard" element={<DashBoard/>} />
+      <Route path="/teacher-login/otp-verification/dashboard/create-hackathon" element={<CreateHackathon/>} />
       <Route path="/teacher-login/otp-verification" element={<OTPVerification/>} />
     </Routes>
     </ErrorBoundary>
