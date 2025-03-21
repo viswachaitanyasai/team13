@@ -145,17 +145,33 @@ const verifyEmail = async (req, res) => {
       return res.status(400).json({ error: "Invalid OTP" });
     }
 
-    // Mark email as verified
+    // Mark email as verified and clear OTP fields
     teacher.isVerified = true;
     teacher.otp = null;
     teacher.otpExpires = null;
     await teacher.save();
 
-    res.json({ message: "Email verified successfully. You can now log in." });
+    // Generate token
+    const token = generateToken(teacher._id);
+
+    // Set token in HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.json({
+      message: "Email verified successfully. You are now logged in.",
+      teacher: { id: teacher._id, name: teacher.name, email: teacher.email },
+      token,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 const resendOTP = async (req, res) => {
   try {
