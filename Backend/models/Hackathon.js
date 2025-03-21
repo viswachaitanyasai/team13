@@ -14,12 +14,14 @@ const HackathonSchema = new mongoose.Schema({
   sponsors: [{ type: String }], // List of sponsor names
   is_public: { type: Boolean, default: true }, // Public or Private Hackathon
   passkey: { type: String, select: false }, // Hashed passkey (Only for private hackathons)
+  invite_code: { type: String, unique: true, required: true }, // Unique invite code
   status: {
     type: String,
     enum: ["upcoming", "ongoing", "completed"],
     default: "upcoming",
   },
   allow_multiple_solutions: { type: Boolean, default: false },
+  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Students who joined
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });
