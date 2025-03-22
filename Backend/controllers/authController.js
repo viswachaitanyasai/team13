@@ -111,7 +111,12 @@ const login = async (req, res) => {
 
     res.json({
       message: "Login successful",
-      teacher: { id: teacher._id, name: teacher.name, email: teacher.email },
+      teacher: {
+        id: teacher._id,
+        name: teacher.name,
+        email: teacher.email,
+        isVerified: teacher.isVerified,
+      },
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
