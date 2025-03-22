@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 const EmailVerification = () => {
   const navigate = useNavigate();
-  const [otp, setOtp] = useState(['', '', '', '']);
+  const [otp, setOtp] = useState(['', '', '', '','','']);
   const inputRefs = useRef([]);
 
   const handleChange = (e, index) => {
@@ -14,7 +14,7 @@ const EmailVerification = () => {
     newOtp[index] = value;
     setOtp(newOtp);
 
-    if (value && index < 3) {
+    if (value && index < 5) {
       inputRefs.current[index + 1].focus();
     }
   };
@@ -32,13 +32,13 @@ const EmailVerification = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-black via-gray-900 to-indigo-900 p-4">
       <div className="bg-gray-800 text-white rounded-lg shadow-xl p-8 max-w-md w-full">
-        <button className="text-indigo-400 mb-6 self-start hover:text-indigo-300 transition" onClick={() => console.log("Back button clicked")}>
+        <button className="text-indigo-400 mb-6 self-start hover:text-indigo-300 transition" onClick={() => navigate("/teacher-login")}>
           &larr; Back
         </button>
 
         <h2 className="text-2xl font-semibold mb-4 text-center text-indigo-400">Email Verification</h2>
         <p className="text-gray-400 mb-6 text-center">
-          Enter the 4-digit verification code sent to <span className="text-indigo-300">info@koalaui.com</span>
+          Enter the 6-digit verification code sent to <span className="text-indigo-300">info@koalaui.com</span>
         </p>
 
         <div className="flex justify-center space-x-4 mb-6">
