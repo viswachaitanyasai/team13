@@ -20,22 +20,41 @@ const createHackathon = async (req, res) => {
       allow_multiple_solutions,
       is_public,
       passkey,
-      judging_parameters, // [{ name: "Creativity", weightage: 40 }, { name: "Technicality", weightage: 60 }]
+      grade, // Grade restriction (e.g., "10th", "UG")
+      judging_parameters,
     } = req.body;
 
+    const validGrades = [
+      "5th",
+      "6th",
+      "7th",
+      "8th",
+      "9th",
+      "10th",
+      "11th",
+      "12th",
+      "UG",
+      "PG",
+    ];
+
     // Validate required fields
-    if (!title || !description || !start_date || !end_date) {
-      return res.status(400).json({
-        error: "Title, description, start date, and end date are required",
-      });
+    if (!title || !description || !start_date || !end_date || !grade) {
+      return res
+        .status(400)
+        .json({ error: "All required fields must be provided." });
     }
 
-    // Convert `is_public` and `allow_multiple_solutions` to Boolean
+    // Validate grade
+    if (!validGrades.includes(grade)) {
+      return res.status(400).json({ error: "Invalid grade level specified." });
+    }
+
+    // Convert is_public & allow_multiple_solutions to Boolean
     const isPublicBool = is_public === "true" || is_public === true;
     const allowMultipleBool =
       allow_multiple_solutions === "true" || allow_multiple_solutions === true;
 
-    // Convert `start_date` and `end_date` to Date objects
+    // Convert start_date & end_date to Date objects
     const startDateObj = new Date(start_date);
     const endDateObj = new Date(end_date);
     if (isNaN(startDateObj) || isNaN(endDateObj)) {
@@ -62,7 +81,7 @@ const createHackathon = async (req, res) => {
     // Generate unique invite code
     const inviteCode = await generateInviteCode();
 
-    // Create Hackathon first (to get its _id)
+    // Create Hackathon first
     const hackathon = await Hackathon.create({
       teacher_id: req.user.id,
       title,
@@ -76,6 +95,7 @@ const createHackathon = async (req, res) => {
       is_public: isPublicBool,
       passkey: hashedPasskey, // Store hashed passkey
       invite_code: inviteCode, // Store unique invite code
+      grade, // Store grade restriction
     });
 
     // Create judging parameters and store their IDs
@@ -85,7 +105,7 @@ const createHackathon = async (req, res) => {
         judging_parameters.map((param) => ({
           hackathon_id: hackathon._id,
           name: param.name,
-          weightage: param.weightage, // No restriction on total sum
+          weightage: param.weightage,
         }))
       );
       judgingParameterIds = createdParams.map((param) => param._id);
@@ -102,6 +122,7 @@ const createHackathon = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 
 const getHackathons = async (req, res) => {
@@ -152,7 +173,6 @@ const editHackathon = async (req, res) => {
       allow_multiple_solutions,
       is_public,
       passkey,
-      judging_parameters,
     } = req.body;
 
     // Find the hackathon
@@ -174,16 +194,16 @@ const editHackathon = async (req, res) => {
       allow_multiple_solutions === "true" || allow_multiple_solutions === true;
 
     // Validate new judging parameters if provided
-    if (judging_parameters && judging_parameters.length > 0) {
-      const validParams = await JudgingParameter.find({
-        _id: { $in: judging_parameters },
-      });
-      if (validParams.length !== judging_parameters.length) {
-        return res
-          .status(400)
-          .json({ error: "Invalid judging parameter ID(s) provided" });
-      }
-    }
+    // if (judging_parameters && judging_parameters.length > 0) {
+    //   const validParams = await JudgingParameter.find({
+    //     _id: { $in: judging_parameters },
+    //   });
+    //   if (validParams.length !== judging_parameters.length) {
+    //     return res
+    //       .status(400)
+    //       .json({ error: "Invalid judging parameter ID(s) provided" });
+    //   }
+    // }
 
     // Validate start_date and end_date if provided
     if (start_date) {
@@ -235,7 +255,6 @@ const editHackathon = async (req, res) => {
         allow_multiple_solutions,
         is_public,
         passkey: hashedPasskey,
-        judging_parameters,
         updated_at: Date.now(),
       },
       { new: true, runValidators: true }
@@ -323,76 +342,76 @@ const removeHackathon = async (req, res) => {
 
 
 
-const joinHackathon = async (req, res) => {
-  try {
-    const { invite_code, name, email } = req.body;
+// const joinHackathon = async (req, res) => {
+//   try {
+//     const { invite_code, name, email } = req.body;
 
-    if (!invite_code || !name || !email) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Invite code, name, and email are required",
-        });
-    }
+//     if (!invite_code || !name || !email) {
+//       return res
+//         .status(400)
+//         .json({
+//           success: false,
+//           error: "Invite code, name, and email are required",
+//         });
+//     }
 
-    // Find the hackathon by invite code
-    const hackathon = await Hackathon.findOne({ invite_code });
+//     // Find the hackathon by invite code
+//     const hackathon = await Hackathon.findOne({ invite_code });
 
-    if (!hackathon) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Invalid invite code" });
-    }
+//     if (!hackathon) {
+//       return res
+//         .status(404)
+//         .json({ success: false, error: "Invalid invite code" });
+//     }
 
-    // Check if the student already exists
-    let student = await Student.findOne({ email });
+//     // Check if the student already exists
+//     let student = await Student.findOne({ email });
 
-    // Check if student is already a participant
-    if (student) {
-      const isAlreadyParticipant = await Hackathon.exists({
-        _id: hackathon._id,
-        participants: { $in: [student._id] },
-      });
+//     // Check if student is already a participant
+//     if (student) {
+//       const isAlreadyParticipant = await Hackathon.exists({
+//         _id: hackathon._id,
+//         participants: { $in: [student._id] },
+//       });
 
-      if (isAlreadyParticipant) {
-        return res
-          .status(400)
-          .json({ success: false, error: "You are already a participant" });
-      }
-    }
+//       if (isAlreadyParticipant) {
+//         return res
+//           .status(400)
+//           .json({ success: false, error: "You are already a participant" });
+//       }
+//     }
 
-    // If student does not exist, create a new entry
-    if (!student) {
-      student = await Student.create({
-        name,
-        email,
-        joined_hackathons: [hackathon._id],
-      });
-    } else {
-      // Add hackathon to student's joined list, preventing duplicates
-      await Student.updateOne(
-        { _id: student._id },
-        { $addToSet: { joined_hackathons: hackathon._id } }
-      );
-    }
+//     // If student does not exist, create a new entry
+//     if (!student) {
+//       student = await Student.create({
+//         name,
+//         email,
+//         joined_hackathons: [hackathon._id],
+//       });
+//     } else {
+//       // Add hackathon to student's joined list, preventing duplicates
+//       await Student.updateOne(
+//         { _id: student._id },
+//         { $addToSet: { joined_hackathons: hackathon._id } }
+//       );
+//     }
 
-    // Add student to hackathon participants, preventing duplicates
-    await Hackathon.updateOne(
-      { _id: hackathon._id },
-      { $addToSet: { participants: student._id } }
-    );
+//     // Add student to hackathon participants, preventing duplicates
+//     await Hackathon.updateOne(
+//       { _id: hackathon._id },
+//       { $addToSet: { participants: student._id } }
+//     );
 
-    res.json({
-      success: true,
-      message: "Joined hackathon successfully",
-      student,
-      hackathon,
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
+//     res.json({
+//       success: true,
+//       message: "Joined hackathon successfully",
+//       student,
+//       hackathon,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ success: false, error: error.message });
+//   }
+// };
 
 
 
