@@ -54,8 +54,8 @@ const CreateHackathonForm = () => {
 
   return (
     <div className="min-h-screen w-full p-8">
-      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-7000">Create Hackathon</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg">
+      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-700">Create a Hackathon</h2>
+      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg mb-20">
         {/* Hackathon Name */}
         <div className="space-y">
           <label className="block font-medium">Hackathon Name <span className="text-red-500">*</span></label>

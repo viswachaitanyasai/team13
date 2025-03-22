@@ -7,12 +7,11 @@ function Sidebar({ onDashboardClick, onShowHackathonsClick }) {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleItemClick = (item, callback) => {
+  const handleItemClick = (item, path) => {
     setActive(item);
-    callback();
-    setIsOpen(false); // Close sidebar on mobile when item is clicked
+    navigate(path);
+    setIsOpen(false); // Close sidebar on mobile
   };
-
   return (
     <>
       {/* Sidebar Toggle Button for Mobile */}
@@ -41,10 +40,12 @@ function Sidebar({ onDashboardClick, onShowHackathonsClick }) {
           </li>
           <li>
             <button
-              onClick={() => handleItemClick("hackathons", onShowHackathonsClick)}
-              className={`flex items-center w-full p-3 rounded-lg transition-all font-medium text-sm ${
-                active === "hackathons" ? "bg-indigo-500 text-white shadow-md" : "text-gray-300 hover:bg-gray-700"
-              }`}
+               onClick={() => handleItemClick("hackathons", "/hackathons")}
+               className={`flex items-center w-full p-3 rounded-lg transition-all font-medium text-sm ${
+                 active === "hackathons"
+                   ? "bg-indigo-500 text-white shadow-md"
+                   : "text-gray-300 hover:bg-gray-700"
+               }`}
             >
               <FaTrophy className="mr-3 text-base" /> Show Hackathons
             </button>
