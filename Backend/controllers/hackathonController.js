@@ -249,6 +249,25 @@ const editHackathon = async (req, res) => {
   }
 };
 
+const getHackathonsByTeacher = async (req, res) => {
+  try {
+    const { teacher_id } = req.params;
+
+    // Ensure the authenticated user is the same as the requested teacher
+    if (req.user.id !== teacher_id) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    const hackathons = await Hackathon.find({ teacher_id })
+      .populate("judging_parameters")
+      .populate("participants", "name email") // Fetch participant name & email
+      .select("-passkey"); // Exclude passkey from response
+
+    res.json(hackathons);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // Remove a hackathon (Only the teacher who created it can delete)
 const removeHackathon = async (req, res) => {
@@ -386,5 +405,6 @@ module.exports = {
   getHackathonById,
   editHackathon,
   removeHackathon,
+  getHackathonsByTeacher,
   joinHackathon,
 };

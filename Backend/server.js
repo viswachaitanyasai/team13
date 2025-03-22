@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const authRoutes = require("./routes/authRoutes");
 const hackathonRoutes = require("./routes/hackathonRoutes");
 const gradingRoutes = require("./routes/gradingRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const app = express();
 app.use(cors());
@@ -21,6 +22,7 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api/hackathons", hackathonRoutes);
 app.use("/api/submissions", gradingRoutes);
+app.use("/api/analytics/", analyticsRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
