@@ -6,9 +6,11 @@ import { Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
 import ErrorBoundary from './pages/ErrorBoundary';
 import TeacherLogin from './pages/TeacherLogin';
-import DashBoard from './pages/DashBoard';
-import CreateHackathon from './pages/CreateHackathon';
+import TeacherDashboard from './pages/TeacherDashboard';
 import OTPVerification from './components/OTPVerification';
+import Profile from './pages/Profile';
+import AuthPage from './pages/AuthPage';
+import CreateHackathon from './pages/CreateHackathon';
 
 
 function App() {
@@ -16,10 +18,12 @@ function App() {
     <ErrorBoundary>
     <Routes>
       <Route path="/" element={<Landing />} />
-      <Route path="/teacher-login" element={<TeacherLogin/>} />
-      <Route path="/teacher-login/otp-verification/dashboard" element={<DashBoard/>} />
-      <Route path="/teacher-login/otp-verification/dashboard/create-hackathon" element={<CreateHackathon/>} />
+      <Route path="/teacher-login" element={<AuthPage/>} />
+      <Route path="/teacher-login/dashboard" element={<TeacherDashboard/>} />
+      <Route path="/teacher-login/otp-verification/dashboard" element={<TeacherDashboard/>} />
+      <Route path="/teacher-login/dashboard/create-hackathon" element={<CreateHackathon/>} />
       <Route path="/teacher-login/otp-verification" element={<OTPVerification/>} />
+      <Route path="/teacher-login/otp-verification/dashboard/profile" element={<Profile/>} />
     </Routes>
     </ErrorBoundary>
   )

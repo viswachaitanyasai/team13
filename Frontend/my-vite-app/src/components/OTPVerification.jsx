@@ -1,14 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 const EmailVerification = () => {
-        const navigate = useNavigate();
+  const navigate = useNavigate();
   const [otp, setOtp] = useState(['', '', '', '']);
   const inputRefs = useRef([]);
 
   const handleChange = (e, index) => {
     const value = e.target.value;
-    if (isNaN(value)) return; // Only allow numbers
+    if (isNaN(value)) return; 
 
     const newOtp = [...otp];
     newOtp[index] = value;
@@ -26,20 +26,19 @@ const EmailVerification = () => {
   };
 
   const handleResend = () => {
-    // Implement your logic to resend the verification code
     console.log('Resend code requested');
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
-        <button className="text-blue-600 mb-6 self-start" onClick={() => console.log("Back button clicked")}>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-black via-gray-900 to-indigo-900 p-4">
+      <div className="bg-gray-800 text-white rounded-lg shadow-xl p-8 max-w-md w-full">
+        <button className="text-indigo-400 mb-6 self-start hover:text-indigo-300 transition" onClick={() => console.log("Back button clicked")}>
           &larr; Back
         </button>
 
-        <h2 className="text-2xl font-semibold mb-4 text-center">Email verification</h2>
-        <p className="text-gray-600 mb-6 text-center">
-          Introduce the 4-digit verification code sent to info@koalaui.com
+        <h2 className="text-2xl font-semibold mb-4 text-center text-indigo-400">Email Verification</h2>
+        <p className="text-gray-400 mb-6 text-center">
+          Enter the 4-digit verification code sent to <span className="text-indigo-300">info@koalaui.com</span>
         </p>
 
         <div className="flex justify-center space-x-4 mb-6">
@@ -52,18 +51,18 @@ const EmailVerification = () => {
               onChange={(e) => handleChange(e, index)}
               onKeyDown={(e) => handleBackspace(e, index)}
               ref={(el) => (inputRefs.current[index] = el)}
-              className="w-12 h-12 border rounded text-center text-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-14 h-14 bg-gray-900 text-indigo-400 border border-indigo-500 rounded-lg text-center text-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
           ))}
         </div>
 
-        <button className="text-blue-600 block mx-auto mb-4" onClick={handleResend}>
-          Resend code
+        <button className="text-indigo-400 block mx-auto mb-4 hover:text-indigo-300 transition" onClick={handleResend}>
+          Resend Code
         </button>
 
         <button
-          className="bg-blue-600 text-white py-3 px-6 rounded-lg w-full"
-          onClick={() => navigate("./dashboard")} 
+          className="bg-indigo-600 text-white py-3 px-6 rounded-lg w-full hover:bg-indigo-500 transition"
+          onClick={() => navigate("./dashboard")}
         >
           Continue
         </button>

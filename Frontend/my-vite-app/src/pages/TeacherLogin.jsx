@@ -1,18 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 function TeacherLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const imageRef = useRef(null);
+
+  useEffect(() => {
+    const image = imageRef.current;
+    if (image) {
+      let angle = 0;
+      const animate = () => {
+        angle += 0.1;
+        image.style.transform = `rotate(${angle}deg) scale(1.1)`;
+        requestAnimationFrame(animate);
+      };
+      animate();
+    }
+  }, []);
 
   return (
     <div className="flex h-screen w-full bg-black">
-      {/* Left Side - Image Section */}
-      <div
-        className="hidden md:flex w-1/2 bg-cover bg-center"
-        style={{ backgroundImage: "url('https://source.unsplash.com/800x600/?education,teacher')" }}
-      ></div>
+      {/* Left Side - Enhanced Image Section */}
+      <div className="hidden md:flex w-1/2 relative overflow-hidden">
+        <div
+          ref={imageRef}
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-500"
+          style={{ backgroundImage: "../../src/assets/8.jpg" }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-400 to-purple-700 opacity-80"></div>
+        </div>
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-8">
+          <h2 className="text-4xl font-bold mb-4">Empowering Educators</h2>
+          <p className="text-lg text-gray-200">
+            Join our community and revolutionize the way you teach.
+          </p>
+          <div className="mt-8">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-16 w-16 animate-pulse text-indigo-300"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332. 0.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332. 0.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332. 0.477-4.5 1.253"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
 
       {/* Right Side - Login Form */}
       <div className="flex w-full md:w-1/2 items-center justify-center">
@@ -44,14 +85,13 @@ function TeacherLogin() {
             </button>
           </form>
           <p className="mt-4 text-white font-semibold">or</p>
-          Dont have an account ? {" "}
+          Dont have an account ?{" "}
           <a
-            className="text-indigo-500  hover:underline mt-2 inline-block"
+            className="text-indigo-500 hover:underline mt-2 inline-block"
             href="#"
           >
             Register
-          </a>{" "}
-          
+          </a>
         </div>
       </div>
     </div>
