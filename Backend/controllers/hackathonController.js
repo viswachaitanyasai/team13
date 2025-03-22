@@ -172,7 +172,26 @@ const editHackathon = async (req, res) => {
       allow_multiple_solutions,
       is_public,
       passkey,
+      grade, // Allow updating grade
     } = req.body;
+
+    // Valid grade levels (including 1st to 5th)
+    const validGrades = [
+      "1st",
+      "2nd",
+      "3rd",
+      "4th",
+      "5th",
+      "6th",
+      "7th",
+      "8th",
+      "9th",
+      "10th",
+      "11th",
+      "12th",
+      "UG",
+      "PG",
+    ];
 
     // Find the hackathon
     const hackathon = await Hackathon.findById(hackathon_id);
@@ -192,18 +211,6 @@ const editHackathon = async (req, res) => {
     allow_multiple_solutions =
       allow_multiple_solutions === "true" || allow_multiple_solutions === true;
 
-    // Validate new judging parameters if provided
-    // if (judging_parameters && judging_parameters.length > 0) {
-    //   const validParams = await JudgingParameter.find({
-    //     _id: { $in: judging_parameters },
-    //   });
-    //   if (validParams.length !== judging_parameters.length) {
-    //     return res
-    //       .status(400)
-    //       .json({ error: "Invalid judging parameter ID(s) provided" });
-    //   }
-    // }
-
     // Validate start_date and end_date if provided
     if (start_date) {
       start_date = new Date(start_date);
@@ -216,6 +223,11 @@ const editHackathon = async (req, res) => {
       if (isNaN(end_date)) {
         return res.status(400).json({ error: "Invalid end date format" });
       }
+    }
+
+    // Validate grade if provided
+    if (grade && !validGrades.includes(grade)) {
+      return res.status(400).json({ error: "Invalid grade level specified." });
     }
 
     // Ensure sponsors is an array
@@ -254,6 +266,7 @@ const editHackathon = async (req, res) => {
         allow_multiple_solutions,
         is_public,
         passkey: hashedPasskey,
+        grade, // Allow updating grade
         updated_at: Date.now(),
       },
       { new: true, runValidators: true }
