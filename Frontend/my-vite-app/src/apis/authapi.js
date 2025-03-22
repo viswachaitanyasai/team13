@@ -35,7 +35,9 @@ export const resendOTP = async (email) => {
 // 📌 Login User
 export const loginUser = async (credentials) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/login`, credentials);
+        const response = await axios.post(`${API_BASE_URL}/login`, credentials, {
+            withCredentials: true, // Include credentials (cookies)
+        });
         console.log(response.data);
         return response.data;
     } catch (error) {
