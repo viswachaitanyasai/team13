@@ -30,7 +30,7 @@ function Navbar({ teacherName }) {
     }
   };
   return (
-    <nav className="flex items-center justify-between py-3 px-4 bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg w-full fixed top-0 z-50 border-b border-gray-700">
+    <nav className="flex  items-center justify-between py-3 px-4 bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg w-full fixed top-0 z-50 border-b border-gray-700">
       {/* Logo & Title */}
       <div className="flex items-center gap-2">
         <img
