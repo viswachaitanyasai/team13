@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:4000/api/auth";
+const API_BASE_URL = "https://team13-aajv.onrender.com/api/auth";
 
 // 📌 Register a New User
 export const registerUser = async (userData) => {
@@ -25,7 +25,7 @@ export const verifyEmail = async (otpData) => {
 // 📌 Resend OTP
 export const resendOTP = async (email) => {
     try {
-        const response = await axios.post(`${API_BASE_URL}/resend-otp`, { email });
+        const response = await axios.post(`${API_BASE_URL}/resend-otp`, { email: email });
         return response.data;
     } catch (error) {
         throw error.response?.data || { error: "Failed to resend OTP." };
@@ -50,5 +50,23 @@ export const logoutUser = async () => {
         return response.data;
     } catch (error) {
         throw error.response?.data || { error: "Logout failed." };
+    }
+};
+
+export const forgotPassword = async (email) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/forgot-password`, { email });
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { error: "Failed to request password reset." };
+    }
+};
+
+export const resetPassword = async (resetData) => {
+    try {
+        const response = await axios.post(`${API_BASE_URL}/reset-password`, resetData);
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || { error: "Password reset failed." };
     }
 };

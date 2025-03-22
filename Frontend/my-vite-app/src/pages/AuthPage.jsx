@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { loginUser, registerUser } from "../apis/authapi";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -11,22 +14,105 @@ const AuthPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log("Logging in with:", email, password);
-    navigate("/dashboard");
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    const savedPassword = localStorage.getItem("rememberedPassword");
+    const rememberMeStatus = localStorage.getItem("rememberMe") === "true";
+
+    if (rememberMeStatus && savedEmail && savedPassword) {
+      setEmail(savedEmail);
+      setPassword(savedPassword);
+      setRememberMe(true);
+    }
+  }, []);
+
+  const toggleAuthMode = (mode) => {
+    setIsLogin(mode);
+    setErrorMessage("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setFirstName("");
+    setLastName("")
   };
 
-  const handleRegister = (e) => {
+  const handleLogin = async(e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+    setErrorMessage("");
+
+    if (!email.trim() || !password.trim()) {
+      toast.error("Please enter both email and password.");
       return;
     }
-    console.log("Registering with:", firstName, lastName, email, password);
-    navigate("/otp-verification");
+
+    setLoading(true);
+    try {
+      const response = await loginUser({ email, password });
+
+      if (!response.teacher.isVerified) {
+        toast.error("Email not verified. Please verify your email.");
+        return;
+      }
+      localStorage.setItem("teacherName", response.teacher.name);
+      localStorage.setItem("authToken", response.token);
+      localStorage.setItem("userEmail", email);
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", email);
+        localStorage.setItem("rememberedPassword", password);
+        localStorage.setItem("rememberMe", "true");
+      } else {
+        localStorage.removeItem("rememberedEmail");
+        localStorage.removeItem("rememberedPassword");
+        localStorage.removeItem("rememberMe");
+      }
+      toast.success("Login successful!");
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error(error.error || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async(e) => {
+    e.preventDefault();
+    setErrorMessage("");
+    const trimmedFirstName = firstName.trim();
+    const trimmedLastName = lastName.trim();
+    const trimmedEmail = email.trim();
+    const trimmedPassword = password.trim();
+    const trimmedConfirmPassword = confirmPassword.trim();
+
+    if (!trimmedFirstName || !trimmedLastName || !trimmedEmail || !trimmedPassword || !trimmedConfirmPassword) {
+      toast.error("All fields are required.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await registerUser({ 
+        name: `${trimmedFirstName} ${trimmedLastName}`,
+        email: trimmedEmail,
+        password: trimmedPassword
+      });
+      toast.success("Registration Successful! Verify your email.");
+      console.log(response);
+      navigate("/otp-verification", { state: { email: email } });
+    } catch (error) {
+      toast.error(error.error || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,18 +131,27 @@ const AuthPage = () => {
           <div className="flex justify-center mb-6 bg-gray-700 rounded-full p-1">
             <button
               className={`w-1/2 py-2 rounded-full text-lg font-semibold transition-colors duration-300 ${isLogin ? "bg-indigo-600 text-white" : "text-gray-300"}`}
-              onClick={() => setIsLogin(true)}
+              onClick={() => toggleAuthMode(true)}
             >
               Login
             </button>
             <button
               className={`w-1/2 py-2 rounded-full text-lg font-semibold transition-colors duration-300 ${!isLogin ? "bg-indigo-600 text-white" : "text-gray-300"}`}
-              onClick={
-                () => setIsLogin(false)}
+              onClick={() => toggleAuthMode(false)}
             >
               Register
             </button>
           </div>
+          <AnimatePresence mode="wait">
+            {/* Animated Login/Register Form */}
+            <motion.div
+              key={isLogin ? "login" : "register"}
+              initial={{ x: isLogin ? 100 : -100, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: isLogin ? -100 : 100, opacity: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+            >
+
 
           <form onSubmit={isLogin ? handleLogin : handleRegister}>
           {!isLogin && (
@@ -133,18 +228,26 @@ const AuthPage = () => {
                 </div>
               </>
             )}
-
+          {isLogin && (
             <div className="flex justify-between text-sm text-gray-400 mb-4">
               <label>
-                <input type="checkbox" className="mr-1" /> Remember me
+                <input type="checkbox" className="mr-1" checked={rememberMe} onChange={() => setRememberMe(!rememberMe)} /> Remember me
               </label>
               <span className="cursor-pointer">Forgot Password?</span>
             </div>
-
-            <button className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition duration-300">
-              {isLogin ? "Login" : "Register"}
+            )}
+            <button
+              className={`w-full bg-indigo-600 text-white py-3 rounded-lg transition duration-300 ${
+                loading ? "bg-gray-400 cursor-not-allowed" : "hover:bg-indigo-700"
+              }`}
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Processing..." : isLogin ? "Login" : "Register"}
             </button>
           </form>
+          </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>
