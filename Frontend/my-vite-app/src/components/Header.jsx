@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu, FiX} from "react-icons/fi";
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   return (
-    <nav className="w-full fixed top-0 left-0 z-50 bg-opacity-50 backdrop-blur-lg shadow-lg p-4 flex items-center justify-between text-white transition-all duration-300">
+    <nav className="w-full fixed top-0 left-0 z-50 bg-opacity-50 backdrop-blur-lg shadow-lg p-4 flex items-center justify-between text-white transition-all duration-300 font-sans">
       {/* Logo */}
       <div className="flex items-center text-2xl font-extrabold cursor-pointer" onClick={() => navigate("/")}> 
         <img 
@@ -26,6 +26,8 @@ function Header() {
         </li>
         <li className="hover:text-indigo-300 transition duration-300 cursor-pointer">Contact Us</li>
       </ul>
+
+
       
       {/* Sign Up Button */}
       <button className="hidden md:block bg-indigo-500 px-6 py-2 rounded-xl font-semibold hover:bg-indigo-600 transition duration-300">
