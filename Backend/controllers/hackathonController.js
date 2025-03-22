@@ -4,8 +4,6 @@ const JudgingParameter = require("../models/JudgingParameter");
 const { generateInviteCode } = require("../utils/uniqueHackathonJoinId");
 const bcrypt = require("bcrypt");
 
-
-
 // Create a new hackathon with judging parameters
 const createHackathon = async (req, res) => {
   try {
@@ -20,11 +18,15 @@ const createHackathon = async (req, res) => {
       allow_multiple_solutions,
       is_public,
       passkey,
-      grade, // Grade restriction (e.g., "10th", "UG")
+      grade, // Grade restriction (e.g., "1st", "10th", "UG")
       judging_parameters,
     } = req.body;
 
     const validGrades = [
+      "1st",
+      "2nd",
+      "3rd",
+      "4th",
       "5th",
       "6th",
       "7th",
@@ -123,8 +125,6 @@ const createHackathon = async (req, res) => {
   }
 };
 
-
-
 const getHackathons = async (req, res) => {
   try {
     const hackathons = await Hackathon.find({ teacher_id: req.user.id })
@@ -155,7 +155,6 @@ const getHackathonById = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // Edit a hackathon (Only the teacher who created it can update)
 const editHackathon = async (req, res) => {
@@ -304,12 +303,10 @@ const removeHackathon = async (req, res) => {
 
     // Check if the logged-in teacher is the creator
     if (hackathon.teacher_id.toString() !== teacher_id) {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          error: "Unauthorized: You can only delete your own hackathon",
-        });
+      return res.status(403).json({
+        success: false,
+        error: "Unauthorized: You can only delete your own hackathon",
+      });
     }
 
     // Remove hackathon reference from students
@@ -338,9 +335,6 @@ const removeHackathon = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
-
-
-
 
 // const joinHackathon = async (req, res) => {
 //   try {
@@ -413,11 +407,6 @@ const removeHackathon = async (req, res) => {
 //   }
 // };
 
-
-
-
-
-
 module.exports = {
   createHackathon,
   getHackathons,
@@ -425,5 +414,4 @@ module.exports = {
   editHackathon,
   removeHackathon,
   getHackathonsByTeacher,
-  
 };

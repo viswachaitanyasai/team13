@@ -22,25 +22,40 @@ const register = async (req, res) => {
 
     // Check if the email is already registered
     const existingUser = await Teacher.findOne({ email: trimmedEmail });
+
     if (existingUser) {
-      return res.status(400).json({ error: "Email already in use" });
+      if (existingUser.isVerified) {
+        return res.status(400).json({ error: "Email already in use" });
+      }
+
+      // User exists but is unverified, update their OTP and resend
+      const otp = generateOTP();
+      existingUser.otp = await hashOTP(otp);
+      existingUser.otpExpires = Date.now() + 10 * 60 * 1000;
+      existingUser.password = await bcrypt.hash(trimmedPassword, 10); // Update password in case user changed it
+      await existingUser.save();
+
+      // Resend OTP
+      await sendOTP(trimmedEmail, otp);
+
+      return res.status(200).json({
+        message: "OTP resent for email verification",
+        email: trimmedEmail,
+      });
     }
 
-    // Hash password
+    // New user registration
     const hashedPassword = await bcrypt.hash(trimmedPassword, 10);
-
-    // Generate and hash OTP
-    const otp = generateOTP(); // Example: "123456"
+    const otp = generateOTP();
     const hashedOTP = await hashOTP(otp);
 
-    // Create teacher with OTP (unverified)
     const teacher = await Teacher.create({
       name: trimmedName,
       email: trimmedEmail,
       password: hashedPassword,
-      isVerified: false, // Ensure user verifies OTP before login
+      isVerified: false,
       otp: hashedOTP,
-      otpExpires: Date.now() + 10 * 60 * 1000, // OTP valid for 10 minutes
+      otpExpires: Date.now() + 10 * 60 * 1000,
     });
 
     // Send OTP via email
@@ -102,7 +117,6 @@ const login = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 // Logout user (clear token)
 const logout = async (req, res) => {
@@ -171,7 +185,6 @@ const verifyEmail = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 const resendOTP = async (req, res) => {
   try {
@@ -278,9 +291,6 @@ const resetPassword = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
-
 
 module.exports = {
   register,
