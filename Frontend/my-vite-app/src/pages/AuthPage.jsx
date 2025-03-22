@@ -6,7 +6,7 @@ const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState(""); 
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -34,35 +34,46 @@ const AuthPage = () => {
       <div className="flex w-3/4 my-20 bg-gray-800 bg-opacity-90 shadow-2xl rounded-lg overflow-hidden backdrop-blur-md">
         {/* Left Side - Image Section */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-8">
-          <img src="../../src/assets/login.jpg" alt="Auth Visual" className="w-full h-auto rounded-lg shadow-lg" />
+          <img
+            src="../../src/assets/login.jpg"
+            alt="Auth Visual"
+            className="w-full h-auto rounded-lg shadow-lg"
+          />
         </div>
 
         {/* Right Side - Form Section */}
         <div className="w-full md:w-1/2 p-10">
-          <h2 className="text-3xl font-bold text-center text-white mb-6">Welcome to EduHack!</h2>
+          <h2 className="text-3xl font-bold text-center text-white mb-6">
+            Welcome to EduHack!
+          </h2>
 
           {/* Toggle Buttons */}
           <div className="flex justify-center mb-6 bg-gray-700 rounded-full p-1">
             <button
-              className={`w-1/2 py-2 rounded-full text-lg font-semibold transition-colors duration-300 ${isLogin ? "bg-indigo-600 text-white" : "text-gray-300"}`}
+              className={`w-1/2 py-2 rounded-full text-lg font-semibold transition-colors duration-300 ${
+                isLogin ? "bg-indigo-600 text-white" : "text-gray-300"
+              }`}
               onClick={() => setIsLogin(true)}
             >
               Login
             </button>
             <button
-              className={`w-1/2 py-2 rounded-full text-lg font-semibold transition-colors duration-300 ${!isLogin ? "bg-indigo-600 text-white" : "text-gray-300"}`}
-              onClick={
-                () => setIsLogin(false)}
+              className={`w-1/2 py-2 rounded-full text-lg font-semibold transition-colors duration-300 ${
+                !isLogin ? "bg-indigo-600 text-white" : "text-gray-300"
+              }`}
+              onClick={() => setIsLogin(false)}
             >
               Register
             </button>
           </div>
 
           <form onSubmit={isLogin ? handleLogin : handleRegister}>
-          {!isLogin && (
+            {!isLogin && (
               <>
                 {/* First Name */}
-                <label className="block text-sm ml-2 mb-2 font-medium text-gray-300">First Name</label>
+                <label className="block text-sm ml-2 mb-2 font-medium text-gray-300">
+                  First Name
+                </label>
                 <input
                   type="text"
                   placeholder="Enter your First Name"
@@ -71,9 +82,11 @@ const AuthPage = () => {
                   className="w-full px-4 py-2 border rounded-full outline-none mb-3 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500"
                   required
                 />
-                
+
                 {/* Last Name */}
-                <label className="block text-sm ml-2 mb-2 font-medium text-gray-300">Last Name</label>
+                <label className="block text-sm ml-2 mb-2 font-medium text-gray-300">
+                  Last Name
+                </label>
                 <input
                   type="text"
                   placeholder="Enter your Last Name"
@@ -85,7 +98,9 @@ const AuthPage = () => {
               </>
             )}
             {/* Email */}
-            <label className="block text-sm ml-2 mb-2 font-medium text-gray-300">Email</label>
+            <label className="block text-sm ml-2 mb-2 font-medium text-gray-300">
+              Email
+            </label>
             <input
               type="email"
               placeholder="Enter your Email"
@@ -96,7 +111,9 @@ const AuthPage = () => {
             />
 
             {/* Password */}
-            <label className="block text-sm font-medium ml-2 mb-2 text-gray-300">Password</label>
+            <label className="block text-sm font-medium ml-2 mb-2 text-gray-300">
+              Password
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -106,7 +123,10 @@ const AuthPage = () => {
                 className="w-full px-4 py-2 border rounded-full outline-none mb-3 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500"
                 required
               />
-              <span className="absolute right-3 top-3 cursor-pointer text-gray-400" onClick={() => setShowPassword(!showPassword)}>
+              <span
+                className="absolute right-3 top-3 cursor-pointer text-gray-400"
+                onClick={() => setShowPassword(!showPassword)}
+              >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
@@ -114,7 +134,9 @@ const AuthPage = () => {
             {/* Confirm Password (only for Register) */}
             {!isLogin && (
               <>
-                <label className="block text-sm font-medium ml-2 mb-2 text-gray-300">Confirm Password</label>
+                <label className="block text-sm font-medium ml-2 mb-2 text-gray-300">
+                  Confirm Password
+                </label>
                 <div className="relative">
                   <input
                     type={showConfirmPassword ? "text" : "password"}
