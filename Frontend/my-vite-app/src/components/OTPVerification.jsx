@@ -1,9 +1,16 @@
 import React, { useState, useRef } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { verifyEmail, resendOTP } from "../apis/authapi";
+import { toast } from "react-toastify";
 
 const EmailVerification = () => {
   const navigate = useNavigate();
+  const location=useLocation();
+  const email = location.state?.email || "your email";
   const [otp, setOtp] = useState(['', '', '', '','','']);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
   const inputRefs = useRef([]);
 
   const handleChange = (e, index) => {
@@ -18,6 +25,24 @@ const EmailVerification = () => {
       inputRefs.current[index + 1].focus();
     }
   };
+  const handleVerify = async () => {
+    setErrorMessage("");
+    setLoading(true);
+    
+    try {
+      const response = await verifyEmail({ email, otp: otp.join("") });
+
+      // If OTP verification is successful
+      localStorage.setItem("teacherName", response.teacher.name);
+      localStorage.setItem("authToken", response.token);
+      toast.success("OTP verification successful!")
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error(error.error || "Invalid OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleBackspace = (e, index) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
@@ -25,8 +50,18 @@ const EmailVerification = () => {
     }
   };
 
-  const handleResend = () => {
-    console.log('Resend code requested');
+  const handleResend = async () => {
+    setErrorMessage("");
+    setResendLoading(true);
+    
+    try {
+      await resendOTP(email);
+      toast.success("A new OTP has been sent to your email.");
+    } catch (error) {
+      toast.error(error.error || "Failed to resend OTP. Try again later.");
+    } finally {
+      setResendLoading(false);
+    }
   };
 
   return (
@@ -38,7 +73,7 @@ const EmailVerification = () => {
 
         <h2 className="text-2xl font-semibold mb-4 text-center text-indigo-400">Email Verification</h2>
         <p className="text-gray-400 mb-6 text-center">
-          Enter the 6-digit verification code sent to <span className="text-indigo-300">info@koalaui.com</span>
+          Enter the 6-digit verification code sent to <span className="text-indigo-300">{email}</span>
         </p>
 
         <div className="flex justify-center space-x-4 mb-6">
@@ -55,16 +90,20 @@ const EmailVerification = () => {
             />
           ))}
         </div>
-
-        <button className="text-indigo-400 block mx-auto mb-4 hover:text-indigo-300 transition" onClick={handleResend}>
-          Resend Code
+        <button 
+          className="text-indigo-400 block mx-auto mb-4 hover:text-indigo-300 transition disabled:opacity-50" 
+          onClick={handleResend}
+          disabled={resendLoading}
+        >
+          {resendLoading ? "Resending..." : "Resend Code"}
         </button>
 
         <button
-          className="bg-indigo-600 text-white py-3 px-6 rounded-lg w-full hover:bg-indigo-500 transition"
-          onClick={() => navigate("./dashboard")}
+          className={`bg-indigo-600 text-white py-3 px-6 rounded-lg w-full hover:bg-indigo-500 transition ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+          onClick={handleVerify}
+          disabled={loading}
         >
-          Continue
+          {loading ? "Verifying..." : "Continue"}
         </button>
       </div>
     </div>
