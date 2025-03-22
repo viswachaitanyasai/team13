@@ -1,15 +1,36 @@
-import React, { useState } from "react";
-
+import React, { useState ,useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 const CreateHackathonForm = () => {
+    const navigate=useNavigate();
   const [hackathonName, setHackathonName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [duration, setDuration] = useState("");
   const [startDate, setStartDate] = useState("");
+  const [dateError, setDateError] = useState("");
+
   const [submissionDeadline, setSubmissionDeadline] = useState("");
   const [fileAttachments, setFileAttachments] = useState(null);
   const [sponsors, setSponsors] = useState("");
   const [allowMultiple, setAllowMultiple] = useState(false);
+
+  const today = new Date().toISOString().split("T")[0];
+
+  // Validate dates whenever either start date or deadline changes
+  useEffect(() => {
+    if (startDate && submissionDeadline) {
+      const start = new Date(startDate);
+      const deadline = new Date(submissionDeadline);
+      
+      if (deadline <= start) {
+        setDateError("Submission deadline must be after the start date");
+      } else {
+        setDateError("");
+      }
+    } else {
+      setDateError("");
+    }
+  }, [startDate, submissionDeadline]);
 
   const handleFileChange = (e, setFile) => {
     setFile(e.target.files[0]);
@@ -33,8 +54,8 @@ const CreateHackathonForm = () => {
 
   return (
     <div className="min-h-screen w-full p-8">
-      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-7000">Create Hackathon</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg">
+      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-700">Create a Hackathon</h2>
+      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg mb-20">
         {/* Hackathon Name */}
         <div className="space-y">
           <label className="block font-medium">Hackathon Name <span className="text-red-500">*</span></label>
@@ -57,7 +78,7 @@ const CreateHackathonForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="block font-medium">Hackathon is for <span className="text-red-500">*</span></label>
+          <label className="block font-medium">Hackathon Eligibility<span className="text-red-500">*</span></label>
           <select className="w-full p-3 border rounded-md" required>
             <option value="">Select</option>
             <option value="1st Year">1st Year</option>
@@ -84,13 +105,13 @@ const CreateHackathonForm = () => {
         {/* Start Date */}
         <div className="space-y-2">
           <label className="block font-medium">Start Date</label>
-          <input type="date" className="w-full p-3 border rounded-md" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <input type="date" className="w-full p-3 border rounded-md"value={startDate} onChange={(e) => setStartDate(e.target.value)} min={today} />
         </div>
 
         {/* Submission Deadline */}
         <div className="space-y-2">
           <label className="block font-medium">Submission Deadline</label>
-          <input type="date" className="w-full p-3 border rounded-md" value={submissionDeadline} onChange={(e) => setSubmissionDeadline(e.target.value)} />
+          <input type="date" className="w-full p-3 border rounded-md" value={submissionDeadline} onChange={(e) => setSubmissionDeadline(e.target.value)} min={startDate || today} />
         </div>
 
         {/* File Attachments */}
@@ -108,7 +129,7 @@ const CreateHackathonForm = () => {
        
         {/* Buttons */}
         <div className="col-span-2 flex justify-end gap-3 mt-4">
-          <button type="submit" className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <button onClick={()=>navigate("/create-hackathon2")}  type="submit" className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">
             Next Step
           </button>
         </div>
