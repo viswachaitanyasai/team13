@@ -13,6 +13,7 @@ const StudentSchema = new mongoose.Schema({
       "Invalid email format",
     ],
   },
+  password: { type: String, required: true, trim: true },
   grade: {
     type: String,
     required: true,
