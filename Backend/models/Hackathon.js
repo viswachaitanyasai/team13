@@ -17,6 +17,10 @@ const HackathonSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: [
+      "1st",
+      "2nd",
+      "3rd",
+      "4th",
       "5th",
       "6th",
       "7th",
@@ -27,7 +31,7 @@ const HackathonSchema = new mongoose.Schema({
       "12th",
       "UG",
       "PG",
-    ], // Restrict valid grades
+    ],
   },
   status: {
     type: String,
