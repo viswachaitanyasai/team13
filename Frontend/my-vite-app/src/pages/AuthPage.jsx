@@ -5,25 +5,33 @@ import { useNavigate } from "react-router-dom";
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState(""); 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    if (!isLogin && password !== confirmPassword) {
+    console.log("Logging in with:", email, password);
+    navigate("/dashboard");
+  };
+
+  const handleRegister = (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    console.log(`${isLogin ? "Logging in" : "Signing up"} with:`, email, password);
-    navigate("./dashboard");
+    console.log("Registering with:", firstName, lastName, email, password);
+    navigate("/otp-verification");
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-indigo-900">
-      <div className="flex w-3/4 bg-gray-800 bg-opacity-90 shadow-2xl rounded-lg overflow-hidden backdrop-blur-md">
+    <div className="flex h-full items-center justify-center bg-gradient-to-br from-gray-900 to-indigo-900">
+      <div className="flex w-3/4 my-20 bg-gray-800 bg-opacity-90 shadow-2xl rounded-lg overflow-hidden backdrop-blur-md">
         {/* Left Side - Image Section */}
         <div className="hidden md:flex w-1/2 items-center justify-center p-8">
           <img src="../../src/assets/login.jpg" alt="Auth Visual" className="w-full h-auto rounded-lg shadow-lg" />
@@ -50,7 +58,32 @@ const AuthPage = () => {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={isLogin ? handleLogin : handleRegister}>
+          {!isLogin && (
+              <>
+                {/* First Name */}
+                <label className="block text-sm ml-2 mb-2 font-medium text-gray-300">First Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter your First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-full outline-none mb-3 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+                
+                {/* Last Name */}
+                <label className="block text-sm ml-2 mb-2 font-medium text-gray-300">Last Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter your Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className="w-full px-4 py-2 border rounded-full outline-none mb-3 bg-gray-900 text-white focus:ring-2 focus:ring-indigo-500"
+                  required
+                />
+              </>
+            )}
             {/* Email */}
             <label className="block text-sm ml-2 mb-2 font-medium text-gray-300">Email</label>
             <input

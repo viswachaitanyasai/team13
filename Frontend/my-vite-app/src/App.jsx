@@ -6,12 +6,14 @@ import { Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
 import ErrorBoundary from './pages/ErrorBoundary';
 import TeacherLogin from './pages/TeacherLogin';
-import TeacherDashboard from './pages/TeacherDashboard';
+import DashboardPage from './pages/TeacherDashboard';
 import OTPVerification from './components/OTPVerification';
 import Profile from './pages/Profile';
 import AuthPage from './pages/AuthPage';
 import CreateHackathon from './pages/CreateHackathon';
-
+import Layout from './components/layouts/layout';
+import CreateHackathonForm2 from './components/CreateHackathonForm2';
+import AboutHackathons from './components/AboutHackathons';
 
 function App() {
   return (
@@ -19,11 +21,15 @@ function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/teacher-login" element={<AuthPage/>} />
-      <Route path="/teacher-login/dashboard" element={<TeacherDashboard/>} />
-      <Route path="/teacher-login/otp-verification/dashboard" element={<TeacherDashboard/>} />
-      <Route path="/teacher-login/dashboard/create-hackathon" element={<CreateHackathon/>} />
-      <Route path="/teacher-login/otp-verification" element={<OTPVerification/>} />
-      <Route path="/teacher-login/otp-verification/dashboard/profile" element={<Profile/>} />
+      <Route element={<Layout />}>
+          <Route path="/dashboard" element={<DashboardPage/>} />
+          <Route path="/create-hackathon" element={<CreateHackathon/>} />
+          <Route path="/create-hackathon2" element={<CreateHackathonForm2/>} />
+          <Route path="/profile" element={<Profile/>} />
+          <Route path="/hackathons" element={<AboutHackathons/>} />
+        </Route>
+    
+      <Route path="/otp-verification" element={<OTPVerification/>} />
     </Routes>
     </ErrorBoundary>
   )

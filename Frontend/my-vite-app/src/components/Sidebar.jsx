@@ -1,61 +1,68 @@
 import React, { useState } from "react";
-import { FaHome, FaTrophy, FaPlus } from "react-icons/fa";
+import { FaHome, FaTrophy, FaPlus, FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 function Sidebar({ onDashboardClick, onShowHackathonsClick }) {
   const [active, setActive] = useState("dashboard");
+  const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
-  const handleItemClick = (item, callback) => {
+  const handleItemClick = (item, path) => {
     setActive(item);
-    callback();
+    navigate(path);
+    setIsOpen(false); // Close sidebar on mobile
   };
-
   return (
-    <aside className="h-screen w-64 bg-gray-900 text-white shadow-lg flex flex-col justify-between border-r border-gray-800">
-      <div className="flex flex-col items-center py-6">
-        <img
-          src="https://d51e583nnuf2e.cloudfront.net/Frontend/assets/img/logo-in-circle.svg"
-          alt="Company Logo"
-          className="h-16 w-16 drop-shadow-lg"
-        />
-        <h2 className="mt-2 text-lg font-semibold text-indigo-400">Teacher Dashboard</h2>
-      </div>
+    <>
+      {/* Sidebar Toggle Button for Mobile */}
+      <button
+        className="lg:hidden fixed bottom-4 right-4 bg-indigo-600 p-2 rounded-md text-white shadow-md z-50"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <FaBars className="text-xl" />
+      </button>
 
-      {/* Navigation Items */}
-      <ul className="flex-grow px-4">
-        <li>
-          <button
-            onClick={() => handleItemClick("dashboard", onDashboardClick)}
-            className={`flex items-center w-full p-3 rounded-lg transition-all ${
-              active === "dashboard" ? "bg-indigo-500 text-white" : "text-gray-300 hover:bg-gray-800"
-            }`}
-          >
-            <FaHome className="mr-3" /> Dashboard
-          </button>
-        </li>
-        <li>
-          <button
-            onClick={() => handleItemClick("hackathons", onShowHackathonsClick)}
-            className={`flex items-center w-full p-3 rounded-lg transition-all ${
-              active === "hackathons" ? "bg-indigo-500 text-white" : "text-gray-300 hover:bg-gray-800"
-            }`}
-          >
-            <FaTrophy className="mr-3" /> Show Hackathons
-          </button>
-        </li>
-      </ul>
+      {/* Sidebar */}
+      <aside
+        className={`h-full pt-20 sm:w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl flex flex-col justify-between border-r border-gray-700 fixed left-0 top-0 transition-transform transform lg:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:flex-col`}
+      >
+        {/* Navigation Items */}
+        <ul className="flex-grow px-4">
+          <li>
+            <button
+              onClick={() => handleItemClick("dashboard", onDashboardClick)}
+              className={`flex items-center w-full p-3 rounded-lg transition-all font-medium text-sm ${
+                active === "dashboard" ? "bg-indigo-500 text-white shadow-md" : "text-gray-300 hover:bg-gray-700"
+              }`}
+            >
+              <FaHome className="mr-3 text-base" /> Dashboard
+            </button>
+          </li>
+          <li>
+            <button
+               onClick={() => handleItemClick("hackathons", "/hackathons")}
+               className={`flex items-center w-full p-3 rounded-lg transition-all font-medium text-sm ${
+                 active === "hackathons"
+                   ? "bg-indigo-500 text-white shadow-md"
+                   : "text-gray-300 hover:bg-gray-700"
+               }`}
+            >
+              <FaTrophy className="mr-3 text-base" /> Show Hackathons
+            </button>
+          </li>
+        </ul>
 
-      {/* Create Hackathon Button */}
-      <div className="px-4 pb-6">
-        <button
-          onClick={() => navigate("./create-hackathon")}
-          className="flex items-center justify-center w-full p-3 text-lg bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-md"
-        >
-          <FaPlus className="mr-2" /> Create Hackathon
-        </button>
-      </div>
-    </aside>
+        {/* Create Hackathon Button */}
+        <div className="px-4 pb-6">
+          <button
+            onClick={() => navigate("/create-hackathon")}
+            className="flex items-center justify-center w-full p-3 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-md font-semibold"
+          >
+            <FaPlus className="mr-2 text-base" /> Create Hackathon
+          </button>
+        </div>
+      </aside>
+    </>
   );
 }
 
