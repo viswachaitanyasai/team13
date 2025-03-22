@@ -12,7 +12,7 @@ function Navbar({ teacherName }) {
   };
 
   return (
-    <nav className="flex sticky items-center justify-between p-4 bg-[#4c3c3c] bg-opacity-20 backdrop-blur-lg border border-gray-700 shadow-xl w-full ">
+    <nav className="flex items-center justify-between p-4 bg-[#4c3c3c] bg-opacity-20 backdrop-blur-lg border border-gray-700 shadow-xl w-full ">
       {/* Logo & Title */}
       <div className="flex items-center">
         <img
