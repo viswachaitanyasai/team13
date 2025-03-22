@@ -4,22 +4,40 @@ const HackathonSchema = new mongoose.Schema({
   teacher_id: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
   title: { type: String, required: true },
   description: { type: String, required: true },
-  judging_parameters: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "JudgingParameter" },
-  ],
-  image_url: { type: String }, // URL for the hackathon poster
-  file_attachment_url: { type: String }, // URL for terms & conditions file
+  image_url: { type: String },
+  file_attachment_url: { type: String },
   start_date: { type: Date, required: true },
   end_date: { type: Date, required: true },
-  sponsors: [{ type: String }], // List of sponsor names
-  is_public: { type: Boolean, default: true }, // Public or Private Hackathon
-  passkey: { type: String, select: false }, // Hashed passkey (Only for private hackathons)
+  sponsors: [{ type: String }],
+  allow_multiple_solutions: { type: Boolean, default: false },
+  is_public: { type: Boolean, default: true },
+  passkey: { type: String, select: false },
+  invite_code: { type: String, unique: true, required: true },
+  grade: {
+    type: String,
+    required: true,
+    enum: [
+      "5th",
+      "6th",
+      "7th",
+      "8th",
+      "9th",
+      "10th",
+      "11th",
+      "12th",
+      "UG",
+      "PG",
+    ], // Restrict valid grades
+  },
   status: {
     type: String,
     enum: ["upcoming", "ongoing", "completed"],
     default: "upcoming",
   },
-  allow_multiple_solutions: { type: Boolean, default: false },
+  judging_parameters: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "JudgingParameter" },
+  ],
+  participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });
