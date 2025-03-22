@@ -425,5 +425,5 @@ module.exports = {
   editHackathon,
   removeHackathon,
   getHackathonsByTeacher,
-  joinHackathon,
+  
 };

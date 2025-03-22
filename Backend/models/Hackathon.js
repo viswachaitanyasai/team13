@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const HackathonSchema = new mongoose.Schema({
   teacher_id: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
   title: { type: String, required: true },
