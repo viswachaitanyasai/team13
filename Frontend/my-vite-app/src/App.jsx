@@ -11,6 +11,8 @@ import Profile from './pages/Profile';
 import AuthPage from './pages/AuthPage';
 import CreateHackathon from './pages/CreateHackathon';
 import Layout from './components/layouts/layout';
+import CreateHackathonForm2 from './components/CreateHackathonForm2';
+import AboutHackathons from './components/AboutHackathons';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -26,7 +28,9 @@ function App() {
       <Route element={<Layout />}>
           <Route path="/dashboard" element={<DashboardPage/>} />
           <Route path="/create-hackathon" element={<CreateHackathon/>} />
+          <Route path="/create-hackathon2" element={<CreateHackathonForm2/>} />
           <Route path="/profile" element={<Profile/>} />
+          <Route path="/hackathons" element={<AboutHackathons/>} />
         </Route>
     
       <Route path="/otp-verification" element={<OTPVerification/>} />
