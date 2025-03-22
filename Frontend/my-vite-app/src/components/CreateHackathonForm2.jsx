@@ -1,36 +1,17 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-const CreateHackathonForm = () => {
+
+const CreateHackathonForm2 = () => {
     const navigate=useNavigate();
   const [hackathonName, setHackathonName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState(null);
   const [duration, setDuration] = useState("");
   const [startDate, setStartDate] = useState("");
-  const [dateError, setDateError] = useState("");
-
   const [submissionDeadline, setSubmissionDeadline] = useState("");
   const [fileAttachments, setFileAttachments] = useState(null);
-  const [sponsors, setSponsors] = useState("");
-  const [allowMultiple, setAllowMultiple] = useState(false);
-
-  const today = new Date().toISOString().split("T")[0];
-
-  // Validate dates whenever either start date or deadline changes
-  useEffect(() => {
-    if (startDate && submissionDeadline) {
-      const start = new Date(startDate);
-      const deadline = new Date(submissionDeadline);
-      
-      if (deadline <= start) {
-        setDateError("Submission deadline must be after the start date");
-      } else {
-        setDateError("");
-      }
-    } else {
-      setDateError("");
-    }
-  }, [startDate, submissionDeadline]);
+//   const [sponsors, setSponsors] = useState("");
+//   const [allowMultiple, setAllowMultiple] = useState(false);
 
   const handleFileChange = (e, setFile) => {
     setFile(e.target.files[0]);
@@ -54,7 +35,7 @@ const CreateHackathonForm = () => {
 
   return (
     <div className="min-h-screen w-full p-8">
-      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-7000">Create Hackathon</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-7000">Choose Parameter</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg">
         {/* Hackathon Name */}
         <div className="space-y">
@@ -78,7 +59,7 @@ const CreateHackathonForm = () => {
         </div>
 
         <div className="space-y-2">
-          <label className="block font-medium">Hackathon Eligibility<span className="text-red-500">*</span></label>
+          <label className="block font-medium">Hackathon is for <span className="text-red-500">*</span></label>
           <select className="w-full p-3 border rounded-md" required>
             <option value="">Select</option>
             <option value="1st Year">1st Year</option>
@@ -95,23 +76,16 @@ const CreateHackathonForm = () => {
           <label className="block font-medium">Relevant Files(If Any)</label>
           <input type="file" onChange={(e) => handleFileChange(e, setImage)} className="p-2 border rounded-md" />
         </div>
-
-        {/* Duration */}
-        {/* <div className="space-y-2">
-          <label className="block font-medium">Duration</label>
-          <input type="text" className="w-full p-3 border rounded-md" placeholder="Enter duration (e.g., 48 hours)" value={duration} onChange={(e) => setDuration(e.target.value)} />
-        </div> */}
-
         {/* Start Date */}
         <div className="space-y-2">
           <label className="block font-medium">Start Date</label>
-          <input type="date" className="w-full p-3 border rounded-md"value={startDate} onChange={(e) => setStartDate(e.target.value)} min={today} />
+          <input type="date" className="w-full p-3 border rounded-md" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         </div>
 
         {/* Submission Deadline */}
         <div className="space-y-2">
           <label className="block font-medium">Submission Deadline</label>
-          <input type="date" className="w-full p-3 border rounded-md" value={submissionDeadline} onChange={(e) => setSubmissionDeadline(e.target.value)} min={startDate || today} />
+          <input type="date" className="w-full p-3 border rounded-md" value={submissionDeadline} onChange={(e) => setSubmissionDeadline(e.target.value)} />
         </div>
 
         {/* File Attachments */}
@@ -138,4 +112,4 @@ const CreateHackathonForm = () => {
   );
 };
 
-export default CreateHackathonForm;
+export default CreateHackathonForm2;
