@@ -102,10 +102,12 @@ const login = async (req, res) => {
     const token = generateToken(teacher._id);
 
     // Set token in HTTP-only cookie (7 days)
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // ✅ Always true in production (requires HTTPS)
-      sameSite: "None", // ✅ Needed for cross-origin cookies
+      secure: isProduction, // ✅ Secure only in production (HTTPS required)
+      sameSite: isProduction ? "None" : "Lax", // ✅ None for cross-origin, Lax for same-origin (dev)
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -175,10 +177,12 @@ const verifyEmail = async (req, res) => {
     const token = generateToken(teacher._id);
 
     // Set token in HTTP-only cookie
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // ✅ Always true in production (requires HTTPS)
-      sameSite: "None", // ✅ Needed for cross-origin cookies
+      secure: isProduction, // ✅ Secure only in production (HTTPS required)
+      sameSite: isProduction ? "None" : "Lax", // ✅ None for cross-origin, Lax for same-origin (dev)
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
