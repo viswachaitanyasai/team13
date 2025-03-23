@@ -15,9 +15,10 @@ const app = express();
 
 // ✅ Dynamic Allowed Origins (Works for both development & production)
 const allowedOrigins = [
-  process.env.FRONTEND_URL || "http://localhost:5173",
+  "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
+  "https://eduhack.vercel.app"
 ];
 
 // ✅ CORS Configuration
