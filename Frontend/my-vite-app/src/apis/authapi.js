@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API_BASE_URL = "https://team13-aajv.onrender.com/api/auth";
 
+
 // 📌 Register a New User
 export const registerUser = async (userData) => {
   try {
@@ -15,7 +16,12 @@ export const registerUser = async (userData) => {
 // 📌 Verify Email (OTP Verification)
 export const verifyEmail = async (otpData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/verify-email`, otpData);
+    const response = await axios.post(`${API_BASE_URL}/verify-email`, otpData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     return response.data;
   } catch (error) {
     throw error.response?.data || { error: "Email verification failed." };
@@ -38,7 +44,11 @@ export const resendOTP = async (email) => {
 export const loginUser = async (credentials) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/login`, credentials, {
-      withCredentials: true, // Include credentials (cookies)
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // Include credentials (cookies)
     });
     console.log(response.data);
     return response.data;

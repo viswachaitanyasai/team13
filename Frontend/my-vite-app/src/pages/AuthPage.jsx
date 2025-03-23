@@ -53,13 +53,21 @@ const AuthPage = () => {
     setLoading(true);
     try {
       const response = await loginUser({ email, password });
+      console.log("Login Response:", response); 
+      if (!response.cookie) {
+        toast.error("Invalid response from server.");
+        return;
+      }
+
 
       if (!response.teacher.isVerified) {
         toast.error("Email not verified. Please verify your email.");
         return;
       }
       localStorage.setItem("teacherName", response.teacher.name);
-      localStorage.setItem("authToken", response.token);
+      localStorage.setItem("teacherId", response.teacher.id);
+      localStorage.setItem("authToken", response.cookie);
+      console.log("Token Stored:", localStorage.getItem("authToken")); 
       localStorage.setItem("userEmail", email);
       if (rememberMe) {
         localStorage.setItem("rememberedEmail", email);
@@ -73,8 +81,9 @@ const AuthPage = () => {
       toast.success("Login successful!");
       navigate("/dashboard");
     } catch (error) {
-      toast.error(error.error || "Login failed. Please try again.");
-    } finally {
+      console.error("Login Error:", error);
+      toast.error(error.response?.data?.error || "Login failed. Please try again.");
+    }  finally {
       setLoading(false);
     }
   };
