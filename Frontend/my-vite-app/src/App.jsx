@@ -18,6 +18,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Statistics from "./components/Statistics";
 import ViewSubmissions from "./pages/ViewSubmissions";
 import ViewEvaluation from "./pages/viewEvaluation";
+import SecuredRoute from "./components/SecuredRoute";
 function App() {
   return (
     <>
@@ -27,6 +28,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/teacher-login" element={<AuthPage />} />
+          <Route path="/otp-verification" element={<OTPVerification />} />
+
+          <Route element={<SecuredRoute />}>
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/create-hackathon" element={<CreateHackathon />} />
@@ -37,11 +41,11 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/hackathons" element={<AboutHackathons />} />
             <Route path="/statistics" element={<Statistics />} />
-            <Route path="/submission" element={<ViewSubmissions />} />
+            {/* <Route path="/submission" element={<ViewSubmissions />} /> */}
+            <Route path="/submission/:hackathonId" element={<ViewSubmissions />} />
             <Route path="/evaluation" element={<ViewEvaluation />} />
           </Route>
-
-          <Route path="/otp-verification" element={<OTPVerification />} />
+          </Route>
         </Routes>
       </ErrorBoundary>
     </>
