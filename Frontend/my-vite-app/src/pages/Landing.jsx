@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "../components/Header";
 import Carousal from "../components/Carousal";
-import Promotion from "../components/promotion";
+import Promotion from "../components/Promotion";
 import Footer from "../components/Footer";
 // import FeedbackForm from "../components/FeedBack";
 import FeaturesSection from "../components/Features";

@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createHackathon } from "../apis/hackathonapi"; 
+import { createHackathon } from "../apis/hackathonapi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const CreateHackathonForm2 = () => {
   const navigate = useNavigate();
-  const suggestedParameters = ["Innovation", "Complexity", "Technical Skill", "Presentation"];
+  const suggestedParameters = [
+    "Innovation",
+    "Complexity",
+    "Technical Skill",
+    "Presentation",
+  ];
   const [selectedParameters, setSelectedParameters] = useState([]);
   const [otherParameter, setOtherParameter] = useState("");
   const [showOtherInput, setShowOtherInput] = useState(false);
@@ -14,7 +19,6 @@ const CreateHackathonForm2 = () => {
   const [passKey, setPassKey] = useState("");
   const [grade, setGrade] = useState(localStorage.getItem("eligibility") || "");
   const teacherId = localStorage.getItem("teacherId");
-  
 
   const handleSelectChange = (e) => {
     const value = e.target.value;
@@ -39,7 +43,7 @@ const CreateHackathonForm2 = () => {
     setSelectedParameters(selectedParameters.filter((p) => p !== param));
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (selectedParameters.length === 0) {
       toast.error("Please select at least one evaluation parameter.");
@@ -68,27 +72,35 @@ const CreateHackathonForm2 = () => {
     const submissionDeadline = localStorage.getItem("submissionDeadline");
     const fileAttachment = localStorage.getItem("fileAttachmentUrl") || "";
 
-    if (!hackathonName || !description || !startDate || !submissionDeadline || !grade) {
+    if (
+      !hackathonName ||
+      !description ||
+      !startDate ||
+      !submissionDeadline ||
+      !grade
+    ) {
       toast.error("All fields are required before submitting.");
       return;
     }
-  
-    
+
     const formData = {
-        title: hackathonName,
-        description: description,
-        image_url: "",
-        file_attachment_url: "", // Upload file first to get the URL
-        start_date: startDate,
-        end_date: submissionDeadline,
-        sponsors: [], // Add sponsors if needed
-        allow_multiple_solutions: false,
-        is_public: hackathonType === "Public",
-        passkey: hackathonType === "Private" ? passKey : null,
-        grade: grade, // Match API field
-        judging_parameters: selectedParameters.map(param => ({ name: param, weightage: 10 })) // Default weightage
-      };
-      try{
+      title: hackathonName,
+      description: description,
+      image_url: "",
+      file_attachment_url: "", // Upload file first to get the URL
+      start_date: startDate,
+      end_date: submissionDeadline,
+      sponsors: [], // Add sponsors if needed
+      allow_multiple_solutions: false,
+      is_public: hackathonType === "Public",
+      passkey: hackathonType === "Private" ? passKey : null,
+      grade: grade, // Match API field
+      judging_parameters: selectedParameters.map((param) => ({
+        name: param,
+        weightage: 10,
+      })), // Default weightage
+    };
+    try {
       const response = await createHackathon(formData);
       toast.success("Hackathon created successfully!");
       console.log("Hackathon Created:", response);
@@ -101,8 +113,13 @@ const CreateHackathonForm2 = () => {
 
   return (
     <div className="min-h-screen w-full p-8">
-      <h2 className="text-3xl font-extrabold text-center mb-8 text-blue-800 transition-all duration-500 hover:text-blue-600">Select Hackathon Parameters</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg">
+      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-700">
+        Select Hackathon Parameters
+      </h2>
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg"
+      >
         {/* Hackathon Type Toggle */}
         <div className="space-y-2 col-span-2">
           <label className="block font-medium">Hackathon Type</label>
@@ -114,7 +131,9 @@ const CreateHackathonForm2 = () => {
                 className="sr-only peer"
                 checked={hackathonType === "Private"}
                 onChange={() =>
-                  setHackathonType(hackathonType === "Public" ? "Private" : "Public")
+                  setHackathonType(
+                    hackathonType === "Public" ? "Private" : "Public"
+                  )
                 }
               />
               <div className="w-14 h-7 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 peer-checked:after:translate-x-7 after:content-[''] after:absolute after:w-6 after:h-6 after:bg-white after:rounded-full after:transition-all"></div>
@@ -141,7 +160,11 @@ const CreateHackathonForm2 = () => {
         {/* Select Parameters */}
         <div className="space-y-2 col-span-2">
           <label className="block font-medium">Select Parameters</label>
-          <select className="w-full p-3 border rounded-md" onChange={handleSelectChange} defaultValue="">
+          <select
+            className="w-full p-3 border rounded-md"
+            onChange={handleSelectChange}
+            defaultValue=""
+          >
             <option value="" disabled selected>
               Choose a parameter
             </option>
@@ -207,7 +230,10 @@ const CreateHackathonForm2 = () => {
           >
             Prev
           </button>
-          <button type="submit" className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <button
+            type="submit"
+            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
             Submit
           </button>
         </div>
