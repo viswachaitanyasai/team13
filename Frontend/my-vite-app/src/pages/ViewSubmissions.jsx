@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"; 
 import * as Dialog from "@radix-ui/react-dialog";
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Bar,
