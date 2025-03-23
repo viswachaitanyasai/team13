@@ -50,7 +50,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/hackathons", hackathonRoutes);
 app.use("/api/submissions", gradingRoutes);
 app.use("/api/analytics", analyticsRoutes);
-app.use("/api/uploads", uploadRoutes); // Updated endpoint to be explicit
+app.use("/api/files", uploadRoutes);
 
 // ✅ Start Server
 const PORT = process.env.PORT || 4000;
