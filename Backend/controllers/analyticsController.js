@@ -29,7 +29,6 @@ const getHackathonStats = async (req, res) => {
   }
 };
 
-// 📌 2️⃣ Get Student Registrations (Past Week, Month, Year)
 const getStudentRegistrations = async (req, res) => {
   try {
     const teacher_id = req.user.id;

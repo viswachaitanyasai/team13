@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Trophy, Lightbulb, Users } from "lucide-react";
 import UpcomingHackathons from './UpcomingHackathons';
 import PastHackathons from "./PastHackathons";
-// import UpcomingHackathons from './UpcomingHackathons';
+import OngoingHackathons from "./OngoingHackathons";
 
 
-const AboutHackathons = () => {
+const AboutHackathons = () => { 
   const [activeSection, setActiveSection] = useState('past');
 
   return (
@@ -69,32 +69,34 @@ const AboutHackathons = () => {
         {/* Buttons */}
         <div className="flex justify-center flex-wrap gap-6 mb-16">
           {[
-            "Past Hackathons",
-            "Ongoing Hackathons",
-            "Upcoming Hackathons",
-            "Host an Event",
-          ].map((label, index) => (
+            { label: "Past Hackathons", value: "past" },
+            { label: "Ongoing Hackathons", value: "ongoing" },
+            { label: "Upcoming Hackathons", value: "upcoming" },
+          ].map((button, index) => (
             <button
               key={index}
+              onClick={() => setActiveSection(button.value)}
               className={`px-8 py-3 rounded-lg font-medium transition-colors duration-200 text-lg shadow-lg ${
-                index === 3
+                button.value === activeSection
+                  ? "bg-indigo-700 text-white"
+                  : index === 3
                   ? "bg-gray-700 hover:bg-gray-600"
-                  : "bg-indigo-600 hover:bg-indigo-700"
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
               }`}
             >
-              {label}
+              {button.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Display Selected Section */}
-      <div className="mt-6">
-        {activeSection === 'past' && <PastHackathons />}
-        {/* {activeSection === 'ongoing' && <OngoingHackathons />} */}
-        {activeSection === 'upcoming' && <UpcomingHackathons />}
+     {/* Display Selected Section */}
+     <div className="mt-6">
+        {activeSection === "past" && <PastHackathons />}
+        {activeSection === "ongoing" && <OngoingHackathons />}
+        {activeSection === "upcoming" && <UpcomingHackathons />}
       </div>
-    </div>
+    </div> 
   );
 };
 

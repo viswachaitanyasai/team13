@@ -1,7 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const HackathonCard = ({ event }) => {
+  const navigate = useNavigate();
+
   if (!event) return null;
+
+  const handleViewSubmissions = () => {
+    navigate(`/submission/${event._id}`);
+  };
 
   return (
     <div className="mb-10 ">
@@ -40,7 +47,10 @@ const HackathonCard = ({ event }) => {
               Participants: {event.stats?.participants ?? 0}
             </span>
           </div>
-          <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors duration-200">
+          <button
+            onClick={handleViewSubmissions}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+          >
             View Submissions
           </button>
         </div>

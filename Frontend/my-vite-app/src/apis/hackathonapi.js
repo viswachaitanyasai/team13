@@ -18,6 +18,7 @@ export const createHackathon = async (hackathonData, navigate) => {
     const response = await axios.post(`${API_BASE_URL}/`, hackathonData, {
       headers: { 
         "Authorization": `Bearer ${token}` },
+
     });
     return response.data;
   } catch (error) {
