@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { createHackathon } from "../apis/hackathonapi"; 
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const ParameterSelection = () => {
+const CreateHackathonForm2 = () => {
   const navigate = useNavigate();
   const suggestedParameters = ["Innovation", "Complexity", "Technical Skill", "Presentation"];
   const [selectedParameters, setSelectedParameters] = useState([]);
@@ -9,12 +12,15 @@ const ParameterSelection = () => {
   const [showOtherInput, setShowOtherInput] = useState(false);
   const [hackathonType, setHackathonType] = useState("Public");
   const [passKey, setPassKey] = useState("");
+  const [grade, setGrade] = useState(localStorage.getItem("eligibility") || "");
+  const teacherId = localStorage.getItem("teacherId");
+  
 
   const handleSelectChange = (e) => {
     const value = e.target.value;
     if (value === "Other") {
       setShowOtherInput(true);
-    } else if (!selectedParameters.includes(value)) {
+    } else if (!selectedParameters.includes(value) && value !== "") {
       setSelectedParameters([...selectedParameters, value]);
     }
   };
@@ -24,6 +30,8 @@ const ParameterSelection = () => {
       setSelectedParameters([...selectedParameters, otherParameter.trim()]);
       setOtherParameter("");
       setShowOtherInput(false);
+    } else {
+      toast.error("Please enter a parameter before adding.");
     }
   };
 
@@ -31,9 +39,64 @@ const ParameterSelection = () => {
     setSelectedParameters(selectedParameters.filter((p) => p !== param));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log("Form Submitted with Parameters:", selectedParameters, hackathonType, passKey);
+    if (selectedParameters.length === 0) {
+      toast.error("Please select at least one evaluation parameter.");
+      return;
+    }
+
+    if (!grade) {
+      toast.error("Please select a grade restriction.");
+      return;
+    }
+
+    if (hackathonType === "Private" && !passKey.trim()) {
+      toast.error("Passkey is required for Private Hackathons.");
+      return;
+    }
+    // if (!teacherId) {
+    //   toast.error("Authentication error. Please log in again.");
+    //   return;
+    // }
+
+    const hackathonName = localStorage.getItem("hackathonName");
+    const description = localStorage.getItem("description");
+    const problemStatement = localStorage.getItem("problemStatement");
+    const context = localStorage.getItem("context");
+    const startDate = localStorage.getItem("startDate");
+    const submissionDeadline = localStorage.getItem("submissionDeadline");
+    const fileAttachment = localStorage.getItem("fileAttachmentUrl") || "";
+
+    if (!hackathonName || !description || !startDate || !submissionDeadline || !grade) {
+      toast.error("All fields are required before submitting.");
+      return;
+    }
+  
+    
+    const formData = {
+        title: hackathonName,
+        description: description,
+        image_url: "",
+        file_attachment_url: "", // Upload file first to get the URL
+        start_date: startDate,
+        end_date: submissionDeadline,
+        sponsors: [], // Add sponsors if needed
+        allow_multiple_solutions: false,
+        is_public: hackathonType === "Public",
+        passkey: hackathonType === "Private" ? passKey : null,
+        grade: grade, // Match API field
+        judging_parameters: selectedParameters.map(param => ({ name: param, weightage: 10 })) // Default weightage
+      };
+      try{
+      const response = await createHackathon(formData);
+      toast.success("Hackathon created successfully!");
+      console.log("Hackathon Created:", response);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Hackathon Creation Error:", error);
+      toast.error(error.error || "Failed to create hackathon.");
+    }
   };
 
   return (
@@ -78,7 +141,7 @@ const ParameterSelection = () => {
         {/* Select Parameters */}
         <div className="space-y-2 col-span-2">
           <label className="block font-medium">Select Parameters</label>
-          <select className="w-full p-3 border rounded-md" onChange={handleSelectChange}>
+          <select className="w-full p-3 border rounded-md" onChange={handleSelectChange} defaultValue="">
             <option value="" disabled selected>
               Choose a parameter
             </option>
@@ -153,4 +216,4 @@ const ParameterSelection = () => {
   );
 };
 
-export default ParameterSelection;
+export default CreateHackathonForm2;

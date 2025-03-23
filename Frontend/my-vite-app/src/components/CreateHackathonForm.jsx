@@ -1,18 +1,31 @@
-import React, { useState ,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { createHackathon } from "../apis/hackathonapi";
+
 const CreateHackathonForm = () => {
-    const navigate=useNavigate();
+  const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+
+  // Step 1 State
   const [hackathonName, setHackathonName] = useState("");
   const [description, setDescription] = useState("");
-  const [image, setImage] = useState(null);
-  const [duration, setDuration] = useState("");
+  const [problemStatement, setProblemStatement] = useState("");
+  const [context, setContext] = useState("");
+  const [eligibility, setEligibility] = useState("");
   const [startDate, setStartDate] = useState("");
-  const [dateError, setDateError] = useState("");
-
   const [submissionDeadline, setSubmissionDeadline] = useState("");
   const [fileAttachments, setFileAttachments] = useState(null);
-  const [sponsors, setSponsors] = useState("");
-  const [allowMultiple, setAllowMultiple] = useState(false);
+  const [dateError, setDateError] = useState("");
+
+  // Step 2 State
+  const suggestedParameters = ["Innovation", "Complexity", "Technical Skill", "Presentation"];
+  const [selectedParameters, setSelectedParameters] = useState([]);
+  const [otherParameter, setOtherParameter] = useState("");
+  const [showOtherInput, setShowOtherInput] = useState(false);
+  const [hackathonType, setHackathonType] = useState("Public");
+  const [passKey, setPassKey] = useState("");
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -21,9 +34,9 @@ const CreateHackathonForm = () => {
     if (startDate && submissionDeadline) {
       const start = new Date(startDate);
       const deadline = new Date(submissionDeadline);
-      
+
       if (deadline <= start) {
-        setDateError("Submission deadline must be after the start date");
+        toast.error("Submission deadline must be after the start date");
       } else {
         setDateError("");
       }
@@ -36,104 +49,343 @@ const CreateHackathonForm = () => {
     setFile(e.target.files[0]);
   };
 
-  const handleSubmit = (e) => {
+  const handleNextStep = (e) => {
     e.preventDefault();
+
+    if (!hackathonName.trim()) {
+      toast.error("Please fill out hackathon name");
+      return;
+    }
+    if (!description.trim()) {
+      toast.error("Please fill out description.");
+      return;
+    }
+    if (!eligibility) {
+      toast.error("Please mention eligibility.");
+      return;
+    }
+    if (!startDate) {
+      toast.error("Please specify start date.");
+      return;
+    }
+    if (!submissionDeadline) {
+      toast.error("Please specify end date.");
+      return;
+    }
+    if (dateError) {
+      toast.error(dateError);
+      return;
+    }
+
+    setStep(2);
+  };
+
+  const handleSelectChange = (e) => {
+    const value = e.target.value;
+    if (value === "Other") {
+      setShowOtherInput(true);
+    } else if (!selectedParameters.includes(value) && value !== "") {
+      setSelectedParameters([...selectedParameters, value]);
+    }
+  };
+
+  const handleAddOtherParameter = () => {
+    if (otherParameter.trim() !== "") {
+      setSelectedParameters([...selectedParameters, otherParameter.trim()]);
+      setOtherParameter("");
+      setShowOtherInput(false);
+    } else {
+      toast.error("Please enter a parameter before adding.");
+    }
+  };
+
+  const handleRemoveParameter = (param) => {
+    setSelectedParameters(selectedParameters.filter((p) => p !== param));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (selectedParameters.length === 0) {
+      toast.error("Please select at least one evaluation parameter.");
+      return;
+    }
+
+    if (hackathonType === "Private" && !passKey.trim()) {
+      toast.error("Passkey is required for Private Hackathons.");
+      return;
+    }
+
     const formData = {
-      hackathonName,
-      description,
-      image,
-      duration,
-      startDate,
-      submissionDeadline,
-      fileAttachments,
-      sponsors,
-      allowMultiple,
+      title: hackathonName,
+      description: description,
+      image_url: "",
+      file_attachment_url: "", // Upload file first to get the URL
+      start_date: startDate,
+      end_date: submissionDeadline,
+      sponsors: [], // Add sponsors if needed
+      allow_multiple_solutions: false,
+      is_public: hackathonType === "Public",
+      passkey: hackathonType === "Private" ? passKey : null,
+      grade: eligibility,
+      judging_parameters: selectedParameters, // Default weightage
     };
-    console.log("Form Submitted:", formData);
+
+    try {
+      const response = await createHackathon(formData);
+      toast.success("Hackathon created successfully!");
+      console.log("Hackathon Created:", response);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Hackathon Creation Error:", error);
+      toast.error(error.error || "Failed to create hackathon.");
+    }
   };
 
   return (
     <div className="min-h-screen w-full p-8">
-      <h2 className="text-3xl font-extrabold text-center mb-8 text-blue-800 transition-all duration-500 hover:text-blue-600">Create a Hackathon</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg mb-20">
-        {/* Hackathon Name */}
-        <div className="space-y">
-          <label className="block font-medium">Hackathon Name <span className="text-red-500">*</span></label>
-          <input type="text" className="w-full p-3 border rounded-md" placeholder="Enter Hackathon name" value={hackathonName} onChange={(e) => setHackathonName(e.target.value)} required />
-        </div>
+      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-700">
+        {step === 1 ? "Create a Hackathon" : "Select Hackathon Parameters"}
+      </h2>
+      {step === 1 ? (
+        <form onSubmit={handleNextStep} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg mb-20">
+          {/* Hackathon Name */}
+          <div className="space-y">
+            <label className="block font-medium">
+              Hackathon Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              className="w-full p-3 border rounded-md"
+              placeholder="Enter Hackathon name"
+              value={hackathonName}
+              onChange={(e) => setHackathonName(e.target.value)}
+            />
+          </div>
 
-        {/* Description */}
-        <div className="space-y-2 col-span-2">
-          <label className="block font-medium">Description <span className="text-red-500">*</span></label>
-          <textarea className="w-full p-3 border rounded-md" placeholder="What is this hackathon about..." value={description} onChange={(e) => setDescription(e.target.value)} required />
-        </div>
+          {/* Description */}
+          <div className="space-y-2 col-span-2">
+            <label className="block font-medium">
+              Description <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              className="w-full p-3 border rounded-md"
+              placeholder="What is this hackathon about..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
 
-        <div className="space-y-2 col-span-2">
-          <label className="block font-medium">Problem Statement <span className="text-red-500">*</span></label>
-          <textarea className="w-full p-3 border rounded-md" placeholder="Give your Problem Statement" value={description} onChange={(e) => setDescription(e.target.value)} required />
-        </div>
-        <div className="space-y-2 col-span-2">
-          <label className="block font-medium">Context<span className="text-red-500">*</span></label>
-          <textarea className="w-full p-3 border rounded-md" placeholder="What is this hackathon about..." value={description} onChange={(e) => setDescription(e.target.value)} required />
-        </div>
+          <div className="space-y-2 col-span-2">
+            <label className="block font-medium">
+              Problem Statement <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              className="w-full p-3 border rounded-md"
+              placeholder="Give your Problem Statement"
+              value={problemStatement}
+              onChange={(e) => setProblemStatement(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2 col-span-2">
+            <label className="block font-medium">
+              Context<span className="text-red-500">*</span>
+            </label>
+            <textarea
+              className="w-full p-3 border rounded-md"
+              placeholder="What is this hackathon about..."
+              value={context}
+              onChange={(e) => setContext(e.target.value)}
+            />
+          </div>
 
-        <div className="space-y-2">
-          <label className="block font-medium">Hackathon Eligibility<span className="text-red-500">*</span></label>
-          <select className="w-full p-3 border rounded-md" required>
-            <option value="">Select</option>
-            <option value="1st Year">1st Year</option>
-            <option value="2nd Year">2nd Year</option>
-            <option value="3rd Year">3rd Year</option>
-            <option value="4th Year">4th Year</option>
-            <option value="5th Year">5th Year</option>
-            <option value="UG">Undergraduate (UG)</option>
-            <option value="PG">Postgraduate (PG)</option>
-          </select>
-        </div>
-        {/* Image Upload */}
-        <div className="space-y-2">
-          <label className="block font-medium">Relevant Files(If Any)</label>
-          <input type="file" onChange={(e) => handleFileChange(e, setImage)} className="p-2 border rounded-md" />
-        </div>
+          <div className="space-y-2">
+            <label className="block font-medium">
+              Hackathon Eligibility<span className="text-red-500">*</span>
+            </label>
+            <select
+              className="w-full p-3 border rounded-md"
+              value={eligibility}
+              onChange={(e) => setEligibility(e.target.value)}
+            >
+              <option value="">Select</option>
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year">3rd Year</option>
+              <option value="4th Year">4th Year</option>
+              <option value="5th Year">5th Year</option>
+              <option value="UG">Undergraduate (UG)</option>
+              <option value="PG">Postgraduate (PG)</option>
+            </select>
+          </div>
 
-        {/* Duration */}
-        {/* <div className="space-y-2">
-          <label className="block font-medium">Duration</label>
-          <input type="text" className="w-full p-3 border rounded-md" placeholder="Enter duration (e.g., 48 hours)" value={duration} onChange={(e) => setDuration(e.target.value)} />
-        </div> */}
+          {/* File Upload */}
+          <div className="space-y-2">
+            <label className="block font-medium">Relevant Files(If Any)</label>
+            <input
+              type="file"
+              onChange={(e) => handleFileChange(e, setFileAttachments)}
+              className="p-2 border rounded-md"
+            />
+          </div>
 
-        {/* Start Date */}
-        <div className="space-y-2">
-          <label className="block font-medium">Start Date</label>
-          <input type="date" className="w-full p-3 border rounded-md"value={startDate} onChange={(e) => setStartDate(e.target.value)} min={today} />
-        </div>
+          {/* Start Date */}
+          <div className="space-y-2">
+            <label className="block font-medium">
+              Start Date<span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              className="w-full p-3 border rounded-md"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              min={today}
+            />
+          </div>
 
-        {/* Submission Deadline */}
-        <div className="space-y-2">
-          <label className="block font-medium">Submission Deadline</label>
-          <input type="date" className="w-full p-3 border rounded-md" value={submissionDeadline} onChange={(e) => setSubmissionDeadline(e.target.value)} min={startDate || today} />
-        </div>
+          {/* Submission Deadline */}
+          <div className="space-y-2">
+            <label className="block font-medium">
+              Submission Deadline<span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              className="w-full p-3 border rounded-md"
+              value={submissionDeadline}
+              onChange={(e) => setSubmissionDeadline(e.target.value)}
+              min={startDate || today}
+            />
+          </div>
 
-        {/* File Attachments */}
-        <div className="space-y-2">
-          <label className="block font-medium">File Attachments</label>
-          <input type="file" onChange={(e) => handleFileChange(e, setFileAttachments)} className="p-2 border rounded-md" />
-        </div>
+          {/* Buttons */}
+          <div className="col-span-2 flex justify-end gap-3 mt-4">
+            <button
+              type="submit"
+              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Next Step
+            </button>
+          </div>
+        </form>
+      ) : (
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg">
+          {/* Hackathon Type Toggle */}
+          <div className="space-y-2 col-span-2">
+            <label className="block font-medium">Hackathon Type</label>
+            <div className="flex items-center gap-3">
+              <span>Public</span>
+              <label className="relative inline-flex cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={hackathonType === "Private"}
+                  onChange={() =>
+                    setHackathonType(hackathonType === "Public" ? "Private" : "Public")
+                  }
+                />
+                <div className="w-14 h-7 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 peer-checked:after:translate-x-7 after:content-[''] after:absolute after:w-6 after:h-6 after:bg-white after:rounded-full after:transition-all"></div>
+              </label>
+              <span>Private</span>
+            </div>
+          </div>
 
-        {/* Sponsors */}
-        {/* <div className="space-y-2">
-          <label className="block font-medium">Sponsors</label>
-          <input type="text" className="w-full p-3 border rounded-md" placeholder="Enter sponsor names" value={sponsors} onChange={(e) => setSponsors(e.target.value)} />
-        </div> */}
+          {/* Passkey Input for Private Hackathon */}
+          {hackathonType === "Private" && (
+            <div className="space-y-2 col-span-2">
+              <label className="block font-medium">Enter Passkey</label>
+              <input
+                type="password"
+                className="w-full p-3 border rounded-md"
+                placeholder="Enter passkey"
+                value={passKey}
+                onChange={(e) => setPassKey(e.target.value)}
+                required
+              />
+            </div>
+          )}
 
-       
-        {/* Buttons */}
-        <div className="col-span-2 flex justify-end gap-3 mt-4">
-          <button onClick={()=>navigate("/create-hackathon2")}  type="submit" className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-            Next Step
-          </button>
-        </div>
-      </form>
+          {/* Select Parameters */}
+          <div className="space-y-2 col-span-2">
+            <label className="block font-medium">Select Parameters</label>
+            <select
+              className="w-full p-3 border rounded-md"
+              onChange={handleSelectChange}
+              defaultValue=""
+            >
+              <option value="" disabled selected>
+                Choose a parameter
+              </option>
+              {suggestedParameters.map((param, index) => (
+                <option key={index} value={param}>
+                  {param}
+                </option>
+              ))}
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          {/* Input for Other Parameter */}
+          {showOtherInput && (
+            <div className="flex gap-2 col-span-2">
+              <input
+                type="text"
+                className="w-full p-3 border rounded-md"
+                placeholder="Specify other parameter"
+                value={otherParameter}
+                onChange={(e) => setOtherParameter(e.target.value)}
+              />
+              <button
+                type="button"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                onClick={handleAddOtherParameter}
+              >
+                Add
+              </button>
+            </div>
+          )}
+
+          {/* Display Selected Parameters */}
+          {selectedParameters.length > 0 && (
+            <div className="col-span-2">
+              <h3 className="font-medium">Selected Parameters:</h3>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {selectedParameters.map((param, index) => (
+                  <div
+                    key={index}
+                    className="px-3 py-2 bg-gray-200 rounded-md flex items-center"
+                  >
+                    {param}
+                    <button
+                      type="button"
+                      className="ml-2 text-red-500"
+                      onClick={() => handleRemoveParameter(param)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Buttons */}
+          <div className="col-span-2 flex justify-end gap-3 mt-4">
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+            >
+              Prev
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 };

@@ -4,8 +4,6 @@ const JudgingParameter = require("../models/JudgingParameter");
 const { generateInviteCode } = require("../utils/uniqueHackathonJoinId");
 const bcrypt = require("bcrypt");
 
-
-
 // Create a new hackathon with judging parameters
 const createHackathon = async (req, res) => {
   try {
@@ -20,11 +18,15 @@ const createHackathon = async (req, res) => {
       allow_multiple_solutions,
       is_public,
       passkey,
-      grade, // Grade restriction (e.g., "10th", "UG")
+      grade, // Grade restriction (e.g., "1st", "10th", "UG")
       judging_parameters,
     } = req.body;
 
     const validGrades = [
+      "1st",
+      "2nd",
+      "3rd",
+      "4th",
       "5th",
       "6th",
       "7th",
@@ -123,8 +125,6 @@ const createHackathon = async (req, res) => {
   }
 };
 
-
-
 const getHackathons = async (req, res) => {
   try {
     const hackathons = await Hackathon.find({ teacher_id: req.user.id })
@@ -156,7 +156,6 @@ const getHackathonById = async (req, res) => {
   }
 };
 
-
 // Edit a hackathon (Only the teacher who created it can update)
 const editHackathon = async (req, res) => {
   try {
@@ -173,7 +172,26 @@ const editHackathon = async (req, res) => {
       allow_multiple_solutions,
       is_public,
       passkey,
+      grade, // Allow updating grade
     } = req.body;
+
+    // Valid grade levels (including 1st to 5th)
+    const validGrades = [
+      "1st",
+      "2nd",
+      "3rd",
+      "4th",
+      "5th",
+      "6th",
+      "7th",
+      "8th",
+      "9th",
+      "10th",
+      "11th",
+      "12th",
+      "UG",
+      "PG",
+    ];
 
     // Find the hackathon
     const hackathon = await Hackathon.findById(hackathon_id);
@@ -193,18 +211,6 @@ const editHackathon = async (req, res) => {
     allow_multiple_solutions =
       allow_multiple_solutions === "true" || allow_multiple_solutions === true;
 
-    // Validate new judging parameters if provided
-    // if (judging_parameters && judging_parameters.length > 0) {
-    //   const validParams = await JudgingParameter.find({
-    //     _id: { $in: judging_parameters },
-    //   });
-    //   if (validParams.length !== judging_parameters.length) {
-    //     return res
-    //       .status(400)
-    //       .json({ error: "Invalid judging parameter ID(s) provided" });
-    //   }
-    // }
-
     // Validate start_date and end_date if provided
     if (start_date) {
       start_date = new Date(start_date);
@@ -217,6 +223,11 @@ const editHackathon = async (req, res) => {
       if (isNaN(end_date)) {
         return res.status(400).json({ error: "Invalid end date format" });
       }
+    }
+
+    // Validate grade if provided
+    if (grade && !validGrades.includes(grade)) {
+      return res.status(400).json({ error: "Invalid grade level specified." });
     }
 
     // Ensure sponsors is an array
@@ -255,6 +266,7 @@ const editHackathon = async (req, res) => {
         allow_multiple_solutions,
         is_public,
         passkey: hashedPasskey,
+        grade, // Allow updating grade
         updated_at: Date.now(),
       },
       { new: true, runValidators: true }
@@ -304,12 +316,10 @@ const removeHackathon = async (req, res) => {
 
     // Check if the logged-in teacher is the creator
     if (hackathon.teacher_id.toString() !== teacher_id) {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          error: "Unauthorized: You can only delete your own hackathon",
-        });
+      return res.status(403).json({
+        success: false,
+        error: "Unauthorized: You can only delete your own hackathon",
+      });
     }
 
     // Remove hackathon reference from students
@@ -338,9 +348,6 @@ const removeHackathon = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
-
-
-
 
 // const joinHackathon = async (req, res) => {
 //   try {
@@ -413,11 +420,6 @@ const removeHackathon = async (req, res) => {
 //   }
 // };
 
-
-
-
-
-
 module.exports = {
   createHackathon,
   getHackathons,
@@ -425,5 +427,4 @@ module.exports = {
   editHackathon,
   removeHackathon,
   getHackathonsByTeacher,
-  
 };

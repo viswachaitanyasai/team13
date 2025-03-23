@@ -5,7 +5,6 @@ import './index.css';
 import { Routes, Route } from 'react-router-dom';
 import Landing from './pages/Landing';
 import ErrorBoundary from './pages/ErrorBoundary';
-import TeacherLogin from './pages/TeacherLogin';
 import DashboardPage from './pages/TeacherDashboard';
 import OTPVerification from './components/OTPVerification';
 import Profile from './pages/Profile';
@@ -14,11 +13,16 @@ import CreateHackathon from './pages/CreateHackathon';
 import Layout from './components/layouts/layout';
 import CreateHackathonForm2 from './components/CreateHackathonForm2';
 import AboutHackathons from './components/AboutHackathons';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Statistics from './components/Statistics';
 
 
 function App() {
   return (
+    <>
+      {/* Toast Container for Notifications */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
     <ErrorBoundary>
     <Routes>
       <Route path="/" element={<Landing />} />
@@ -35,6 +39,7 @@ function App() {
       <Route path="/otp-verification" element={<OTPVerification/>} />
     </Routes>
     </ErrorBoundary>
+    </>
   )
 }
 

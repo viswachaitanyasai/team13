@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaHome, FaTrophy, FaPlus, FaBars } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-function Sidebar({ onDashboardClick, onShowHackathonsClick }) {
+function Sidebar() {
   const [active, setActive] = useState("dashboard");
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
@@ -30,12 +30,10 @@ function Sidebar({ onDashboardClick, onShowHackathonsClick }) {
         <ul className="flex-grow px-4">
           <li>
             <button
-               onClick={() => handleItemClick("hackathons", "/statistics")}
-               className={`flex items-center w-full p-3 rounded-lg transition-all font-medium text-sm ${
-                 active === "statistics"
-                   ? "bg-indigo-500 text-white shadow-md"
-                   : "text-gray-300 hover:bg-gray-700"
-               }`}
+              onClick={() => handleItemClick("dashboard", "/dashboard")}
+              className={`flex items-center w-full p-3 rounded-lg transition-all font-medium text-sm ${
+                active === "dashboard" ? "bg-indigo-500 text-white shadow-md" : "text-gray-300 hover:bg-gray-700"
+              }`}
             >
               <FaHome className="mr-3 text-base" /> Dashboard
             </button>
