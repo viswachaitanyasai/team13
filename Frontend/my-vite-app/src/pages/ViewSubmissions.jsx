@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"; 
 import * as Dialog from "@radix-ui/react-dialog";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  CartesianGrid,
 } from "recharts";
 import { getSubmissionStats } from "../apis/analyticsApi";
 import { toast } from "react-toastify";
