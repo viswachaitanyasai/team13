@@ -9,7 +9,7 @@ const PastHackathons = () => {
       title: "AI Challenge 2024",
       date: "March 10, 2024",
       description: "Explore cutting-edge AI solutions and compete with top minds! Showcase your innovative approaches to real-world problems.",
-      icon: <Calendar className="h-5 w-5 text-white" />, 
+      // icon: <Calendar className="h-5 w-5 text-white" />, 
       emoji: "🧠 💻",
       stats: {
         registrations: 500,
