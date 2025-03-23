@@ -1,21 +1,22 @@
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import "./index.css";
-import { Routes, Route } from "react-router-dom";
-import Landing from "./pages/Landing";
-import ErrorBoundary from "./pages/ErrorBoundary";
-import DashboardPage from "./pages/TeacherDashboard";
-import OTPVerification from "./components/OTPVerification";
-import Profile from "./pages/Profile";
-import AuthPage from "./pages/AuthPage";
-import CreateHackathon from "./pages/CreateHackathon";
-import Layout from "./components/layouts/layout";
-import CreateHackathonForm2 from "./components/CreateHackathonForm2";
-import AboutHackathons from "./components/AboutHackathons";
+import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AboutHackathons from "./components/AboutHackathons";
+import CreateHackathonForm2 from "./components/CreateHackathonForm2";
+import OTPVerification from "./components/OTPVerification";
 import Statistics from "./components/Statistics";
+import Layout from "./components/layouts/layout";
+import "./index.css";
+import AuthPage from "./pages/AuthPage";
+import CreateHackathon from "./pages/CreateHackathon";
+import ErrorBoundary from "./pages/ErrorBoundary";
+import Landing from "./pages/Landing";
+import Profile from "./pages/Profile";
+import SubmissionAnalysis from "./pages/SubmissionAnalysis";
+import DashboardPage from "./pages/TeacherDashboard";
 import ViewSubmissions from "./pages/ViewSubmissions";
 import ViewEvaluation from "./pages/viewEvaluation";
 function App() {
@@ -39,6 +40,8 @@ function App() {
             <Route path="/statistics" element={<Statistics />} />
             <Route path="/submission" element={<ViewSubmissions />} />
             <Route path="/evaluation" element={<ViewEvaluation />} />
+            <Route path="/analysis" element={<SubmissionAnalysis/>} />
+
           </Route>
 
           <Route path="/otp-verification" element={<OTPVerification />} />
