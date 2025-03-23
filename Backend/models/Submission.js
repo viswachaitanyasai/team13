@@ -13,9 +13,8 @@ const SubmissionSchema = new mongoose.Schema(
       required: true,
     },
     submission_url: { type: String, required: true }, // URL to the submitted solution
+    extractedText: { type: String },
     submission_date: { type: Date, default: Date.now },
-    grade_received: { type: String, enum: ["low", "mid", "high"] },
-    feedback: { type: String },
   },
   { _id: false }
 );
