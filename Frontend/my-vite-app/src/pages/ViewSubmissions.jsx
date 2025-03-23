@@ -1,14 +1,15 @@
-import React from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-  CartesianGrid,
 } from "recharts";
 
 const ViewSubmissions = () => {
@@ -23,7 +24,7 @@ const ViewSubmissions = () => {
     revisit: 3000,
     shortlisted: 2000,
   };
-
+const navigate=useNavigate()
   const data = [
     { name: "Shortlisted", count: hackathon.shortlisted, color: "#22C55E" },
     { name: "Revisit", count: hackathon.revisit, color: "#FACC15" },
@@ -116,9 +117,10 @@ const ViewSubmissions = () => {
                   Evaluation Details
                 </Dialog.Title>
                 <p className="text-gray-300 mt-2">
-                  Review the submitted projects and scores.
+                  Do you want to review the submitted projects and scores.
                 </p>
-                <div className="mt-4">
+                <div className=" flex gap-2 mt-4">
+                  <button onClick={()=>{navigate('/evaluation')}} className="bg-blue-500 px-4 py-2 rounded-md text-lg text-white">Yes</button>
                   <Dialog.Close className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-white">
                     Close
                   </Dialog.Close>
