@@ -1,19 +1,36 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const API_BASE_URL = "https://team13-aajv.onrender.com/api/hackathons";
 
-export const createHackathon = async (hackathonData) => {
+
+export const createHackathon = async (hackathonData, navigate) => {
   const token = localStorage.getItem("authToken");
+  console.log("Retrieved Token Before API Call:", token);
   if (!token) {
-    throw new Error("No authentication token found. Please log in again.");
+    toast.error("No authentication token found. Redirecting to login...");
+    navigate("/teacher-login"); // Redirect to login page
+    return;
+
   }
   try {
+
     const response = await axios.post(`${API_BASE_URL}/`, hackathonData, {
-      headers: { "Content-Type": "multipart/form-data",
+      headers: { 
         "Authorization": `Bearer ${token}` },
     });
     return response.data;
   } catch (error) {
+    console.error("API Error:", error.response?.data);
+
+    if (error.response?.status === 401) {
+      toast.error("Session expired. Redirecting to login...");
+      localStorage.removeItem("authToken");
+      navigate("/teacher-login");
+    } else {
+      toast.error(error.response?.data?.error || "Failed to create hackathon.");
+    }
+    
     throw error.response?.data || { error: "Failed to create hackathon." };
   }
 };
