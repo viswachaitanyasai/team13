@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { Trophy, Lightbulb, Users } from "lucide-react";
+import UpcomingHackathons from './UpcomingHackathons';
 import PastHackathons from "./PastHackathons";
+// import UpcomingHackathons from './UpcomingHackathons';
+
 
 const AboutHackathons = () => {
+  const [activeSection, setActiveSection] = useState('past');
+
   return (
-    <div className="bg-black min-h-screen p-8 text-white">
+    <div className="bg-gradient-to-b from-indigo-50 to-white min-h-screen p-8 text-gray-900">
       <div className="max-w-5xl mx-auto text-center">
         {/* Section Header */}
         <div className="mb-10">
@@ -28,22 +33,22 @@ const AboutHackathons = () => {
               title: "Compete",
               description:
                 "Showcase your skills against top minds in the industry.",
-              icon: <Trophy className="h-12 w-12 text-yellow-400" />,
-              bgColor: "bg-gray-900/70 border-gray-700",
+              icon: <Trophy className="h-12 w-12 text-indigo-500" />,
+              bgColor: "bg-indigo-100 border-indigo-300",
             },
             {
               title: "Learn",
               description:
                 "Gain experience through hands-on projects and mentorship.",
-              icon: <Lightbulb className="h-12 w-12 text-indigo-400" />,
-              bgColor: "bg-gray-900/70 border-gray-700",
+              icon: <Lightbulb className="h-12 w-12 text-blue-500" />,
+              bgColor: "bg-blue-100 border-blue-300",
             },
             {
               title: "Network",
               description:
                 "Meet fellow tech enthusiasts, mentors, and employers.",
-              icon: <Users className="h-12 w-12 text-green-400" />,
-              bgColor: "bg-gray-900/70 border-gray-700",
+              icon: <Users className="h-12 w-12 text-gray-700" />,
+              bgColor: "bg-gray-100 border-gray-300",
             },
           ].map((feature, index) => (
             <div
@@ -51,10 +56,10 @@ const AboutHackathons = () => {
               className={`${feature.bgColor} rounded-xl border p-8 flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-gray-900/50`}
             >
               <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-2xl font-semibold text-white mb-2">
+              <h3 className="text-2xl font-semibold text-gray-900 mb-2">
                 {feature.title}
               </h3>
-              <p className="text-gray-300 text-base leading-relaxed">
+              <p className="text-gray-600 text-base leading-relaxed">
                 {feature.description}
               </p>
             </div>
@@ -83,8 +88,12 @@ const AboutHackathons = () => {
         </div>
       </div>
 
-      {/* Past Hackathons Section */}
-      <PastHackathons />
+      {/* Display Selected Section */}
+      <div className="mt-6">
+        {activeSection === 'past' && <PastHackathons />}
+        {/* {activeSection === 'ongoing' && <OngoingHackathons />} */}
+        {activeSection === 'upcoming' && <UpcomingHackathons />}
+      </div>
     </div>
   );
 };
