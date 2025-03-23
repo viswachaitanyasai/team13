@@ -16,7 +16,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
-  "https://your-frontend.com",
+  "https://eduhack.vercel.app",
 ];
 
 app.use(
@@ -25,12 +25,16 @@ app.use(
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.error(`Blocked by CORS: ${origin}`); // Debugging
         callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true, // ✅ Allow sending cookies
+    credentials: true, // ✅ Allow cookies and sessions
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ Allow all necessary methods
+    allowedHeaders: ["Content-Type", "Authorization"], // ✅ Allow specific headers
   })
 );
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Parse form data
 app.use(cookieParser());
@@ -42,6 +46,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/hackathons", hackathonRoutes);
 app.use("/api/submissions", gradingRoutes);
 app.use("/api/analytics/", analyticsRoutes);
+app.use("/api", uploadRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
