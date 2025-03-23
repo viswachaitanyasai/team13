@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
+import { useNavigate } from "react-router-dom";
 
 const ViewEvaluation = () => {
+  const navigate = useNavigate();
   const hackathon = {
     name: "AI Challenge 2025",
     description:
@@ -53,6 +55,7 @@ const ViewEvaluation = () => {
 
   const [submissions, setSubmissions] = useState(dummySubmissions);
   const [selectedTab, setSelectedTab] = useState("shortlisted");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleStatusUpdate = (id, newStatus) => {
     setSubmissions((prev) =>
@@ -63,13 +66,21 @@ const ViewEvaluation = () => {
   };
 
   const filteredSubmissions = submissions.filter(
-    (submission) => submission.status === selectedTab
+    (submission) =>
+      submission.status === selectedTab &&
+      submission.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-6 text-white">
-      <div className="w-full max-w-3xl bg-gray-800 rounded-xl shadow-lg p-4">
-        <h2 className="text-4xl font-bold text-blue-400 text-center">
+    <div className="min-h-screen flex justify-center bg-gray-900 p-6 text-white">
+      <div className="w-full max-w-4xl bg-gray-800 rounded-xl shadow-lg p-6">
+        <button
+          className="text-blue-600 mb-6 self-start hover:text-indigo-300 transition"
+          onClick={() => navigate(-1)}
+        >
+          &larr; Back
+        </button>
+        <h2 className="text-3xl font-bold text-blue-400 text-center">
           {hackathon.name}
         </h2>
         <p className="text-gray-300 mt-2 text-center">
@@ -77,16 +88,16 @@ const ViewEvaluation = () => {
         </p>
 
         <Tabs.Root
-          className="mt-2"
+          className="mt-4"
           value={selectedTab}
           onValueChange={setSelectedTab}
         >
-          <Tabs.List className="flex justify-center space-x-6 border-b border-gray-700 pb-2 transition-all duration-300 ease-in-out">
+          <Tabs.List className="flex justify-center space-x-6 border-b border-gray-700 pb-2">
             {["shortlisted", "revisit", "rejected"].map((tab) => (
               <Tabs.Trigger
                 key={tab}
                 value={tab}
-                className={`px-3 py-2 rounded-full transition-all duration-300 ease-in-out text-sm font-semibold shadow-md ${
+                className={`px-4 py-2 rounded-full text-sm font-semibold shadow-md transition-all duration-300 ease-in-out ${
                   selectedTab === tab
                     ? "bg-blue-600 text-white"
                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"
@@ -96,35 +107,49 @@ const ViewEvaluation = () => {
               </Tabs.Trigger>
             ))}
           </Tabs.List>
+        </Tabs.Root>
 
-          {filteredSubmissions.length > 0 ? (
-            <div className="mt-6 space-y-4">
+        <input
+          type="text"
+          placeholder="Search by name..."
+          className="mt-4 w-full p-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:outline-none"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+
+        {filteredSubmissions.length > 0 ? (
+          <table className="mt-4 w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-700">
+                <th className="p-3 border-b border-gray-600">Name</th>
+                <th className="p-3 border-b border-gray-600">Class</th>
+                <th className="p-3 border-b border-gray-600">Score</th>
+                <th className="p-3 border-b border-gray-600">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
               {filteredSubmissions.map((submission) => (
-                <div
+                <tr
                   key={submission.id}
-                  className="bg-gray-700 p-3 rounded-lg shadow-md flex flex-col"
+                  className="bg-gray-800 border-b border-gray-700"
                 >
-                  <p className="text-lg font-semibold text-blue-400">
-                    {submission.name}
-                  </p>
-                  <p className="text-gray-300">Class: {submission.class}</p>
-                  <p className="text-gray-300 font-semibold">
-                    Total Score: {submission.score}
-                  </p>
-                  <div className="mt-2 flex justify-between items-center space-x-2">
+                  <td className="p-3">{submission.name}</td>
+                  <td className="p-3">{submission.class}</td>
+                  <td className="p-3">{submission.score}</td>
+                  <td className="p-3 flex space-x-2">
                     <a
                       href={submission.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-md"
+                      className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-md"
                     >
-                      View Submission
+                      View
                     </a>
-                    <button className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full text-md font-medium shadow-md transition">
-                      View Analysis
+                    <button className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded-full font-medium shadow-md">
+                      Analysis
                     </button>
                     <select
-                      className="px-4 py-2 bg-gray-600 text-white rounded-lg shadow-md"
+                      className="px-3 py-1 bg-gray-600 text-white rounded-lg shadow-md"
                       value={submission.status}
                       onChange={(e) =>
                         handleStatusUpdate(submission.id, e.target.value)
@@ -134,16 +159,16 @@ const ViewEvaluation = () => {
                       <option value="revisit">Revisit</option>
                       <option value="rejected">Rejected</option>
                     </select>
-                  </div>
-                </div>
+                  </td>
+                </tr>
               ))}
-            </div>
-          ) : (
-            <p className="mt-6 text-gray-400 text-center">
-              No submissions found in this category.
-            </p>
-          )}
-        </Tabs.Root>
+            </tbody>
+          </table>
+        ) : (
+          <p className="mt-4 text-gray-400 text-center">
+            No submissions found.
+          </p>
+        )}
       </div>
     </div>
   );

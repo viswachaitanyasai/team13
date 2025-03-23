@@ -31,13 +31,13 @@ const ViewSubmissions = () => {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-6 text-white">
-      <div className="w-full max-w-3xl bg-gray-800 rounded-xl shadow-lg p-6">
+    <div className="min-h-screen flex justify-center bg-gray-900 p-6 text-white w-full">
+      <div className="w-full h-full bg-gray-800 rounded-xl shadow-lg p-6">
         <h2 className="text-3xl font-bold text-orange-400">{hackathon.name}</h2>
         <p className="text-gray-300 mt-2">{hackathon.description}</p>
 
         {/* Key Stats */}
-        <div className="mt-6 grid grid-cols-3 gap-4 text-center">
+        <div className="mt-6 grid grid-cols-3 md:gap-4 gap-2 text-center">
           {[
             {
               label: "Registrations",
@@ -55,8 +55,8 @@ const ViewSubmissions = () => {
               color: "text-yellow-400",
             },
           ].map((stat, index) => (
-            <div key={index} className="bg-gray-700 p-4 rounded-lg">
-              <p className={`text-2xl font-semibold ${stat.color}`}>
+            <div key={index} className="bg-gray-700 md:p-4 p-2 rounded-lg">
+              <p className={`lg:text-2xl text-md font-semibold ${stat.color}`}>
                 {stat.value}
               </p>
               <p className="text-gray-300 text-sm">{stat.label}</p>
