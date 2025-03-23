@@ -12,8 +12,7 @@ const PastHackathons = () => {
       emoji: "🧠 💻",
       stats: {
         registrations: 500,
-        participants: 300,
-        submissions: 120
+        participants: 300
       },
       color: "bg-purple-600",
       image: "../../src/assets/Ai.png",
@@ -28,8 +27,7 @@ const PastHackathons = () => {
       emoji: "🔒",
       stats: {
         registrations: 700,
-        participants: 500,
-        submissions: 200
+        participants: 500
       },
       color: "bg-red-600",
       image: "../../src/assets/Cyber.png",
@@ -44,8 +42,7 @@ const PastHackathons = () => {
       emoji: "⛓ ✨",
       stats: {
         registrations: 450,
-        participants: 250,
-        submissions: 100
+        participants: 250
       },
       color: "bg-blue-600",
       image: "/assets/blockchain.png",
@@ -100,11 +97,7 @@ const PastHackathons = () => {
                   </span>
                   <span className="px-3 py-1.5 bg-gray-800 rounded-lg text-sm">
                     Participants: {event.stats.participants}
-                  </span>
-                  <span className="px-3 py-1.5 bg-gray-800 rounded-lg text-sm">
-                    Submissions: {event.stats.submissions}
-                  </span>
-                </div>
+                  </span>                </div>
                 <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-medium transition-colors duration-200">
                   View Submissions
                 </button>
