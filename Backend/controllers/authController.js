@@ -117,6 +117,7 @@ const login = async (req, res) => {
         email: teacher.email,
         isVerified: teacher.isVerified,
       },
+      cookie: token,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -184,7 +185,7 @@ const verifyEmail = async (req, res) => {
     res.json({
       message: "Email verified successfully. You are now logged in.",
       teacher: { id: teacher._id, name: teacher.name, email: teacher.email },
-      token,
+      cookie: token,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
