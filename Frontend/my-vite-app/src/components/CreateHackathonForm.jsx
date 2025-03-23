@@ -105,6 +105,15 @@ const CreateHackathonForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("authToken");
+    console.log("Token Retrieved:", token); 
+
+    if (!token) {
+      toast.error("Authentication error. Please log in again.");
+      navigate("/login"); // Redirect user to login
+      return;
+    }
+
 
     if (selectedParameters.length === 0) {
       toast.error("Please select at least one evaluation parameter.");
@@ -132,7 +141,7 @@ const CreateHackathonForm = () => {
     };
 
     try {
-      const response = await createHackathon(formData);
+      const response = await createHackathon(formData, navigate);
       toast.success("Hackathon created successfully!");
       console.log("Hackathon Created:", response);
       navigate("/dashboard");
@@ -209,11 +218,18 @@ const CreateHackathonForm = () => {
               onChange={(e) => setEligibility(e.target.value)}
             >
               <option value="">Select</option>
-              <option value="1st Year">1st Year</option>
-              <option value="2nd Year">2nd Year</option>
-              <option value="3rd Year">3rd Year</option>
-              <option value="4th Year">4th Year</option>
-              <option value="5th Year">5th Year</option>
+              <option value="1st">1st</option>
+              <option value="2nd">2nd</option>
+              <option value="3rd">3rd</option>
+              <option value="4th">4th</option>
+              <option value="5th">5th</option>
+              <option value="6th">6th</option>
+              <option value="7th">7th</option>
+              <option value="8th">8th</option>
+              <option value="9th">9th</option>
+              <option value="10th">10th</option>
+              <option value="11th">11th</option>
+              <option value="12th">12th</option>
               <option value="UG">Undergraduate (UG)</option>
               <option value="PG">Postgraduate (PG)</option>
             </select>
