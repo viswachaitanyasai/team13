@@ -11,7 +11,26 @@ const gradingRoutes = require("./routes/gradingRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const app = express();
-app.use(cors());
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "https://your-frontend.com",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true, // ✅ Allow sending cookies
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // Parse form data
 app.use(cookieParser());

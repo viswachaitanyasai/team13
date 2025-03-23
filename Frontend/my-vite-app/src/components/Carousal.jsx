@@ -46,14 +46,13 @@ const slidesData = [
 
 const Carousal = () => {
   return (
-    <div className="relative w-full h-[600px]">
+    <div className="relative w-full h-[88vh] mt-[12vh]">
       <Swiper
         modules={[Navigation, Pagination, Autoplay, EffectFade]}
         navigation={{
           nextEl: ".swiper-button-next",
           prevEl: ".swiper-button-prev",
         }}
-        pagination={{ clickable: true }}
         autoplay={{ delay: 3000, disableOnInteraction: false }}
         loop={true}
         effect="fade"
@@ -67,7 +66,7 @@ const Carousal = () => {
       </Swiper>
 
       {/* Custom White Navigation Buttons */}
-      <div className="swiper-button-prev !text-white !opacity-100"></div>
+      <div className="swiper-button-prev !text-white !opacity-100 "></div>
       <div className="swiper-button-next !text-white !opacity-100"></div>
     </div>
   );

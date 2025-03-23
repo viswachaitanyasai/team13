@@ -104,10 +104,11 @@ const login = async (req, res) => {
     // Set token in HTTP-only cookie (7 days)
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: process.env.NODE_ENV === "production", // ✅ Secure in production (HTTPS required)
+      sameSite: "None", // ✅ Allows cross-origin cookies
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
+
 
     res.json({
       message: "Login successful",
@@ -177,10 +178,11 @@ const verifyEmail = async (req, res) => {
     // Set token in HTTP-only cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: process.env.NODE_ENV === "production", // ✅ Secure in production (HTTPS required)
+      sameSite: "None", // ✅ Allows cross-origin cookies
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
+
 
     res.json({
       message: "Email verified successfully. You are now logged in.",
