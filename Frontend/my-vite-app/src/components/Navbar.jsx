@@ -39,7 +39,7 @@ function Navbar({ teacherName }) {
           className="h-10 drop-shadow-lg"
         />
         <h1 className="text-lg font-semibold text-white tracking-wide m-0">
-          CodeMitra
+          EduHack
         </h1>
       </div>
 
@@ -54,8 +54,14 @@ function Navbar({ teacherName }) {
             alt="Profile"
             className="h-8 w-8 rounded-full border border-indigo-400 shadow-lg"
           />
-          <span className="text-white font-medium text-sm">{teacherName || storedTeacherName}</span>
-          <FaChevronDown className={`text-indigo-300 text-sm transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+          <span className="text-white font-medium text-sm">
+            {teacherName || storedTeacherName}
+          </span>
+          <FaChevronDown
+            className={`text-indigo-300 text-sm transition-transform duration-300 ${
+              isDropdownOpen ? "rotate-180" : ""
+            }`}
+          />
         </div>
 
         {/* Dropdown Menu */}
