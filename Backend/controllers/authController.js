@@ -102,13 +102,14 @@ const login = async (req, res) => {
     const token = generateToken(teacher._id);
 
     // Set token in HTTP-only cookie (7 days)
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // ✅ Secure in production (HTTPS required)
-      sameSite: "None", // ✅ Allows cross-origin cookies
+      secure: isProduction, // ✅ Secure only in production (HTTPS required)
+      sameSite: isProduction ? "None" : "Lax", // ✅ None for cross-origin, Lax for same-origin (dev)
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-
 
     res.json({
       message: "Login successful",
@@ -118,6 +119,7 @@ const login = async (req, res) => {
         email: teacher.email,
         isVerified: teacher.isVerified,
       },
+      cookie: token,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -175,18 +177,19 @@ const verifyEmail = async (req, res) => {
     const token = generateToken(teacher._id);
 
     // Set token in HTTP-only cookie
+    const isProduction = process.env.NODE_ENV === "production";
+
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // ✅ Secure in production (HTTPS required)
-      sameSite: "None", // ✅ Allows cross-origin cookies
+      secure: isProduction, // ✅ Secure only in production (HTTPS required)
+      sameSite: isProduction ? "None" : "Lax", // ✅ None for cross-origin, Lax for same-origin (dev)
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
-
 
     res.json({
       message: "Email verified successfully. You are now logged in.",
       teacher: { id: teacher._id, name: teacher.name, email: teacher.email },
-      token,
+      cookie: token,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

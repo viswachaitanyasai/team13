@@ -4,7 +4,7 @@ import { Bar, Doughnut, Line, Pie } from "react-chartjs-2";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement, PointElement, LineElement);
 
-const Dashboard = () => {
+const Statistics = () => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
@@ -464,4 +464,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Statistics;
