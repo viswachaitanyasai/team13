@@ -1,42 +1,54 @@
-const AWS = require("aws-sdk");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const multer = require("multer");
-const multerS3 = require("multer-s3");
 require("dotenv").config();
 
-// Initialize AWS S3
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+// ✅ Initialize AWS S3 Client (SDK v3)
+const s3 = new S3Client({
   region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
 
-// Configure Multer Storage with S3
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.AWS_BUCKET_NAME,
-    acl: "public-read", // Allows public access to uploaded files
-    metadata: (req, file, cb) => {
-      cb(null, { fieldName: file.fieldname });
-    },
-    key: (req, file, cb) => {
-      cb(null, `uploads/${Date.now()}_${file.originalname}`); // Unique file name
-    },
-  }),
-});
+// ✅ Multer Storage (Temporary Memory Storage before Upload)
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
-// Controller Function for Upload
-const uploadFile = (req, res) => {
+// ✅ Upload File to S3
+const uploadFile = async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
   }
-  res.status(200).json({
-    message: "File uploaded successfully",
-    fileUrl: req.file.location,
-  });
+
+  try {
+    const fileName = `uploads/${Date.now()}_${req.file.originalname}`;
+
+    // ✅ Upload Command
+    const uploadParams = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: fileName,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+      ACL: "public-read", // Allows public access
+    };
+
+    await s3.send(new PutObjectCommand(uploadParams));
+
+    // ✅ Generate Public File URL
+    const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+
+    res.status(200).json({
+      message: "File uploaded successfully",
+      fileUrl,
+    });
+  } catch (error) {
+    console.error("S3 Upload Error:", error);
+    res.status(500).json({ error: "File upload failed" });
+  }
 };
 
-// Exporting Multer Middleware and Upload Controller
 module.exports = {
   uploadMiddleware: upload.single("file"),
   uploadFile,
