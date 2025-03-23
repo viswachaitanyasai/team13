@@ -7,6 +7,7 @@ import { createHackathon } from "../apis/hackathonapi";
 const CreateHackathonForm = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   // Step 1 State
   const [hackathonName, setHackathonName] = useState("");
@@ -105,18 +106,21 @@ const CreateHackathonForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const token = localStorage.getItem("authToken");
     console.log("Token Retrieved:", token); 
 
     if (!token) {
       toast.error("Authentication error. Please log in again.");
-      navigate("/login"); // Redirect user to login
+      navigate("/login");
+      setLoading(false); 
       return;
     }
 
 
     if (selectedParameters.length === 0) {
       toast.error("Please select at least one evaluation parameter.");
+      setLoading(false);
       return;
     }
 
@@ -148,6 +152,8 @@ const CreateHackathonForm = () => {
     } catch (error) {
       console.error("Hackathon Creation Error:", error);
       toast.error(error.error || "Failed to create hackathon.");
+    } finally{
+      setLoading(false); 
     }
   };
 
@@ -391,13 +397,14 @@ const CreateHackathonForm = () => {
               onClick={() => setStep(1)}
               className="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700"
             >
-              Prev
+              Previous Page
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className={`px-6 py-3 rounded-md text-white ${loading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+              disabled={loading}
             >
-              Submit
+              {loading ? "Submitting..." : "Submit"}
             </button>
           </div>
         </form>
