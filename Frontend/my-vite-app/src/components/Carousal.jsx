@@ -5,7 +5,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
-import Slide from "./Slide"; // Import Slide component
+import Slide from "./slide"; // Import Slide component
 
 // Import images
 import img1 from "../assets/1.jpg";
