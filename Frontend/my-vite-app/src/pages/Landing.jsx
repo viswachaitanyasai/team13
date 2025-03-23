@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Carousal from "../components/Carousal";
 import Promotion from "../components/Promotion";
 import Footer from "../components/Footer";
-import FeedbackForm from "../components/FeedBack";
+// import FeedbackForm from "../components/FeedBack";
 import FeaturesSection from "../components/Features";
 import CustomizableParameters from "../components/paramSection";
 import StudentVoice from "../components/student";
