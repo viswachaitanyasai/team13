@@ -30,10 +30,12 @@ function Sidebar({ onDashboardClick, onShowHackathonsClick }) {
         <ul className="flex-grow px-4">
           <li>
             <button
-              onClick={() => handleItemClick("dashboard", onDashboardClick)}
-              className={`flex items-center w-full p-3 rounded-lg transition-all font-medium text-sm ${
-                active === "dashboard" ? "bg-indigo-500 text-white shadow-md" : "text-gray-300 hover:bg-gray-700"
-              }`}
+               onClick={() => handleItemClick("hackathons", "/statistics")}
+               className={`flex items-center w-full p-3 rounded-lg transition-all font-medium text-sm ${
+                 active === "statistics"
+                   ? "bg-indigo-500 text-white shadow-md"
+                   : "text-gray-300 hover:bg-gray-700"
+               }`}
             >
               <FaHome className="mr-3 text-base" /> Dashboard
             </button>

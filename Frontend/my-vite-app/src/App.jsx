@@ -14,6 +14,8 @@ import CreateHackathon from './pages/CreateHackathon';
 import Layout from './components/layouts/layout';
 import CreateHackathonForm2 from './components/CreateHackathonForm2';
 import AboutHackathons from './components/AboutHackathons';
+import Statistics from './components/Statistics';
+
 
 function App() {
   return (
@@ -27,6 +29,7 @@ function App() {
           <Route path="/create-hackathon2" element={<CreateHackathonForm2/>} />
           <Route path="/profile" element={<Profile/>} />
           <Route path="/hackathons" element={<AboutHackathons/>} />
+          <Route path="/statistics" element={<Statistics/>} />
         </Route>
     
       <Route path="/otp-verification" element={<OTPVerification/>} />

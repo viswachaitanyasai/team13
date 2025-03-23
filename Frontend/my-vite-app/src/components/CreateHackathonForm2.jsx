@@ -38,7 +38,7 @@ const ParameterSelection = () => {
 
   return (
     <div className="min-h-screen w-full p-8">
-      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-700">Select Hackathon Parameters</h2>
+      <h2 className="text-3xl font-extrabold text-center mb-8 text-blue-800 transition-all duration-500 hover:text-blue-600">Select Hackathon Parameters</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg">
         {/* Hackathon Type Toggle */}
         <div className="space-y-2 col-span-2">
