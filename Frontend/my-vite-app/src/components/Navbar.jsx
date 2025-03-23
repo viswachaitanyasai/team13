@@ -6,7 +6,7 @@ import { logoutUser } from "../apis/authapi";
 function Navbar({ teacherName }) {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [storedTeacherName, setStoredTeacherName] = useState("Teacher");
+  const [storedTeacherName, setStoredTeacherName] = useState("Organizer");
 
   useEffect(() => {
     const nameFromStorage = localStorage.getItem("teacherName");

@@ -3,10 +3,14 @@ import axios from "axios";
 const API_BASE_URL = "https://team13-aajv.onrender.com/api/hackathons";
 
 export const createHackathon = async (hackathonData) => {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    throw new Error("No authentication token found. Please log in again.");
+  }
   try {
-    const token = localStorage.getItem("authToken");
     const response = await axios.post(`${API_BASE_URL}/`, hackathonData, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { "Content-Type": "multipart/form-data",
+        "Authorization": `Bearer ${token}` },
     });
     return response.data;
   } catch (error) {

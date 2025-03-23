@@ -105,6 +105,14 @@ const CreateHackathonForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      toast.error("Authentication error. Please log in again.");
+      navigate("/login"); // Redirect user to login
+      return;
+    }
+
 
     if (selectedParameters.length === 0) {
       toast.error("Please select at least one evaluation parameter.");
