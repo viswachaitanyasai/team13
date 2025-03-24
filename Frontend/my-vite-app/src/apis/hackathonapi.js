@@ -4,7 +4,8 @@ import { toast } from "react-toastify";
 const API_BASE_URL = "https://team13-aajv.onrender.com/api/hackathons";
 
 
-export const createHackathon = async (hackathonData, navigate) => {
+export const createHackathon = async (formData, navigate) => {
+  console.log(formData)
   const token = localStorage.getItem("authToken");
   console.log("Retrieved Token Before API Call:", token);
   if (!token) {
@@ -15,11 +16,12 @@ export const createHackathon = async (hackathonData, navigate) => {
   }
   try {
 
-    const response = await axios.post(`${API_BASE_URL}/`, hackathonData, {
+    const response = await axios.post(`${API_BASE_URL}/`, formData, {
       headers: { 
-        "Authorization": `Bearer ${token}` },
-
+        "Authorization": `Bearer ${token}`,
+      }
     });
+    
     return response.data;
   } catch (error) {
     console.error("API Error:", error.response?.data);
@@ -32,7 +34,7 @@ export const createHackathon = async (hackathonData, navigate) => {
       toast.error(error.response?.data?.error || "Failed to create hackathon.");
     }
     
-    throw error.response?.data || { error: "Failed to create hackathon." };
+    throw error.response?.data ;
   }
 };
 
