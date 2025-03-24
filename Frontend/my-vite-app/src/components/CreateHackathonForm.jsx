@@ -185,6 +185,7 @@ const CreateHackathonForm = () => {
     const formData = new FormData();
     formData.append("title", hackathonName);
     formData.append("description", description);
+    formData.append("context", context);formData.append("problem_statement", problemStatement);
     formData.append("start_date", startDate);
     formData.append("end_date", submissionDeadline);
     formData.append("is_public", hackathonType === "Public");
