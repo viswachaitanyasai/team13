@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const HackathonSchema = new mongoose.Schema({
   teacher_id: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
   title: { type: String, required: true },
-  problem_statement:{type:String,required:true},
+  problem_statement: { type: String, required: true },
   description: { type: String, required: true },
   context: { type: String, required: true },
   image_url: { type: String },
@@ -15,6 +15,7 @@ const HackathonSchema = new mongoose.Schema({
   is_public: { type: Boolean, default: true },
   passkey: { type: String, select: false },
   invite_code: { type: String, unique: true, required: true },
+
   grade: {
     type: String,
     required: true,
@@ -43,9 +44,10 @@ const HackathonSchema = new mongoose.Schema({
   judging_parameters: [
     { type: mongoose.Schema.Types.ObjectId, ref: "JudgingParameter" },
   ],
-  isResultPublished:{type:Boolean,default:false},
-  custom_prompt:{type:String},
+  isResultPublished: { type: Boolean, default: false },
+  custom_prompt: { type: String },
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
+  skill_gap: { type: Map, of: Number, default: {} }, // Hashmap to track skill gaps and their occurrences
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });

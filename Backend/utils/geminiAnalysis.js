@@ -5,6 +5,8 @@ const {
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const axios = require("axios");
 const path = require("path");
+const Hackathon = require("../models/Hackathon");
+
 
 const API_KEY = process.env.GEMINI_API_KEY;
 const fileManager = new GoogleAIFileManager(API_KEY);
@@ -180,4 +182,34 @@ async function analyzeText({
   }
 }
 
-module.exports = { analyzeAudio, analyzeText };
+
+async function updateSkillGap(hackathonId, newSkillGaps) {
+  try {
+    const hackathon = await Hackathon.findById(hackathonId);
+    if (!hackathon) {
+      throw new Error("Hackathon not found");
+    }
+
+    let currentSkillGap = hackathon.skill_gap || new Map();
+
+    // Update skill gap counts
+    newSkillGaps.forEach((skill) => {
+      if (currentSkillGap.has(skill)) {
+        currentSkillGap.set(skill, currentSkillGap.get(skill) + 1);
+      } else {
+        currentSkillGap.set(skill, 1);
+      }
+    });
+
+    // Save updated skill_gap
+    hackathon.skill_gap = currentSkillGap;
+    await hackathon.save();
+
+    console.log("Skill gap updated successfully");
+  } catch (error) {
+    console.error("Error updating skill gap:", error.message);
+  }
+}
+
+
+module.exports = { analyzeAudio, analyzeText, updateSkillGap };
