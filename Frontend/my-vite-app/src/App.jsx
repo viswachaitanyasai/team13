@@ -20,6 +20,7 @@ import DashboardPage from "./pages/TeacherDashboard";
 import ViewSubmissions from "./pages/ViewSubmissions";
 import ViewEvaluation from "./pages/viewEvaluation";
 import SecuredRoute from "./components/SecuredRoute";
+import ViewHackathon from "./pages/ViewHackathonDetails";
 function App() {
   return (
     <>
@@ -41,6 +42,7 @@ function App() {
             />
             <Route path="/profile" element={<Profile />} />
             <Route path="/hackathons" element={<AboutHackathons />} />
+            <Route path="/hackathon/:hackathonId" element={<ViewHackathon />} />
             <Route path="/statistics" element={<Statistics />} />
             {/* <Route path="/submission" element={<ViewSubmissions />} /> */}
             <Route path="/submission/:hackathonId" element={<ViewSubmissions />} />

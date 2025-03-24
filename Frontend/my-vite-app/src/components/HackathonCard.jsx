@@ -10,6 +10,10 @@ const HackathonCard = ({ event }) => {
     navigate(`/submission/${event._id}`);
   };
 
+  const handleViewHackathon = () => {
+    navigate(`/hackathon/${event._id}`);
+  };
+
   return (
     <div className="mb-10 ">
       {/* Icon circle */}
@@ -32,11 +36,11 @@ const HackathonCard = ({ event }) => {
         </div>
 
         {/* Access Type Section */}
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <span className="px-3 py-1.5 bg-gray-100 text-indigo-700 rounded-lg text-sm">
             {event.accessType}
           </span>
-        </div>
+        </div> */}
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex flex-wrap gap-2">
@@ -47,6 +51,12 @@ const HackathonCard = ({ event }) => {
               Participants: {event.stats?.participants ?? 0}
             </span>
           </div>
+          <button
+              onClick={handleViewHackathon}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+            >
+              View Hackathon
+            </button>
           <button
             onClick={handleViewSubmissions}
             className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"

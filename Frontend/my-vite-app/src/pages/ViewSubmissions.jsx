@@ -15,6 +15,14 @@ import {
 import { getSubmissionStats } from "../apis/analyticsApi";
 import { toast } from "react-toastify";
 
+const SkeletonLoader = () => (
+  <div className="animate-pulse flex flex-col gap-4">
+    <div className="h-8 w-2/3 bg-gray-700 rounded"></div>
+    <div className="h-6 w-1/2 bg-gray-700 rounded"></div>
+    <div className="h-40 bg-gray-700 rounded"></div>
+  </div>
+);
+
 const ViewSubmissions = () => {
   const { hackathonId } = useParams();
   const [hackathonData, setHackathonData] = useState(null);
@@ -48,13 +56,24 @@ const ViewSubmissions = () => {
   }, [hackathonId, token]);
 
   if (loading) {
-    return <p className="text-gray-400 text-center mt-10">Loading submissions...</p>;
+    return (
+      <div className="min-h-screen flex justify-center bg-gray-900 p-6 text-white w-full">
+        <div className="w-full h-full bg-gray-800 rounded-xl shadow-lg p-6">
+          <SkeletonLoader />
+        </div>
+      </div>
+    );
   }
 
   if (!hackathonData) {
-    return <p className="text-red-400 text-center mt-10">No submission data available.</p>;
+    return (
+      <div className="mt-10 flex justify-center">
+        <div className="bg-gray-800 text-purple-200 border border-red-500 px-6 py-3 rounded-lg shadow-lg">
+          No submission data available.
+        </div>
+      </div>
+    );
   }
-
   const data = [
     { name: "Shortlisted", count: hackathonData.total_submissions, color: "#22C55E" },
     { name: "Participants", count: hackathonData.total_participants, color: "#FACC15" },
