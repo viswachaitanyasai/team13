@@ -24,6 +24,8 @@ const CreateHackathonForm = () => {
   const [uploadedFileName, setUploadedFileName] = useState(""); 
   const [uploadedImageName, setUploadedImageName] = useState("");
   const [dateError, setDateError] = useState("");
+  const [imageUrl, setImageUrl] = useState(""); // Stores S3 URL of uploaded image
+  const [fileUrl, setFileUrl] = useState("");
 
   // Step 2 State
   const suggestedParameters = ["Innovation", "Complexity", "Technical Skill", "Presentation"];
@@ -53,45 +55,91 @@ const CreateHackathonForm = () => {
   }, [startDate, submissionDeadline]);
 
   const handleRemoveFile = () => {
+    setFileUrl("");
     setSelectedFileAttachment(null);
     setUploadedFileName(""); 
     document.getElementById("fileUploadInput").value = "";
   };
 
   const handleRemoveImage = () => {
+    setImageUrl(""); // ✅ **Clear S3 image URL**
     setPreviewImage(null);
     setUploadedImageName("");
     document.getElementById("imageUploadInput").value = "";
   };
   
 
-  const handleImageChange = async(e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
-
-    const fresponse = await fileUpload(file);
-    console.log(fresponse);
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        toast.error("Only image files are allowed.");
-        return;
+  
+    if (!file) return;
+  
+    if (!file.type.startsWith("image/")) {
+      toast.error("Only image files are allowed.");
+      return;
+    }
+    setUploadedImageName(file.name);
+    // **Show preview before upload**
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewImage(reader.result); // Set preview image
+    };
+    reader.readAsDataURL(file);
+  
+    // **Upload Image to S3**
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      if (imageUrl) {
+        await removeFileFromS3(imageUrl);
       }
+      const response = await fileUpload(formData); // Upload to S3
+      console.log(response);
   
-      setSelectedImage(file);
-      setUploadedImageName(file.name); 
-  
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const uploadedUrl = response?.imageUrl || response?.fileUrl; // Handle both cases
+      if (uploadedUrl) {
+        setImageUrl(uploadedUrl);
+        setPreviewImage(URL.createObjectURL(file));
+        toast.success("Image uploaded successfully!");
+      } else {
+        toast.error("Image upload failed.");
+      }
+    } catch (error) {
+      console.error("Image Upload Error:", error);
+      toast.error("Image upload failed.");
     }
   };
+  
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
-    setSelectedFileAttachment(file);
-    setUploadedFileName(file.name);
+  
+    if (!file) return;
+  
+    setUploadedFileName(file.name); // Show file name before upload
+  
+    // **Upload File to S3**
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      if (fileUrl) {
+        await removeFileFromS3(fileUrl);
+      }
+  
+      const response = await fileUpload(formData); // Upload file to S3
+  
+      if (response?.fileUrl) {
+        setFileUrl(response.fileUrl); // Store S3 URL instead of file
+        toast.success("File uploaded successfully!");
+      } else {
+        toast.error("File upload failed.");
+      }
+    } catch (error) {
+      console.error("File Upload Error:", error);
+      toast.error("File upload failed.");
+    }
   };
+  
 
 
   const handleNextStep = (e) => {
@@ -164,7 +212,7 @@ const CreateHackathonForm = () => {
       setLoading(false); 
       return;
     }
-    if (!selectedImage) {
+    if (!imageUrl) {
       toast.error("Banner image is required to create a hackathon.");
       setLoading(false);
       return;
@@ -182,34 +230,56 @@ const CreateHackathonForm = () => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("title", hackathonName);
-    formData.append("description", description);
-    formData.append("context", context);formData.append("problem_statement", problemStatement);
-    formData.append("start_date", startDate);
-    formData.append("end_date", submissionDeadline);
-    formData.append("is_public", hackathonType === "Public");
-    formData.append("passkey", hackathonType === "Private" ? passKey : "");
-    formData.append("grade", eligibility);
-    formData.append("judging_parameters", JSON.stringify(selectedParameters));
-    // formData.append("additional_instructions", additionalInstructions);
-
-  // **Appending Banner Image**
-    if (selectedImage) {
-      formData.append("image", selectedImage);
-    }
-
-  // **Appending File Attachment**
-    if (selectedFileAttachment) {
-      formData.append("file_attachment", selectedFileAttachment);
-    }
-
     try {
+      // **Upload Image to S3**
+      // let imageUrl = "";
+      // if (selectedImage) {
+      //   const imageFormData = new FormData();
+      //   imageFormData.append("file", selectedImage);
+      //   const imageResponse = await fileUpload(imageFormData);
+  
+      //   if (imageResponse?.fileUrl) {
+      //     imageUrl = imageResponse.fileUrl;
+      //   } else {
+      //     throw new Error("Failed to upload banner image.");
+      //   }
+      // }
+  
+      // // **Upload File Attachment to S3**
+      // let fileUrl = "";
+      // if (selectedFileAttachment) {
+      //   const fileFormData = new FormData();
+      //   fileFormData.append("file", selectedFileAttachment);
+      //   const fileResponse = await fileUpload(fileFormData);
+  
+      //   if (fileResponse?.fileUrl) {
+      //     fileUrl = fileResponse.fileUrl;
+      //   } else {
+      //     throw new Error("Failed to upload file attachment.");
+      //   }
+      // }
+      const formData = {
+        title: hackathonName,
+        description,
+        context,
+        problem_statement: problemStatement,
+        start_date: startDate,
+        end_date: submissionDeadline,
+        is_public: hackathonType === "Public",
+        passkey: hackathonType === "Private" ? passKey : "",
+        grade: eligibility,
+        judging_parameters: selectedParameters,
+        image_url: imageUrl, // ✅ S3 URL
+        file_attachment_url: fileUrl, // ✅ S3 URL
+        custom_prompt: additionalInstructions,
+      };
+
       const response = await createHackathon(formData, navigate);
       toast.success("Hackathon created successfully!");
       console.log("Hackathon Created:", response);
       navigate("/dashboard");
     } catch (error) {
+      // console.log(response);
       console.error("Hackathon Creation Error:", error);
       toast.error(error.error || "Failed to create hackathon.");
     } finally{
@@ -310,9 +380,11 @@ const CreateHackathonForm = () => {
     onChange={handleFileChange}
     className="p-2 border rounded-md"
   />
-  {uploadedFileName && (
+  {fileUrl && (  // ✅ Show only if uploaded to S3
     <div className="flex items-center gap-2 mt-2">
-      <span className="text-gray-700">{uploadedFileName}</span>
+      <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+        {uploadedFileName}
+      </a>
       <button
         onClick={handleRemoveFile}
         className="px-3 py-1 bg-red-500 text-white rounded-md text-sm"
@@ -335,10 +407,10 @@ const CreateHackathonForm = () => {
     className="p-2 border rounded-md"
   />
 
-  {/* Show Preview & Remove Button */}
-  {previewImage && (
+  {/* Show Image Preview & Remove Button */}
+  {imageUrl && (  // ✅ Show only if uploaded to S3
     <div className="mt-2 flex items-center gap-4">
-      <img src={previewImage} alt="Preview" className="w-40 h-auto rounded-md border" />
+      <img src={imageUrl} alt="Preview" className="w-40 h-auto rounded-md border" />
       <button
         onClick={handleRemoveImage}
         className="px-3 py-1 bg-red-500 text-white rounded-md text-sm"
