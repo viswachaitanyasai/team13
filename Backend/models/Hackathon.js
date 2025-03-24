@@ -3,7 +3,9 @@ const mongoose = require("mongoose");
 const HackathonSchema = new mongoose.Schema({
   teacher_id: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
   title: { type: String, required: true },
+  problem_statement:{type:String,required:true},
   description: { type: String, required: true },
+  context: { type: String, required: true },
   image_url: { type: String },
   file_attachment_url: { type: String },
   start_date: { type: Date, required: true },

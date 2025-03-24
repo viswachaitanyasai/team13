@@ -24,6 +24,6 @@ const SubmissionSchema = new mongoose.Schema(
 );
 
 // ✅ Ensure a student can submit only once per hackathon
-SubmissionSchema.index({ hackathon_id: 1, student_id: 1 }, { unique: true });
+// SubmissionSchema.index({ hackathon_id: 1, student_id: 1 }, { unique: true });
 
 module.exports = mongoose.model("Submission", SubmissionSchema);

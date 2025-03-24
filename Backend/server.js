@@ -10,6 +10,7 @@ const hackathonRoutes = require("./routes/hackathonRoutes");
 const gradingRoutes = require("./routes/gradingRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
+const submissionRoutes = require("./routes/submissionRoutes");
 
 const app = express();
 
@@ -52,7 +53,7 @@ app.use("/api/hackathons", hackathonRoutes);
 app.use("/api/submissions", gradingRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/files", uploadRoutes);
-
+app.use("/api/files", submissionRoutes);
 
 // ✅ Start Server
 const PORT = process.env.PORT || 4000;
