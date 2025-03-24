@@ -127,7 +127,6 @@ const createHackathon = async (req, res) => {
   }
 };
 
-
 const getHackathons = async (req, res) => {
   try {
     const hackathons = await Hackathon.find({ teacher_id: req.user.id })
@@ -392,76 +391,68 @@ const getHackathonSubmissions = async (req, res) => {
   }
 };
 
-// const joinHackathon = async (req, res) => {
-//   try {
-//     const { invite_code, name, email } = req.body;
+const joinHackathon = async (req, res) => {
+  try {
+    const { invite_code, name, email } = req.body;
 
-//     if (!invite_code || !name || !email) {
-//       return res
-//         .status(400)
-//         .json({
-//           success: false,
-//           error: "Invite code, name, and email are required",
-//         });
-//     }
+    if (!invite_code) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invite code is required" });
+    }
 
-//     // Find the hackathon by invite code
-//     const hackathon = await Hackathon.findOne({ invite_code });
+    // Find the hackathon by invite code
+    const hackathon = await Hackathon.findOne({ invite_code }).select(
+      "passkey is_public participants"
+    );
 
-//     if (!hackathon) {
-//       return res
-//         .status(404)
-//         .json({ success: false, error: "Invalid invite code" });
-//     }
+    if (!hackathon) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Invalid invite code" });
+    }
 
-//     // Check if the student already exists
-//     let student = await Student.findOne({ email });
+    // If the hackathon is private, verify the passkey
+    if (!hackathon.is_public) {
+      if (!passkey) {
+        return res.status(400).json({
+          success: false,
+          error: "Passkey is required for private hackathons",
+        });
+      }
 
-//     // Check if student is already a participant
-//     if (student) {
-//       const isAlreadyParticipant = await Hackathon.exists({
-//         _id: hackathon._id,
-//         participants: { $in: [student._id] },
-//       });
+      const isMatch = passkey === hackathon.passkey;
+      if (!isMatch) {
+        return res
+          .status(403)
+          .json({ success: false, error: "Invalid passkey" });
+      }
+    }
 
-//       if (isAlreadyParticipant) {
-//         return res
-//           .status(400)
-//           .json({ success: false, error: "You are already a participant" });
-//       }
-//     }
+    // Check if student is already a participant
+    if (hackathon.participants.includes(req.student.id)) {
+      return res
+        .status(400)
+        .json({ success: false, error: "You are already a participant" });
+    }
 
-//     // If student does not exist, create a new entry
-//     if (!student) {
-//       student = await Student.create({
-//         name,
-//         email,
-//         joined_hackathons: [hackathon._id],
-//       });
-//     } else {
-//       // Add hackathon to student's joined list, preventing duplicates
-//       await Student.updateOne(
-//         { _id: student._id },
-//         { $addToSet: { joined_hackathons: hackathon._id } }
-//       );
-//     }
+    // Add student to hackathon participants
+    await Hackathon.updateOne(
+      { _id: hackathon._id },
+      { $addToSet: { participants: req.student.id } }
+    );
 
-//     // Add student to hackathon participants, preventing duplicates
-//     await Hackathon.updateOne(
-//       { _id: hackathon._id },
-//       { $addToSet: { participants: student._id } }
-//     );
+    // Add hackathon to student's joined list
+    await Student.updateOne(
+      { _id: req.student.id },
+      { $addToSet: { joined_hackathons: hackathon._id } }
+    );
 
-//     res.json({
-//       success: true,
-//       message: "Joined hackathon successfully",
-//       student,
-//       hackathon,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// };
+    res.json({ success: true, message: "Joined hackathon successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
 
 module.exports = {
   createHackathon,
@@ -470,6 +461,7 @@ module.exports = {
   editHackathon,
   removeHackathon,
   getHackathonsByTeacher,
+  joinHackathon,
   getHackathonSubmissions,
   getHackathonRegistrations,
 };
