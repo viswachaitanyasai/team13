@@ -1,5 +1,5 @@
-import React, { useState } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const ViewEvaluation = () => {
@@ -72,10 +72,10 @@ const ViewEvaluation = () => {
   );
 
   return (
-    <div className="min-h-screen flex justify-center bg-gray-900 p-6 text-white">
-      <div className="w-full max-w-4xl bg-gray-800 rounded-xl shadow-lg p-6">
+    <div className="min-h-screen flex justify-center bg-gray-900 p-2 text-white md:w-full w-screen">
+      <div className="w-full max-w-4xl bg-gray-800 rounded-xl shadow-lg md:p-8 p-3">
         <button
-          className="text-blue-600 mb-6 self-start hover:text-indigo-300 transition"
+          className="text-blue-600 mb-6 ml-2 self-start hover:text-indigo-300 transition"
           onClick={() => navigate(-1)}
         >
           &larr; Back
@@ -83,21 +83,19 @@ const ViewEvaluation = () => {
         <h2 className="text-3xl font-bold text-blue-400 text-center">
           {hackathon.name}
         </h2>
-        <p className="text-gray-300 mt-2 text-center">
-          {hackathon.description}
-        </p>
+        <p className="text-gray-300 mt-2 text-center">{hackathon.description}</p>
 
         <Tabs.Root
-          className="mt-4"
+          className="mt-6"
           value={selectedTab}
           onValueChange={setSelectedTab}
         >
-          <Tabs.List className="flex justify-center space-x-6 border-b border-gray-700 pb-2">
+          <Tabs.List className="flex justify-center md:space-x-6 space-x-2 border-b border-gray-700 pb-4">
             {["shortlisted", "revisit", "rejected"].map((tab) => (
               <Tabs.Trigger
                 key={tab}
                 value={tab}
-                className={`px-4 py-2 rounded-full text-sm font-semibold shadow-md transition-all duration-300 ease-in-out ${
+                className={`px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-in-out ${
                   selectedTab === tab
                     ? "bg-blue-600 text-white"
                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"
@@ -112,62 +110,62 @@ const ViewEvaluation = () => {
         <input
           type="text"
           placeholder="Search by name..."
-          className="mt-4 w-full p-2 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:outline-none"
+          className="mt-6 w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:outline-none"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
 
         {filteredSubmissions.length > 0 ? (
-          <table className="mt-4 w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gray-700">
-                <th className="p-3 border-b border-gray-600">Name</th>
-                <th className="p-3 border-b border-gray-600">Class</th>
-                <th className="p-3 border-b border-gray-600">Score</th>
-                <th className="p-3 border-b border-gray-600">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredSubmissions.map((submission) => (
-                <tr
-                  key={submission.id}
-                  className="bg-gray-800 border-b border-gray-700"
-                >
-                  <td className="p-3">{submission.name}</td>
-                  <td className="p-3">{submission.class}</td>
-                  <td className="p-3">{submission.score}</td>
-                  <td className="p-3 flex space-x-2">
-                    <a
-                      href={submission.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-md"
-                    >
-                      View
-                    </a>
-                    <button className="px-3 py-1 bg-green-600 hover:bg-green-700 rounded-full font-medium shadow-md">
-                      Analysis
-                    </button>
-                    <select
-                      className="px-3 py-1 bg-gray-600 text-white rounded-lg shadow-md"
-                      value={submission.status}
-                      onChange={(e) =>
-                        handleStatusUpdate(submission.id, e.target.value)
-                      }
-                    >
-                      <option value="shortlisted">Shortlisted</option>
-                      <option value="revisit">Revisit</option>
-                      <option value="rejected">Rejected</option>
-                    </select>
-                  </td>
+          <div className="overflow-x-auto md:overflow-hidden max-w-full mt-6">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gray-700">
+                  <th className="p-4 text-left border-b border-gray-600">Name</th>
+                  <th className="p-4 text-left border-b border-gray-600">Class</th>
+                  <th className="p-4 text-left border-b border-gray-600">Score</th>
+                  <th className="p-4 text-left border-b border-gray-600">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredSubmissions.map((submission) => (
+                  <tr
+                    key={submission.id}
+                    className="bg-gray-800 border-b border-gray-700 hover:bg-gray-700 transition duration-200"
+                  >
+                    <td className="p-4">{submission.name}</td>
+                    <td className="p-4">{submission.class}</td>
+                    <td className="p-4">{submission.score}</td>
+                    <td className="p-4 flex space-x-2">
+                      <a
+                        href={submission.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-md transition"
+                      >
+                        View
+                      </a>
+                      <button className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full font-medium shadow-md transition">
+                        Analysis
+                      </button>
+                      <select
+                        className="px-4 py-2 bg-gray-600 text-white rounded-lg shadow-md transition"
+                        value={submission.status}
+                        onChange={(e) =>
+                          handleStatusUpdate(submission.id, e.target.value)
+                        }
+                      >
+                        <option value="shortlisted">Shortlisted</option>
+                        <option value="revisit">Revisit</option>
+                        <option value="rejected">Rejected</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
-          <p className="mt-4 text-gray-400 text-center">
-            No submissions found.
-          </p>
+          <p className="mt-6 text-gray-400 text-center">No submissions found.</p>
         )}
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaChevronDown, FaCog, FaSignOutAlt, FaUserTie } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "../apis/authapi";
@@ -7,13 +7,32 @@ function Navbar({ teacherName }) {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [storedTeacherName, setStoredTeacherName] = useState("Organizer");
+  const dropdownRef = useRef(null); // Reference for dropdown menu
+  const buttonRef = useRef(null); 
 
   useEffect(() => {
     const nameFromStorage = localStorage.getItem("teacherName");
     if (nameFromStorage) {
       setStoredTeacherName(nameFromStorage);
     }
-  }, []);
+
+  const handleClickOutside = (event) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target) &&
+      buttonRef.current &&
+      !buttonRef.current.contains(event.target)
+    ) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, []);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -46,6 +65,7 @@ function Navbar({ teacherName }) {
       {/* Profile & Dropdown */}
       <div className="relative">
         <div
+          ref={buttonRef}
           className="flex items-center cursor-pointer px-3 py-1 gap-2 rounded-full border border-gray-600 bg-gray-700 hover:bg-gray-600 transition-all shadow-lg backdrop-blur-lg"
           onClick={toggleDropdown}
         >
@@ -66,7 +86,9 @@ function Navbar({ teacherName }) {
 
         {/* Dropdown Menu */}
         {isDropdownOpen && (
-          <div className="absolute right-0 mt-3 w-56 bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
+          <div
+            ref={dropdownRef}
+            className="absolute right-0 mt-3 w-56 bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
             <button
               onClick={() => navigate("/profile")}
               className="block px-6 py-3 text-sm text-white hover:bg-indigo-500 transition-all no-underline w-full text-left flex items-center"

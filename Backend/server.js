@@ -10,7 +10,7 @@ const hackathonRoutes = require("./routes/hackathonRoutes");
 const gradingRoutes = require("./routes/gradingRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
-const submissionRoutes = require("./routes/submissionRoutes");
+const studentRoutes=require('./routes/studentRoutes');const submissionRoutes = require("./routes/submissionRoutes");
 
 const app = express();
 
@@ -50,6 +50,7 @@ connectDB();
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/hackathons", hackathonRoutes);
+app.use("/api/student", studentRoutes);
 app.use("/api/submissions", gradingRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/files", uploadRoutes);
