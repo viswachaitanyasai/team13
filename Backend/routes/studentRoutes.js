@@ -3,6 +3,8 @@ const {
   registerStudent,
   loginStudent,
   getStudentProfile,
+  getMyHackathons,
+  getHackathonById,
 } = require("../controllers/studentController");
 const submissionController = require("../controllers/submissionController");
 const { uploadMiddleware } = require("../controllers/uploadController");
@@ -19,6 +21,8 @@ router.post("/login", loginStudent);
 
 // Protected route - Get Student Profile
 router.get("/profile", studentAuthMiddleware, getStudentProfile);
+router.get("/myhackathons", studentAuthMiddleware, getMyHackathons);
+router.get("/:id", studentAuthMiddleware, getHackathonById);
 
 router.post("/submit", uploadMiddleware,studentAuthMiddleware, submissionController.submitSolution);
 
