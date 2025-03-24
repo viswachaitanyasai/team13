@@ -7,6 +7,6 @@ const {
 const router = express.Router();
 
 // ✅ Set the route to `/files/upload`
-router.post("/files/upload", uploadMiddleware, uploadFile);
+router.post("/upload", uploadMiddleware, uploadFile);
 
 module.exports = router;
