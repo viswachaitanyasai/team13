@@ -86,3 +86,42 @@ exports.getStudentProfile = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+exports.getMyHackathons = async (req, res) => {
+  try {
+    const student = await Student.findById(req.student.id).populate(
+      "joined_hackathons"
+    );
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    res.json({ hackathons: student.joined_hackathons });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+exports.getHackathonById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const hackathon = await Hackathon.findById(id);
+
+    if (!hackathon) {
+      return res.status(404).json({ error: "Hackathon not found" });
+    }
+
+    const hasJoined = hackathon.participants.includes(req.student.id);
+    const hasSubmitted = await Submission.exists({
+      student: req.student.id,
+      hackathon: id,
+    });
+
+    res.json({
+      ...hackathon.toObject(),
+      hasJoined,
+      hasSubmitted,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
