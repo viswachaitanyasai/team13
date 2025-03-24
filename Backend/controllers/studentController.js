@@ -143,3 +143,11 @@ exports.getHackathonById = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+exports.getPublicHackathons = async (req, res) => {
+  try {
+    const hackathons = await Hackathon.find({ is_public: true });
+    res.json({ hackathons });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
