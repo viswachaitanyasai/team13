@@ -5,6 +5,7 @@ const {
   getStudentProfile,
   getMyHackathons,
   getHackathonById,
+  getPublicHackathons,
 } = require("../controllers/studentController");
 const studentAuthMiddleware = require("../middlewares/studentAuthMiddleware");
 
@@ -20,5 +21,6 @@ router.post("/login", loginStudent);
 router.get("/profile", studentAuthMiddleware, getStudentProfile);
 router.get("/myhackathons", studentAuthMiddleware, getMyHackathons);
 router.get("/hackathon/:id", getHackathonById);
+router.get("/hackathons", getPublicHackathons);
 
 module.exports = router;
