@@ -354,6 +354,44 @@ const removeHackathon = async (req, res) => {
   }
 };
 
+// Get registrations for a specific hackathon
+const getHackathonRegistrations = async (req, res) => {
+  try {
+    const { hackathon_id } = req.params;
+
+    const hackathon = await Hackathon.findById(hackathon_id).populate("participants", "name email");
+
+    if (!hackathon) {
+      return res.status(404).json({ message: "Hackathon not found" });
+    }
+
+    res.status(200).json({ participants: hackathon.participants });
+  } catch (error) {
+    console.error("Error fetching registrations:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Get submissions for a specific hackathon
+const getHackathonSubmissions = async (req, res) => {
+  try {
+    const { hackathon_id } = req.params;
+
+    const submissions = await Submission.find({ hackathon: hackathon_id })
+      .populate("student", "name email")
+      .populate("hackathon", "title");
+
+    if (!submissions.length) {
+      return res.status(404).json({ message: "No submissions found for this hackathon" });
+    }
+
+    res.status(200).json({ submissions });
+  } catch (error) {
+    console.error("Error fetching submissions:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // const joinHackathon = async (req, res) => {
 //   try {
 //     const { invite_code, name, email } = req.body;
@@ -432,4 +470,6 @@ module.exports = {
   editHackathon,
   removeHackathon,
   getHackathonsByTeacher,
+  getHackathonSubmissions,
+  getHackathonRegistrations,
 };

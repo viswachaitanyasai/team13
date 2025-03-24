@@ -10,8 +10,7 @@ const hackathonRoutes = require("./routes/hackathonRoutes");
 const gradingRoutes = require("./routes/gradingRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
-const studentRoutes=require('./routes/studentRoutes');const submissionRoutes = require("./routes/submissionRoutes");
-
+const studentRoutes = require("./routes/studentRoutes");
 const app = express();
 
 // ✅ Dynamic Allowed Origins (Works for both development & production)
@@ -54,7 +53,6 @@ app.use("/api/student", studentRoutes);
 app.use("/api/submissions", gradingRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/files", uploadRoutes);
-app.use("/api/files", submissionRoutes);
 
 // ✅ Start Server
 const PORT = process.env.PORT || 4000;

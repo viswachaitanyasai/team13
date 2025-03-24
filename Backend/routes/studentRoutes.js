@@ -4,6 +4,9 @@ const {
   loginStudent,
   getStudentProfile,
 } = require("../controllers/studentController");
+const submissionController = require("../controllers/submissionController");
+const { uploadMiddleware } = require("../controllers/uploadController");
+
 const studentAuthMiddleware = require("../middlewares/studentAuthMiddleware");
 
 const router = express.Router();
@@ -16,5 +19,8 @@ router.post("/login", loginStudent);
 
 // Protected route - Get Student Profile
 router.get("/profile", studentAuthMiddleware, getStudentProfile);
+
+router.post("/submit", uploadMiddleware,studentAuthMiddleware, submissionController.submitSolution);
+
 
 module.exports = router;
