@@ -19,6 +19,6 @@ router.post("/login", loginStudent);
 // Protected route - Get Student Profile
 router.get("/profile", studentAuthMiddleware, getStudentProfile);
 router.get("/myhackathons", studentAuthMiddleware, getMyHackathons);
-router.get("/:id", studentAuthMiddleware, getHackathonById);
+router.get("/hackathon/:id", getHackathonById);
 
 module.exports = router;

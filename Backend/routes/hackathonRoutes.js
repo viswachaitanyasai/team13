@@ -18,8 +18,6 @@ router.get("/:hackathon_id", getHackathonById);
 router.put("/:hackathon_id", authMiddleware, editHackathon);
 router.delete("/:hackathon_id", authMiddleware, removeHackathon); // Protected delete route
 router.get("/teacher/:teacher_id", authMiddleware, getHackathonsByTeacher);
-// router.post("/join", joinHackathon); // Students join using invite code
-
-
+router.post("/join", joinHackathon); // Students join using invite code
 
 module.exports = router;
