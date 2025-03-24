@@ -1,37 +1,42 @@
 const fs = require("fs");
+const fsPromises = require("fs").promises;
 const path = require("path");
 const { extractText } = require("../utils/textExtractor");
 const { analyzeText, analyzeAudio } = require("../utils/geminiAnalysis");
 const { extractAudioFromVideo } = require("../utils/videoProcessor");
 const { uploadFileToS3 } = require("../utils/s3Uploader");
-const { Submission } = require("../models/Submission");
-const { Evaluation } = require("../models/Evaluation");
+const Submission  = require("../models/Submission");
+const Evaluation  = require("../models/Evaluation");
+const Hackathon = require("../models/Hackathon");
 
 // ✅ Process File (Extract Text / Convert Audio)
-const processFile = async (filePath, fileType,problemStatement,judgement_parameters,custom_parameters) => {
+const processFile = async (filePath, fileType,problemStatement,judgement_parameters,custom_prompt) => {
   if (fileType.startsWith("audio/")) {
-    return { extractedText: "", evaluationResult: await analyzeAudio(problemStatement, judgement_parameters, filePath, custom_parameters) };
+    return { extractedText: "", evaluationResult: await analyzeAudio(problemStatement, judgement_parameters, filePath, custom_prompt) };
   } 
   if (fileType.startsWith("video/")) {
     const audioPath = await extractAudioFromVideo(filePath);
-    return { extractedText: "", evaluationResult: await analyzeAudio(problemStatement, judgement_parameters, audioPath, custom_parameters) };
+    return { extractedText: "", evaluationResult: await analyzeAudio(problemStatement, judgement_parameters, audioPath, custom_prompt) };
   } 
   
   // ✅ Extract Text for Text-Based Files
   const extractedText = await extractText(filePath, fileType);
-  const evaluationResult = await analyzeText(extractedText);
+  const evaluationResult = await analyzeText(extractedText,);
   return { extractedText, evaluationResult };
 };
 
 // ✅ Save File Locally
-const saveFileLocally = (fileBuffer, fileName) => {
+const saveFileLocally = async (fileBuffer, fileName) => {
   const uploadDir = path.join(__dirname, "..", "uploads");
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+
+  try {
+    await fsPromises.access(uploadDir); // Check if directory exists
+  } catch (error) {
+    await fsPromises.mkdir(uploadDir, { recursive: true }); // Create if not exists
   }
 
   const filePath = path.join(uploadDir, fileName);
-  fs.writeFileSync(filePath, fileBuffer);
+  await fsPromises.writeFile(filePath, fileBuffer);
   return filePath;
 };
 
@@ -41,8 +46,7 @@ const submitSolution = async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const { hackathon_id } = req.body;
-    const student_id = req.user?.id; // Ensure req.user exists
+    const { hackathon_id, student_id } = req.body;
 
     if (!hackathon_id) {
       return res.status(400).json({ error: "Hackathon ID is required." });
@@ -61,20 +65,14 @@ const submitSolution = async (req, res) => {
       hackathon_id,
       student_id,
       submission_url: "", // Will be updated after S3 upload
-      extracted_text: "", // Will be updated later
     });
 
     await submission.save();
 
-    // ✅ Generate temp file path with submission_id
-    // Extract file extension
-    const fileExtension = path.extname(originalFileName); // e.g., ".pdf", ".png"
-
-    // Define the new file name format: "student_id.ext"
+    // ✅ Save file locally with submission ID
+    const fileExtension = path.extname(originalFileName);
     const fileName = `${student_id}${fileExtension}`;
-
-    // Generate the temporary file path
-    const tempFilePath = saveFileLocally(fileBuffer, fileName);
+    const tempFilePath = await saveFileLocally(fileBuffer, fileName);
 
     // ✅ Upload file to S3
     const fileUrl = await uploadFileToS3(
@@ -83,43 +81,82 @@ const submitSolution = async (req, res) => {
       fileType
     );
 
-    // ✅ Update Submission with the uploaded file URL
+    // ✅ Update Submission with uploaded file URL
     submission.submission_url = fileUrl;
     await submission.save();
 
-    //done till here just need to pass the req details to processfile
-    const { extractedText, evaluationResult } = processFile(tempFilePath, fileType);
+    // ✅ Fetch Hackathon details
+    const hackathon = await Hackathon.findById(hackathon_id);
+    const problemStatement = `Title: ${hackathon.title}\nDescription: ${hackathon.description}\nProblem Statement: ${hackathon.problem_statement}\nContext: ${hackathon.context}`;
+    const judgement_parameters = hackathon.judging_parameters;
+    const custom_prompt = hackathon.custom_prompt;
 
-    // ✅ Analyze extracted text
+    // Declare evaluationResult in the outer scope
+    let evaluationResult;
 
-    // const evaluationResult = await analyzeText(extractedText);
+    // ✅ **Process File for Evaluation**
+    try {
+      // Process File for Evaluation
+      const result = await processFile(
+        tempFilePath,
+        fileType,
+        problemStatement,
+        judgement_parameters,
+        custom_prompt
+      );
+      // Destructure and assign to evaluationResult
+      const { extractedText, evaluationResult: evalRes } = result;
+      // console.log("Type of evaluationResult:", typeof evalRes);
+      // JSON.parse(evalRes);
 
-    // ✅ Create Evaluation Entry
-    const evaluation = new Evaluation({
-      submission_id: submission._id,
-      extracted_text,
-      evaluationResult,
-    });
+      evaluationResult = evalRes;
+      // console.log("Evaluation Result1:", evaluationResult);
 
-    await evaluation.save();
+      // ✅ Create Evaluation Entry with the exact return structure and update status to "completed"
+      const evaluation = new Evaluation({
+        submission_id: submission._id,
+        evaluation_status: "completed", // set status to completed
+        parameter_feedback: evaluationResult.parameter_feedback,
+        improvement: evaluationResult.improvement,
+        actionable_steps: evaluationResult.actionable_steps,
+        strengths: evaluationResult.strengths,
+        overall_score: evaluationResult.overall_score,
+        overall_reason: evaluationResult.overall_reason,
+        summary: evaluationResult.summary,
+      });
 
-    // ✅ Link Submission with Evaluation
-    submission.evaluation_id = evaluation._id;
-    submission.extracted_text = extractedText; // Update extracted text
-    await submission.save();
+      await evaluation.save();
 
-    // ✅ Delete temporary file
-    fs.unlinkSync(tempFilePath);
+      // ✅ Link Submission with Evaluation
+      submission.evaluation_id = evaluation._id;
+      await submission.save();
+    } finally {
+      // ✅ Delete temporary file in all cases
+      await fsPromises
+        .unlink(tempFilePath)
+        .catch((err) => console.error("File deletion error:", err));
+    }
 
+    // Send a structured response including evaluation details
     res.status(200).json({
       message: "Submission processed successfully",
-      submission,
-      evaluation,
+      submission, // includes submission ID and linked evaluation_id
+      evaluation: {
+        overall_score: evaluationResult.overall_score,
+        overall_reason: evaluationResult.overall_reason,
+        parameter_feedback: evaluationResult.parameter_feedback,
+        improvement: evaluationResult.improvement,
+        actionable_steps: evaluationResult.actionable_steps,
+        strengths: evaluationResult.strengths,
+        summary: evaluationResult.summary,
+      },
     });
   } catch (error) {
     console.error("Submission Error:", error);
     res.status(500).json({ error: "Error processing submission" });
   }
 };
+
+
 
 module.exports = { submitSolution };
