@@ -1,8 +1,9 @@
 const express = require("express");
-
 const router = express.Router();
-const { submit } = require("../controllers/submissionController");
+const submissionController = require("../controllers/submissionController");
+const { uploadMiddleware } = require("../controllers/uploadController");
 
-router.post("/submit", submit);
+// ✅ File Upload & Submission Route
+router.post("/submit", uploadMiddleware, submissionController.submitSolution);
 
 module.exports = router;

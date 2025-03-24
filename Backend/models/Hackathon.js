@@ -41,6 +41,7 @@ const HackathonSchema = new mongoose.Schema({
   judging_parameters: [
     { type: mongoose.Schema.Types.ObjectId, ref: "JudgingParameter" },
   ],
+  custom_prompt:{type:String},
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
