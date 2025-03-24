@@ -107,6 +107,7 @@ const getSubmissionStats = async (req, res) => {
       title: hackathon.title,
       total_participants: hackathon.participants.length,
       total_submissions: submissionMap[hackathon._id.toString()] || 0,
+      
     }));
 
     res.json({ success: true, stats });

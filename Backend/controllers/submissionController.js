@@ -66,7 +66,8 @@ const submitSolution = async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const { hackathon_id, student_id } = req.body;
+    const { hackathon_id, } = req.body;
+    const student_id = req.student.id;
 
     if (!hackathon_id) {
       return res.status(400).json({ error: "Hackathon ID is required." });
