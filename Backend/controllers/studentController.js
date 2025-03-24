@@ -104,17 +104,35 @@ exports.getMyHackathons = async (req, res) => {
 exports.getHackathonById = async (req, res) => {
   try {
     const { id } = req.params;
+    const token = req.header("Authorization");
     const hackathon = await Hackathon.findById(id);
+    if (token) {
+      const decoded = jwt.verify(
+        token.replace("Bearer ", ""),
+        process.env.JWT_SECRETKEY
+      );
+      const student = await Student.findById(decoded.id).select("-password");
 
-    if (!hackathon) {
-      return res.status(404).json({ error: "Hackathon not found" });
+      if (!student) {
+        return res
+          .status(401)
+          .json({ error: "Invalid token. Student not found." });
+      }
+
+      req.student = student;
+
+      if (!hackathon) {
+        return res.status(404).json({ error: "Hackathon not found" });
+      }
+      const hasJoined = hackathon.participants.includes(req.student.id);
+      const hasSubmitted = await Submission.exists({
+        student: req.student.id,
+        hackathon: id,
+      });
+    } else {
+      const hasJoined = false;
+      const hasSubmitted = false;
     }
-
-    const hasJoined = hackathon.participants.includes(req.student.id);
-    const hasSubmitted = await Submission.exists({
-      student: req.student.id,
-      hackathon: id,
-    });
 
     res.json({
       ...hackathon.toObject(),
