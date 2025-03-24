@@ -39,7 +39,7 @@ const PastHackathons = () => {
     }, []);
 
     return (
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto mt-2 p-4">
         <h2 className="text-2xl font-bold text-indigo-700 mb-6">Past Hackathons</h2>
         {loading ? (
           <p className="text-gray-600">Loading hackathons...</p>

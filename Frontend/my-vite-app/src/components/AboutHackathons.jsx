@@ -16,7 +16,7 @@ const AboutHackathons = () => {
           <h1 className="text-5xl font-extrabold text-orange-500 mb-4 tracking-wide">
             Hackathon Central
           </h1>
-          <p className="text-gray-300 text-lg leading-relaxed max-w-3xl mx-auto">
+          <p className="text-black text-lg leading-relaxed max-w-3xl mx-auto">
             Explore hackathons where innovation meets collaboration. From{" "}
             <span className="text-indigo-400 font-semibold">AI</span>,
             <span className="text-red-400 font-semibold"> Cybersecurity</span>,
@@ -30,23 +30,23 @@ const AboutHackathons = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {[
             {
-              title: "Compete",
+              title: "Create",
               description:
-                "Showcase your skills against top minds in the industry.",
+                "Set up a new hackathon by defining rules, timelines, and evaluation criteria. Customize the event to suit your needs",
               icon: <Trophy className="h-12 w-12 text-indigo-500" />,
               bgColor: "bg-indigo-100 border-indigo-300",
             },
             {
-              title: "Learn",
+              title: "Manage",
               description:
-                "Gain experience through hands-on projects and mentorship.",
+                "Monitor participant submissions, track deadlines, and ensure compliance with the hackathon guidelines.",
               icon: <Lightbulb className="h-12 w-12 text-blue-500" />,
               bgColor: "bg-blue-100 border-blue-300",
             },
             {
-              title: "Network",
+              title: "Evaluate",
               description:
-                "Meet fellow tech enthusiasts, mentors, and employers.",
+                "Use AI to analyze projects, provide insights, and generate fair rankings based on predefined criteria.",
               icon: <Users className="h-12 w-12 text-gray-700" />,
               bgColor: "bg-gray-100 border-gray-300",
             },
