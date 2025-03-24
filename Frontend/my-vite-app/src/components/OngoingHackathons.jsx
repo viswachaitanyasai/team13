@@ -4,6 +4,16 @@ import HackathonCard from './HackathonCard';
 import { getHackathons } from "../apis/hackathonapi";
 import { toast } from "react-toastify";
 
+const SkeletonCard = () => (
+  <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-md animate-pulse">
+    <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
+    <div className="h-4 bg-gray-300 rounded w-1/2 mb-4"></div>
+    <div className="h-20 bg-gray-200 rounded mb-4"></div>
+    <div className="h-6 bg-gray-300 rounded w-1/3"></div>
+  </div>
+);
+
+
 const OngoingHackathons = () => {
   const [hackathons, setHackathons] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -92,7 +102,12 @@ const OngoingHackathons = () => {
     <div className="max-w-4xl mx-auto mt-2 p-4">
       <h2 className="text-2xl font-bold text-indigo-700 mb-6">Ongoing Hackathons</h2>
       {loading ? (
-        <p className="text-gray-600">Loading hackathons...</p>
+        <div className="grid gap-6">
+          {/* Render 3 Skeleton Cards while loading */}
+          {[1, 2, 3].map((index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
       ) : hackathons.length > 0 ? (
         <div className="grid gap-6">
           {hackathons.map((hackathon) => (

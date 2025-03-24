@@ -23,6 +23,7 @@ import SecuredRoute from "./components/SecuredRoute";
 import OngoingHackathons from "./components/OngoingHackathons";
 import UpcomingHackathons from "./components/UpcomingHackathons";
 import PastHackathons from "./components/PastHackathons";
+import ViewHackathon from "./pages/ViewHackathonDetails";
 function App() {
   return (
     <>
@@ -44,6 +45,7 @@ function App() {
             />
             <Route path="/profile" element={<Profile />} />
             <Route path="/hackathons" element={<AboutHackathons />} />
+            <Route path="/hackathon/:hackathonId" element={<ViewHackathon />} />
             <Route path="/hackathons/past" element={<PastHackathons />} />
             <Route path="/hackathons/ongoing" element={<OngoingHackathons />} />
             <Route path="/hackathons/upcoming" element={<UpcomingHackathons />} />

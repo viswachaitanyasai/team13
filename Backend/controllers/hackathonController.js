@@ -18,8 +18,9 @@ const createHackathon = async (req, res) => {
       allow_multiple_solutions,
       is_public,
       passkey,
-      grade, // Grade restriction (e.g., "1st", "10th", "UG")
+      grade,
       judging_parameters,
+      custom_prompt, // Added custom_prompt
     } = req.body;
 
     const validGrades = [
@@ -95,9 +96,10 @@ const createHackathon = async (req, res) => {
       sponsors: sponsorsArray,
       allow_multiple_solutions: allowMultipleBool,
       is_public: isPublicBool,
-      passkey: hashedPasskey, // Store hashed passkey
-      invite_code: inviteCode, // Store unique invite code
-      grade, // Store grade restriction
+      passkey: hashedPasskey,
+      invite_code: inviteCode,
+      grade,
+      custom_prompt, // Save custom_prompt in the model
     });
 
     // Create judging parameters and store their IDs
@@ -124,6 +126,7 @@ const createHackathon = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 const getHackathons = async (req, res) => {
   try {
@@ -173,6 +176,7 @@ const editHackathon = async (req, res) => {
       is_public,
       passkey,
       grade, // Allow updating grade
+      custom_prompt,
     } = req.body;
 
     // Valid grade levels (including 1st to 5th)
@@ -267,6 +271,7 @@ const editHackathon = async (req, res) => {
         is_public,
         passkey: hashedPasskey,
         grade, // Allow updating grade
+        custom_prompt,
         updated_at: Date.now(),
       },
       { new: true, runValidators: true }
