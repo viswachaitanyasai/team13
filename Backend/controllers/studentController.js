@@ -1,5 +1,5 @@
 const Student = require("../models/Student");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 // @desc Register a new student
@@ -57,11 +57,20 @@ exports.loginStudent = async (req, res) => {
     }
 
     // Generate JWT Token
-    const token = jwt.sign({ id: student._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: student._id }, process.env.JWT_SECRETKEY, {
       expiresIn: "7d",
     });
 
-    res.json({ token, student: { name: student.name, email: student.email, grade: student.grade, district: student.district, state: student.state } });
+    res.json({
+      token,
+      student: {
+        name: student.name,
+        email: student.email,
+        grade: student.grade,
+        district: student.district,
+        state: student.state,
+      },
+    });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
