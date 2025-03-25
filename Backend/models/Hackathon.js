@@ -61,6 +61,7 @@ const HackathonSchema = new mongoose.Schema({
   skill_gap_analysis: { type: String, default: "", select: false },
   shortlisted_students: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Student" },
+    
   ],
   revisit_students: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Student" },
