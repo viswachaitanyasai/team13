@@ -481,6 +481,49 @@ const getHackathonEvaluations = async (req, res) => {
   }
 };
 
+const getHackathonSummary = async (req, res) => {
+  try {
+    const { hackathon_id } = req.params;
+
+    // Fetch hackathon details with necessary fields populated
+    const hackathon = await Hackathon.findById(hackathon_id)
+      .populate({
+        path: "judging_parameters",
+        select: "name", // Fetch only the name field of judging parameters
+      })
+      .select(
+        "title status judging_parameters is_result_published participants submissions shortlisted_students revisit_students rejected_students summary_analysis skill_gap_analysis"
+      );
+
+    if (!hackathon) {
+      return res.status(404).json({ error: "Hackathon not found" });
+    }
+
+    // Construct response
+    const summary = {
+      title: hackathon.title,
+      status: hackathon.status,
+      judging_parameters: hackathon.judging_parameters.map(
+        (param) => param.name
+      ),
+      is_result_published: hackathon.is_result_published,
+      number_of_participants: hackathon.participants.length,
+      number_of_submissions: hackathon.submissions.length,
+      number_of_shortlisted_students: hackathon.shortlisted_students.length,
+      number_of_revisit_students: hackathon.revisit_students.length,
+      number_of_rejected_students: hackathon.rejected_students.length,
+      summary_analysis: hackathon.summary_analysis,
+      skill_gap_analysis: hackathon.skill_gap_analysis,
+    };
+
+    res.status(200).json(summary);
+  } catch (error) {
+    console.error("Error fetching hackathon summary:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+
 
 
 
@@ -494,4 +537,5 @@ module.exports = {
   getHackathonSubmissions,
   getHackathonRegistrations,
   getHackathonEvaluations,
+  getHackathonSummary,
 };
