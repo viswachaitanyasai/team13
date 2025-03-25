@@ -1,7 +1,8 @@
 const Student = require("../models/Student");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const Hackathon = require("../models/Hackathon");
+const Submission = require("../models/Submission");
 // @desc Register a new student
 // @route POST /api/students/register
 // @access Public
