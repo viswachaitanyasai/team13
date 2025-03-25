@@ -400,15 +400,9 @@ const getHackathonSubmissions = async (req, res) => {
   try {
     const { hackathon_id } = req.params;
 
-    const hackathon = await Hackathon.findById(hackathon_id)
-      .populate({
-        path: "submissions",
-        populate: [
-          { path: "student_id", select: "name email" }, // Get student details
-          { path: "evaluation_id" }, // Get evaluation details
-        ],
-      })
-      .select("title submissions"); // Fetch title and submissions only
+    const hackathon = await Hackathon.findById(hackathon_id).populate(
+      "submissions"
+    );
 
     if (!hackathon) {
       return res.status(404).json({ message: "Hackathon not found" });
@@ -420,6 +414,7 @@ const getHackathonSubmissions = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 
 const joinHackathon = async (req, res) => {
