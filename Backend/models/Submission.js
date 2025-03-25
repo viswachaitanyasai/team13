@@ -17,7 +17,7 @@ const SubmissionSchema = new mongoose.Schema(
       ref: "Evaluation",
     },
     submission_url: { type: String,},
-    extracted_text: { type: String, default: "" },
+    // extracted_text: { type: String, default: "" },
     submission_date: { type: Date, default: Date.now },
   },
   { timestamps: true }
