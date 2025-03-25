@@ -11,6 +11,7 @@ const submissionRoutes = require("./routes/submissionRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const studentRoutes = require("./routes/studentRoutes");
+const quizRoutes = require("./routes/quizRoutes");
 const app = express();
 
 // ✅ Dynamic Allowed Origins (Works for both development & production)
@@ -18,7 +19,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
-  "https://eduhack.vercel.app"
+  "https://eduhack.vercel.app",
 ];
 
 // ✅ CORS Configuration
@@ -53,6 +54,8 @@ app.use("/api/student", studentRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/files", uploadRoutes);
+app.use("/api/quiz", quizRoutes);
+
 
 // ✅ Start Server
 const PORT = process.env.PORT || 4000;
