@@ -84,6 +84,18 @@ function Sidebar() {
               <FaTrophy className="mr-3 text-base" /> Upcoming Hackathons
             </button>
           </li>
+          <li>
+            <button
+               onClick={() => handleItemClick("quizzes", "/quizzes")}
+               className={`flex items-center w-full p-3 rounded-lg transition-all font-medium text-sm ${
+                 active === "quizzes"
+                   ? "bg-indigo-500 text-white shadow-md"
+                   : "text-gray-300 hover:bg-gray-700"
+               }`}
+            >
+              <FaTrophy className="mr-3 text-base" />Quizzes
+            </button>
+          </li>
         </ul>
 
         <div className="px-4 pb-2">
