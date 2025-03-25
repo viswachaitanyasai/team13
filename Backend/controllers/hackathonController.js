@@ -144,7 +144,6 @@ const createHackathon = async (req, res) => {
 };
 
 
-
 const getHackathons = async (req, res) => {
   try {
     const hackathons = await Hackathon.find({ teacher_id: req.user.id })
@@ -334,7 +333,6 @@ const getHackathonsByTeacher = async (req, res) => {
   }
 };
 
-
 // Remove a hackathon (Only the teacher who created it can delete)
 const removeHackathon = async (req, res) => {
   try {
@@ -381,14 +379,15 @@ const removeHackathon = async (req, res) => {
   }
 };
 
-
-
 // Get registrations for a specific hackathon
 const getHackathonRegistrations = async (req, res) => {
   try {
     const { hackathon_id } = req.params;
 
-    const hackathon = await Hackathon.findById(hackathon_id).populate("participants", "name email");
+    const hackathon = await Hackathon.findById(hackathon_id).populate(
+      "participants",
+      "name email"
+    );
 
     if (!hackathon) {
       return res.status(404).json({ message: "Hackathon not found" });
@@ -485,71 +484,6 @@ const getHackathonEvaluations = async (req, res) => {
 
 
 
-
-
-const joinHackathon = async (req, res) => {
-  try {
-    const { invite_code, name, email } = req.body;
-
-    if (!invite_code) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Invite code is required" });
-    }
-
-    // Find the hackathon by invite code
-    const hackathon = await Hackathon.findOne({ invite_code }).select(
-      "passkey is_public participants"
-    );
-
-    if (!hackathon) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Invalid invite code" });
-    }
-
-    // If the hackathon is private, verify the passkey
-    if (!hackathon.is_public) {
-      if (!passkey) {
-        return res.status(400).json({
-          success: false,
-          error: "Passkey is required for private hackathons",
-        });
-      }
-
-      const isMatch = await bcrypt.compare(passkey, hackathon.passkey); // Correct bcrypt comparison
-      if (!isMatch) {
-        return res
-          .status(403)
-          .json({ success: false, error: "Invalid passkey" });
-      }
-    }
-
-    // Check if student is already a participant
-    if (hackathon.participants.includes(req.student.id)) {
-      return res
-        .status(400)
-        .json({ success: false, error: "You are already a participant" });
-    }
-
-    // Add student to hackathon participants
-    await Hackathon.updateOne(
-      { _id: hackathon._id },
-      { $addToSet: { participants: req.student.id } }
-    );
-
-    // Add hackathon to student's joined list
-    await Student.updateOne(
-      { _id: req.student.id },
-      { $addToSet: { joined_hackathons: hackathon._id } }
-    );
-
-    res.json({ success: true, message: "Joined hackathon successfully" });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-};
-
 module.exports = {
   createHackathon,
   getHackathons,
@@ -557,7 +491,6 @@ module.exports = {
   editHackathon,
   removeHackathon,
   getHackathonsByTeacher,
-  joinHackathon,
   getHackathonSubmissions,
   getHackathonRegistrations,
   getHackathonEvaluations,
