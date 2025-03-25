@@ -501,6 +501,7 @@ const getHackathonSummary = async (req, res) => {
 
     // Construct response
     const summary = {
+      id:hackathon_id,
       title: hackathon.title,
       status: hackathon.status,
       judging_parameters: hackathon.judging_parameters.map(
