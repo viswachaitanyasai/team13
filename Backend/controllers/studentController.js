@@ -107,13 +107,21 @@ exports.getHackathonById = async (req, res) => {
     const { id } = req.params;
     const token = req.header("Authorization");
     const hackathon = await Hackathon.findById(id);
+
+    if (!hackathon) {
+      return res.status(404).json({ error: "Hackathon not found" });
+    }
+
+    let hasJoined = false;
+    let hasSubmitted = false;
+
     if (token) {
       const decoded = jwt.verify(
         token.replace("Bearer ", ""),
         process.env.JWT_SECRETKEY
       );
       const student = await Student.findById(decoded.id).select("-password");
-
+      console.log(hackathon.passkey);
       if (!student) {
         return res
           .status(401)
@@ -121,29 +129,45 @@ exports.getHackathonById = async (req, res) => {
       }
 
       req.student = student;
-
-      if (!hackathon) {
-        return res.status(404).json({ error: "Hackathon not found" });
-      }
-      const hasJoined = hackathon.participants.includes(req.student.id);
-      const hasSubmitted = await Submission.exists({
+      hasJoined = hackathon.participants.includes(req.student.id);
+      hasSubmitted = await Submission.exists({
         student: req.student.id,
         hackathon: id,
       });
-    } else {
-      const hasJoined = false;
-      const hasSubmitted = false;
     }
 
-    res.json({
-      ...hackathon.toObject(),
+    const filteredHackathon = {
+      _id: hackathon._id,
+      teacher_id: hackathon.teacher_id,
+      title: hackathon.title,
+      problem_statement: hackathon.problem_statement,
+      description: hackathon.description,
+      context: hackathon.context,
+      image_url: hackathon.image_url,
+      file_attachment_url: hackathon.file_attachment_url,
+      start_date: hackathon.start_date,
+      end_date: hackathon.end_date,
+      sponsors: hackathon.sponsors,
+      allow_multiple_solutions: hackathon.allow_multiple_solutions,
+      is_public: hackathon.is_public,
+      invite_code: hackathon.invite_code,
+      grade: hackathon.grade,
+      status: hackathon.status,
+      isResultPublished: hackathon.isResultPublished,
+      no_of_participants: hackathon.participants.length,
+      created_at: hackathon.created_at,
+      updated_at: hackathon.updated_at,
       hasJoined,
       hasSubmitted,
-    });
+    };
+
+    res.json(filteredHackathon);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Server error" });
   }
 };
+
 exports.getPublicHackathons = async (req, res) => {
   try {
     const hackathons = await Hackathon.find({ is_public: true });
