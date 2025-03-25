@@ -54,7 +54,8 @@ const HackathonSchema = new mongoose.Schema({
     default: [], // ✅ Ensures the array is always stored
   },
 
-  skill_gap: { type: Map, of: Number, default: {}, select: false }, // Hashmap to track skill gaps
+  skill_gap: { type: Map, of: Number, default: {}, select: false, select: false }, // Hashmap to track skill gaps
+  keywords: { type: Map, of: Number, default: {}, select: false }, // Hashmap to track skill gaps
   keywords: { type: Map, of: Number, default: {}, select: false }, // Hashmap to track skill gaps
   summary_analysis: { type: String, default: "", select: false },
   skill_gap_analysis: { type: String, default: "", select: false },
@@ -67,6 +68,9 @@ const HackathonSchema = new mongoose.Schema({
   rejected_students: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Student" },
   ],
+  summary_analysis: { type: String, default: "", select: false },
+  skill_gap_analysis: { type: String, default: "", select: false },
+
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });
