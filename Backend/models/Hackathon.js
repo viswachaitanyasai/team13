@@ -47,7 +47,14 @@ const HackathonSchema = new mongoose.Schema({
   isResultPublished: { type: Boolean, default: false },
   custom_prompt: { type: String },
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
-  skill_gap: { type: Map, of: Number, default: {} }, // Hashmap to track skill gaps and their occurrences
+
+  // ✅ Track all submissions made in this hackathon
+  submissions: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Submission" }],
+    default: [], // ✅ Ensures the array is always stored
+  },
+
+  skill_gap: { type: Map, of: Number, default: {} }, // Hashmap to track skill gaps
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });

@@ -1,5 +1,6 @@
 const Hackathon = require("../models/Hackathon");
 const Student = require("../models/Student");
+const Submission = require("../models/Submission");
 const JudgingParameter = require("../models/JudgingParameter");
 const { generateInviteCode } = require("../utils/uniqueHackathonJoinId");
 const bcrypt = require("bcrypt");
@@ -21,7 +22,7 @@ const createHackathon = async (req, res) => {
       is_public,
       passkey,
       grade,
-      judging_parameters, // Now only an array of names
+      judging_parameters, // Now an array of names
       custom_prompt,
     } = req.body;
 
@@ -87,7 +88,7 @@ const createHackathon = async (req, res) => {
 
     const inviteCode = await generateInviteCode();
 
-    // Create the hackathon first
+    // ✅ Create the hackathon with an empty submissions array
     const hackathon = await Hackathon.create({
       teacher_id: req.user.id,
       title,
@@ -108,9 +109,10 @@ const createHackathon = async (req, res) => {
       isResultPublished: false,
       custom_prompt,
       participants: [],
+      submissions: [], // ✅ Initialize submissions as an empty array
     });
 
-    // Insert Judging Parameters (Only store name and hackathon_id)
+    // ✅ Insert Judging Parameters (Only store name and hackathon_id)
     let judgingParameterIds = [];
     if (Array.isArray(judging_parameters) && judging_parameters.length > 0) {
       const createdParams = await JudgingParameter.insertMany(
@@ -122,14 +124,16 @@ const createHackathon = async (req, res) => {
       judgingParameterIds = createdParams.map((param) => param._id);
     }
 
-    // Update the hackathon with judging parameter IDs
+    // ✅ Update the hackathon with judging parameter IDs
     hackathon.judging_parameters = judgingParameterIds;
     await hackathon.save();
 
-    res
-      .status(201)
-      .json({ message: "Hackathon created successfully", hackathon });
+    res.status(201).json({
+      message: "Hackathon created successfully",
+      hackathon,
+    });
   } catch (error) {
+    console.error("Error creating hackathon:", error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -312,6 +316,10 @@ const getHackathonsByTeacher = async (req, res) => {
     const hackathons = await Hackathon.find({ teacher_id })
       .populate("judging_parameters")
       .populate("participants", "name email") // Fetch participant name & email
+      .populate({
+        path: "submissions",
+        populate: { path: "student_id", select: "name email" }, // Fetch submission details
+      })
       .select("-passkey"); // Exclude passkey from response
 
     res.json(hackathons);
@@ -319,6 +327,7 @@ const getHackathonsByTeacher = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Remove a hackathon (Only the teacher who created it can delete)
 const removeHackathon = async (req, res) => {
@@ -342,7 +351,7 @@ const removeHackathon = async (req, res) => {
       });
     }
 
-    // Atomic removal: Remove hackathon from students' joined_hackathons
+    // Remove hackathon from students' joined_hackathons
     await Student.updateMany(
       { joined_hackathons: hackathon_id },
       { $pull: { joined_hackathons: hackathon_id } }
@@ -350,6 +359,9 @@ const removeHackathon = async (req, res) => {
 
     // Remove all linked judging parameters
     await JudgingParameter.deleteMany({ hackathon_id });
+
+    // ✅ Remove all linked submissions
+    await Submission.deleteMany({ hackathon_id });
 
     // Delete the hackathon
     await Hackathon.deleteOne({ _id: hackathon_id });
@@ -362,6 +374,7 @@ const removeHackathon = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 
 
 // Get registrations for a specific hackathon
@@ -387,20 +400,27 @@ const getHackathonSubmissions = async (req, res) => {
   try {
     const { hackathon_id } = req.params;
 
-    const submissions = await Submission.find({ hackathon: hackathon_id })
-      .populate("student", "name email")
-      .populate("hackathon", "title");
+    const hackathon = await Hackathon.findById(hackathon_id)
+      .populate({
+        path: "submissions",
+        populate: [
+          { path: "student_id", select: "name email" }, // Get student details
+          { path: "evaluation_id" }, // Get evaluation details
+        ],
+      })
+      .select("title submissions"); // Fetch title and submissions only
 
-    if (!submissions.length) {
-      return res.status(404).json({ message: "No submissions found for this hackathon" });
+    if (!hackathon) {
+      return res.status(404).json({ message: "Hackathon not found" });
     }
 
-    res.status(200).json({ submissions });
+    res.status(200).json({ submissions: hackathon.submissions });
   } catch (error) {
     console.error("Error fetching submissions:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 const joinHackathon = async (req, res) => {
   try {
