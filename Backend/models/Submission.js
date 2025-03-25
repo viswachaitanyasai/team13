@@ -17,13 +17,13 @@ const SubmissionSchema = new mongoose.Schema(
       ref: "Evaluation",
     },
     submission_url: { type: String,},
-    extracted_text: { type: String, default: "" },
+    // extracted_text: { type: String, default: "" },
     submission_date: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
 
 // ✅ Ensure a student can submit only once per hackathon
-SubmissionSchema.index({ hackathon_id: 1, student_id: 1 }, { unique: true });
+// SubmissionSchema.index({ hackathon_id: 1, student_id: 1 }, { unique: true });
 
 module.exports = mongoose.model("Submission", SubmissionSchema);
