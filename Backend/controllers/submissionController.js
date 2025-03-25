@@ -103,6 +103,12 @@ const submitSolution = async (req, res) => {
 
     // ✅ Update Submission with uploaded file
     await submission.save();
+    // Add submission to Hackathon's submissions array
+    await Hackathon.findByIdAndUpdate(
+      hackathon_id,
+      { $push: { submissions: submission._id } },
+      { new: true }
+    );
     res.status(200).json({
       message: "Submission recorded successfully",
     });

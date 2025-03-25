@@ -1,5 +1,6 @@
 const Hackathon = require("../models/Hackathon");
 const Student = require("../models/Student");
+const Submission = require("../models/Submission");
 const JudgingParameter = require("../models/JudgingParameter");
 const { generateInviteCode } = require("../utils/uniqueHackathonJoinId");
 const bcrypt = require("bcrypt");
@@ -9,7 +10,9 @@ const createHackathon = async (req, res) => {
   try {
     const {
       title,
+      problem_statement,
       description,
+      context,
       image_url,
       file_attachment_url,
       start_date,
@@ -19,8 +22,8 @@ const createHackathon = async (req, res) => {
       is_public,
       passkey,
       grade,
-      judging_parameters,
-      custom_prompt, // Added custom_prompt
+      judging_parameters, // Now an array of names
+      custom_prompt,
     } = req.body;
 
     const validGrades = [
@@ -40,37 +43,39 @@ const createHackathon = async (req, res) => {
       "PG",
     ];
 
-    // Validate required fields
-    if (!title || !description || !start_date || !end_date || !grade) {
+    if (
+      !title ||
+      !problem_statement ||
+      !description ||
+      !context ||
+      !start_date ||
+      !end_date ||
+      !grade
+    ) {
       return res
         .status(400)
         .json({ error: "All required fields must be provided." });
     }
 
-    // Validate grade
     if (!validGrades.includes(grade)) {
       return res.status(400).json({ error: "Invalid grade level specified." });
     }
 
-    // Convert is_public & allow_multiple_solutions to Boolean
     const isPublicBool = is_public === "true" || is_public === true;
     const allowMultipleBool =
       allow_multiple_solutions === "true" || allow_multiple_solutions === true;
 
-    // Convert start_date & end_date to Date objects
     const startDateObj = new Date(start_date);
     const endDateObj = new Date(end_date);
     if (isNaN(startDateObj) || isNaN(endDateObj)) {
       return res.status(400).json({ error: "Invalid date format" });
     }
 
-    // Ensure sponsors is an array
     const sponsorsArray =
       typeof sponsors === "string"
         ? sponsors.split(",").map((s) => s.trim())
         : sponsors;
 
-    // Hash passkey if hackathon is private
     let hashedPasskey = null;
     if (!isPublicBool) {
       if (!passkey) {
@@ -81,14 +86,15 @@ const createHackathon = async (req, res) => {
       hashedPasskey = await bcrypt.hash(passkey, 10);
     }
 
-    // Generate unique invite code
     const inviteCode = await generateInviteCode();
 
-    // Create Hackathon first
+    // ✅ Create the hackathon with an empty submissions array
     const hackathon = await Hackathon.create({
       teacher_id: req.user.id,
       title,
+      problem_statement,
       description,
+      context,
       image_url,
       file_attachment_url,
       start_date: startDateObj,
@@ -99,33 +105,39 @@ const createHackathon = async (req, res) => {
       passkey: hashedPasskey,
       invite_code: inviteCode,
       grade,
-      custom_prompt, // Save custom_prompt in the model
+      status: "upcoming",
+      isResultPublished: false,
+      custom_prompt,
+      participants: [],
+      submissions: [], // ✅ Initialize submissions as an empty array
     });
 
-    // Create judging parameters and store their IDs
+    // ✅ Insert Judging Parameters (Only store name and hackathon_id)
     let judgingParameterIds = [];
     if (Array.isArray(judging_parameters) && judging_parameters.length > 0) {
       const createdParams = await JudgingParameter.insertMany(
-        judging_parameters.map((param) => ({
+        judging_parameters.map((name) => ({
           hackathon_id: hackathon._id,
-          name: param.name,
-          weightage: param.weightage,
+          name,
         }))
       );
       judgingParameterIds = createdParams.map((param) => param._id);
     }
 
-    // Update the hackathon with judging parameter IDs
+    // ✅ Update the hackathon with judging parameter IDs
     hackathon.judging_parameters = judgingParameterIds;
     await hackathon.save();
 
-    res
-      .status(201)
-      .json({ message: "Hackathon created successfully", hackathon });
+    res.status(201).json({
+      message: "Hackathon created successfully",
+      hackathon,
+    });
   } catch (error) {
+    console.error("Error creating hackathon:", error);
     res.status(400).json({ error: error.message });
   }
 };
+
 
 const getHackathons = async (req, res) => {
   try {
@@ -165,7 +177,9 @@ const editHackathon = async (req, res) => {
     const teacher_id = req.user.id;
     let {
       title,
+      problem_statement,
       description,
+      context,
       image_url,
       file_attachment_url,
       start_date,
@@ -174,11 +188,11 @@ const editHackathon = async (req, res) => {
       allow_multiple_solutions,
       is_public,
       passkey,
-      grade, // Allow updating grade
+      grade,
       custom_prompt,
+      judging_parameters, // Now only an array of names
     } = req.body;
 
-    // Valid grade levels (including 1st to 5th)
     const validGrades = [
       "1st",
       "2nd",
@@ -196,44 +210,36 @@ const editHackathon = async (req, res) => {
       "PG",
     ];
 
-    // Find the hackathon
     const hackathon = await Hackathon.findById(hackathon_id);
     if (!hackathon) {
       return res.status(404).json({ error: "Hackathon not found" });
     }
 
-    // Check if the logged-in teacher is the creator
     if (hackathon.teacher_id.toString() !== teacher_id) {
       return res
         .status(403)
         .json({ error: "Unauthorized: You can only edit your own hackathon" });
     }
 
-    // Convert `is_public` and `allow_multiple_solutions` to Boolean
     is_public = is_public === "true" || is_public === true;
     allow_multiple_solutions =
       allow_multiple_solutions === "true" || allow_multiple_solutions === true;
 
-    // Validate start_date and end_date if provided
     if (start_date) {
       start_date = new Date(start_date);
-      if (isNaN(start_date)) {
+      if (isNaN(start_date))
         return res.status(400).json({ error: "Invalid start date format" });
-      }
     }
     if (end_date) {
       end_date = new Date(end_date);
-      if (isNaN(end_date)) {
+      if (isNaN(end_date))
         return res.status(400).json({ error: "Invalid end date format" });
-      }
     }
 
-    // Validate grade if provided
     if (grade && !validGrades.includes(grade)) {
       return res.status(400).json({ error: "Invalid grade level specified." });
     }
 
-    // Ensure sponsors is an array
     if (sponsors) {
       sponsors =
         typeof sponsors === "string"
@@ -241,7 +247,6 @@ const editHackathon = async (req, res) => {
           : sponsors;
     }
 
-    // Handle passkey updates correctly
     let hashedPasskey = hackathon.passkey;
     if (is_public === false) {
       if (passkey) {
@@ -252,7 +257,7 @@ const editHackathon = async (req, res) => {
           .json({ error: "Passkey is required for private hackathons" });
       }
     } else {
-      hashedPasskey = null; // Remove passkey if hackathon is now public
+      hashedPasskey = null;
     }
 
     // Update hackathon details
@@ -260,7 +265,9 @@ const editHackathon = async (req, res) => {
       hackathon_id,
       {
         title,
+        problem_statement,
         description,
+        context,
         image_url,
         file_attachment_url,
         start_date,
@@ -269,14 +276,27 @@ const editHackathon = async (req, res) => {
         allow_multiple_solutions,
         is_public,
         passkey: hashedPasskey,
-        grade, // Allow updating grade
+        grade,
         custom_prompt,
         updated_at: Date.now(),
       },
       { new: true, runValidators: true }
-    )
-      .populate("judging_parameters")
-      .select("-passkey"); // Exclude passkey from response
+    ).select("-passkey"); // Exclude passkey from response
+
+    // Update Judging Parameters
+    if (Array.isArray(judging_parameters)) {
+      await JudgingParameter.deleteMany({ hackathon_id: hackathon._id });
+
+      const newParams = await JudgingParameter.insertMany(
+        judging_parameters.map((name) => ({
+          hackathon_id: hackathon._id,
+          name,
+        }))
+      );
+
+      updatedHackathon.judging_parameters = newParams.map((param) => param._id);
+      await updatedHackathon.save();
+    }
 
     res.json({ message: "Hackathon updated successfully", updatedHackathon });
   } catch (error) {
@@ -296,6 +316,10 @@ const getHackathonsByTeacher = async (req, res) => {
     const hackathons = await Hackathon.find({ teacher_id })
       .populate("judging_parameters")
       .populate("participants", "name email") // Fetch participant name & email
+      .populate({
+        path: "submissions",
+        populate: { path: "student_id", select: "name email" }, // Fetch submission details
+      })
       .select("-passkey"); // Exclude passkey from response
 
     res.json(hackathons);
@@ -303,6 +327,7 @@ const getHackathonsByTeacher = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 // Remove a hackathon (Only the teacher who created it can delete)
 const removeHackathon = async (req, res) => {
@@ -326,32 +351,31 @@ const removeHackathon = async (req, res) => {
       });
     }
 
-    // Remove hackathon reference from students
+    // Remove hackathon from students' joined_hackathons
     await Student.updateMany(
-      { joined_hackathons: hackathon._id },
-      { $pull: { joined_hackathons: hackathon._id } }
+      { joined_hackathons: hackathon_id },
+      { $pull: { joined_hackathons: hackathon_id } }
     );
 
-    // Remove all participants from hackathon before deletion
-    await Hackathon.updateOne(
-      { _id: hackathon_id },
-      { $set: { participants: [] } }
-    );
-
-    // Delete all judging parameters linked to this hackathon
+    // Remove all linked judging parameters
     await JudgingParameter.deleteMany({ hackathon_id });
 
+    // ✅ Remove all linked submissions
+    await Submission.deleteMany({ hackathon_id });
+
     // Delete the hackathon
-    await Hackathon.findByIdAndDelete(hackathon_id);
+    await Hackathon.deleteOne({ _id: hackathon_id });
 
     res.json({
       success: true,
-      message: "Hackathon and its judging parameters deleted successfully",
+      message: "Hackathon and its related data deleted successfully",
     });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+
 
 // Get registrations for a specific hackathon
 const getHackathonRegistrations = async (req, res) => {
@@ -376,20 +400,27 @@ const getHackathonSubmissions = async (req, res) => {
   try {
     const { hackathon_id } = req.params;
 
-    const submissions = await Submission.find({ hackathon: hackathon_id })
-      .populate("student", "name email")
-      .populate("hackathon", "title");
+    const hackathon = await Hackathon.findById(hackathon_id)
+      .populate({
+        path: "submissions",
+        populate: [
+          { path: "student_id", select: "name email" }, // Get student details
+          { path: "evaluation_id" }, // Get evaluation details
+        ],
+      })
+      .select("title submissions"); // Fetch title and submissions only
 
-    if (!submissions.length) {
-      return res.status(404).json({ message: "No submissions found for this hackathon" });
+    if (!hackathon) {
+      return res.status(404).json({ message: "Hackathon not found" });
     }
 
-    res.status(200).json({ submissions });
+    res.status(200).json({ submissions: hackathon.submissions });
   } catch (error) {
     console.error("Error fetching submissions:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 const joinHackathon = async (req, res) => {
   try {
@@ -421,7 +452,7 @@ const joinHackathon = async (req, res) => {
         });
       }
 
-      const isMatch = passkey === hackathon.passkey;
+      const isMatch = await bcrypt.compare(passkey, hackathon.passkey); // Correct bcrypt comparison
       if (!isMatch) {
         return res
           .status(403)
