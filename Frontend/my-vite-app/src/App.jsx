@@ -24,6 +24,8 @@ import OngoingHackathons from "./components/OngoingHackathons";
 import UpcomingHackathons from "./components/UpcomingHackathons";
 import PastHackathons from "./components/PastHackathons";
 import ViewHackathon from "./pages/ViewHackathonDetails";
+import EditHackathon from "./pages/EditHackathon";
+import CreateQuiz from "./pages/CreateQuiz";
 function App() {
   return (
     <>
@@ -54,6 +56,9 @@ function App() {
             <Route path="/submission/:hackathonId" element={<ViewSubmissions />} />
             <Route path="/evaluation" element={<ViewEvaluation />} />
             <Route path="/analysis" element={<SubmissionAnalysis/>} />
+            <Route path="/edit-hackathon/:hackathonId" element={<EditHackathon/>} />
+            <Route path="/createquiz" element={<CreateQuiz/>} />
+            
 
           </Route>
           </Route>

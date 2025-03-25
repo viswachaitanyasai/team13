@@ -12,7 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { getSubmissionStats } from "../apis/analyticsApi";
+import { getHackathonSubmissions } from "../apis/hackathonapi";
 import { toast } from "react-toastify";
 
 const SkeletonLoader = () => (
@@ -32,7 +32,7 @@ const ViewSubmissions = () => {
   useEffect(() => {
     const fetchSubmissions = async () => {
       try {
-        const response = await getSubmissionStats(token);
+        const response = await getHackathonSubmissions(hackathonId, token);
         console.log("API Response:", response);
         const selectedHackathon = response.stats.find(
           (hackathon) => hackathon._id === hackathonId
@@ -46,6 +46,7 @@ const ViewSubmissions = () => {
           toast.error("No submission data found for this hackathon.");
         }
       } catch (error) {
+        console.error(error);
         toast.error(error.error || "Failed to fetch submissions.");
       } finally {
         setLoading(false);

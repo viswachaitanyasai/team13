@@ -59,7 +59,10 @@ const PastHackathons = () => {
       ) : hackathons.length > 0 ? (
         <div className="grid gap-6">
           {hackathons.map((hackathon) => (
-            <HackathonCard key={hackathon._id} event={hackathon} />
+            <HackathonCard key={hackathon._id}
+             event={hackathon}
+             showDeleteButton={false}
+             showEditButton={false} />
           ))}
         </div>
       ) : (
