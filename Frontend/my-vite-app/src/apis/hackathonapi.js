@@ -91,6 +91,18 @@ export const getHackathonSubmissions = async (hackathonId, token) => {
     throw error.response?.data || { error: "Failed to fetch submissions." };
   }
 };
+
+export const getHackathonSummary = async (hackathonId, token) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/${hackathonId}/summary`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Failed to fetch summary." };
+  }
+};
+
 export const getSubmission = async (hackathonId, token) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/${hackathonId}/submissions`, {

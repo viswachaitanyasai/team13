@@ -1,7 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // ✅ Added useNavigate for navigation
+import { toast } from "react-toastify"; // ✅ Added toast for notifications
+import { createQuiz } from "../apis/quizApi";
 
 const CreateQuiz = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [questions, setQuestions] = useState([
@@ -47,13 +51,10 @@ const CreateQuiz = () => {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem("token"); // Assuming authentication token is stored
-      await axios.post(
-        "/api/quiz/create",
-        { title, description, questions },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert("Quiz created successfully!");
+      const formData = { title, description, questions }; // ✅ Created formData object
+      const response=await createQuiz(formData, navigate); // ✅ Using createQuiz API
+      console.log(response);
+      toast.success("Quiz created successfully!"); // ✅ Success notification
       setTitle("");
       setDescription("");
       setQuestions([{ question_text: "", options: ["", "", "", ""], correct_answer: 0 }]);

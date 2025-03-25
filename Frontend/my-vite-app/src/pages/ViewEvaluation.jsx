@@ -83,7 +83,7 @@ const ViewEvaluation = () => {
         <h2 className="text-3xl font-bold text-blue-400 text-center">
           {hackathon.name}
         </h2>
-        <p className="text-gray-300 mt-2 text-center">{hackathon.description}</p>
+        
 
         <Tabs.Root
           className="mt-6"
@@ -91,7 +91,7 @@ const ViewEvaluation = () => {
           onValueChange={setSelectedTab}
         >
           <Tabs.List className="flex justify-center md:space-x-6 space-x-2 border-b border-gray-700 pb-4">
-            {["shortlisted", "revisit", "rejected"].map((tab) => (
+            {[`shortlisted (count)`, "revisit (count)", "rejected (count) "].map((tab) => (
               <Tabs.Trigger
                 key={tab}
                 value={tab}
@@ -120,10 +120,10 @@ const ViewEvaluation = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-700">
-                  <th className="p-4 text-left border-b border-gray-600">Name</th>
-                  <th className="p-4 text-left border-b border-gray-600">Class</th>
-                  <th className="p-4 text-left border-b border-gray-600">Score</th>
-                  <th className="p-4 text-left border-b border-gray-600">Actions</th>
+                  <th className="p-2.5 px-4 text-left border-b border-gray-600">Name</th>
+                  <th className="p-2.5 px-4 text-left border-b border-gray-600">Class</th>
+                  <th className="p-2.5 px-4 text-left border-b border-gray-600">Score</th>
+                  <th className="p-2.5 px-4 text-left border-b border-gray-600">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,23 +132,23 @@ const ViewEvaluation = () => {
                     key={submission.id}
                     className="bg-gray-800 border-b border-gray-700 hover:bg-gray-700 transition duration-200"
                   >
-                    <td className="p-4">{submission.name}</td>
-                    <td className="p-4">{submission.class}</td>
-                    <td className="p-4">{submission.score}</td>
-                    <td className="p-4 flex space-x-2">
+                    <td className="p-2.5 px-4">{submission.name}</td>
+                    <td className="p-2.5 px-4">{submission.class}</td>
+                    <td className="p-2.5 px-4">{submission.score}</td>
+                    <td className="p-2.5 px-4 flex space-x-4">
                       <a
                         href={submission.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-md transition"
+                        className="px-4 py-2 flex-auto text-decoration-none text-center bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-md transition"
                       >
                         View
                       </a>
-                      <button className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-full font-medium shadow-md transition">
+                      <button className="px-4 py-2 flex-auto bg-green-600 hover:bg-green-700 rounded-full font-medium shadow-md transition">
                         Analysis
                       </button>
                       <select
-                        className="px-4 py-2 bg-gray-600 text-white rounded-lg shadow-md transition"
+                        className="pl-2 pr-1 py-2 flex-auto bg-gray-600 text-white rounded-lg shadow-md transition"
                         value={submission.status}
                         onChange={(e) =>
                           handleStatusUpdate(submission.id, e.target.value)
