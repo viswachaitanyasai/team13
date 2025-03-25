@@ -4,29 +4,23 @@ import HackathonCard from './HackathonCard';
 import { getHackathons } from "../apis/hackathonapi";
 import { toast } from "react-toastify";
 
-const SkeletonCard = () => (
-  <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-md animate-pulse">
-    <div className="h-6 bg-gray-300 rounded w-3/4 mb-2"></div>
-    <div className="h-4 bg-gray-300 rounded w-1/2 mb-4"></div>
-    <div className="h-20 bg-gray-200 rounded mb-4"></div>
-    <div className="h-6 bg-gray-300 rounded w-1/3"></div>
-  </div>
-);
-
 
 const UpcomingHackathons = () => {
   const [hackathons, setHackathons] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  
     const fetchHackathons = async () => {
+      setLoading(true);
+      try{
       const token = localStorage.getItem("authToken");
       if (!token) {
         toast.error("Unauthorized access. Please log in.");
         return;
       }
-      try {
+      
         const allHackathons = await getHackathons(token);
+        console.log(allHackathons);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -39,12 +33,14 @@ const UpcomingHackathons = () => {
 
         setHackathons(upcomingHackathons);
       } catch (error) {
+        console.error(error);
         toast.error(error.error || "Failed to fetch hackathons.");
       } finally {
         setLoading(false);
       }
     };
 
+    useEffect(() => {
     fetchHackathons();
   }, []);
 
@@ -99,17 +95,28 @@ const UpcomingHackathons = () => {
   return (
     <div className="max-w-4xl mx-auto mt-2 p-4">
       <h2 className="text-2xl font-bold text-indigo-700 mb-6">Upcoming Hackathons</h2>
+
       {loading ? (
+        // ✅ **Skeleton Loader**
         <div className="grid gap-6">
-          {/* Render 3 Skeleton Cards while loading */}
-          {[1, 2, 3].map((index) => (
-            <SkeletonCard key={index} />
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="p-5 bg-gray-200 rounded-md animate-pulse">
+              <div className="h-6 bg-gray-300 w-3/4 rounded mb-4"></div>
+              <div className="h-4 bg-gray-300 w-1/2 rounded mb-3"></div>
+              <div className="h-20 bg-gray-300 rounded"></div>
+            </div>
           ))}
         </div>
       ) : hackathons.length > 0 ? (
         <div className="grid gap-6">
           {hackathons.map((hackathon) => (
-            <HackathonCard key={hackathon._id} event={hackathon} />
+            <HackathonCard
+              key={hackathon._id}
+              event={hackathon}
+              refreshHackathons={fetchHackathons}
+              showDeleteButton={true}
+              showEditButton={true} 
+            />
           ))}
         </div>
       ) : (

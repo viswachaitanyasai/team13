@@ -7,7 +7,6 @@ const axios = require("axios");
 const path = require("path");
 const Hackathon = require("../models/Hackathon");
 
-
 const API_KEY = process.env.GEMINI_API_KEY;
 const fileManager = new GoogleAIFileManager(API_KEY);
 const genAI = new GoogleGenerativeAI(API_KEY);
@@ -52,7 +51,7 @@ async function analyzeAudio(
     - **Check clarity**: If unclear, missing key points, or overly generic, score = **0**.
     - **Low-effort responses (short, generic, or superficial)** = **0 marks in all parameters**.
     - **A good solution should clearly describe the methodology, tools, and real-world applicability.**
-
+ -  Analyse the skill gaps and return me an array of keywords of gaps.
     **Problem Statement:** ${problemStatement}
     
     **Parameters:** ${parameters.join(", ")}
@@ -74,6 +73,7 @@ async function analyzeAudio(
       "actionable_steps": ["", ""],
       "strengths": ["", ""],
       "summary": ["", ""]
+       "skill_gap":["",""...],
     }
     
     **Ensure the response is in pure JSON format with no extra formatting.**
@@ -122,7 +122,8 @@ async function analyzeText({
     - *If a submission lacks a clear explanation, effort, or relation to the problem statement, give a total score of 0.*
     - *If it only states a vague idea without detailed steps or implementation, give 0.*
     - *Do NOT provide confirmations or explanations outside of the JSON format.*
-    - Be very very harsh
+    -  Be very very harsh
+    -  Analyse the skill gaps and return me an array of keywords of gaps.
     *Evaluation Guidelines:*
     - evaluation is done as 0(low) or 0.5(medium) or 1(average) or 2(perfect). These are the only categories of grading
     - *Check if the solution is related to the problem statement. If not, score = **0*.
@@ -151,7 +152,8 @@ async function analyzeText({
       "improvement": ["", ""],
       "actionable_steps": ["", ""],
       "strengths": ["", ""],
-      "summary": ["", ""]
+      "summary": ["", ""],
+      "skill_gap":["",""...],
     }
     
     *Ensure the response is in pure JSON format with no extra formatting.*
@@ -182,7 +184,6 @@ async function analyzeText({
   }
 }
 
-
 async function updateSkillGap(hackathonId, newSkillGaps) {
   try {
     const hackathon = await Hackathon.findById(hackathonId);
@@ -210,6 +211,5 @@ async function updateSkillGap(hackathonId, newSkillGaps) {
     console.error("Error updating skill gap:", error.message);
   }
 }
-
 
 module.exports = { analyzeAudio, analyzeText, updateSkillGap };

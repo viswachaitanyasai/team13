@@ -47,7 +47,7 @@ function Sidebar() {
                    : "text-gray-300 hover:bg-gray-700"
                }`}
             >
-              <FaTrophy className="mr-3 text-base" /> Show Hackathons
+              <FaTrophy className="mr-3 text-base" />Hackathons
             </button>
           </li>
           <li>
@@ -86,6 +86,14 @@ function Sidebar() {
           </li>
         </ul>
 
+        <div className="px-4 pb-2">
+          <button
+            onClick={() => navigate("/createquiz")}
+            className="flex items-center justify-center w-full p-3 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-md font-semibold"
+          >
+            <FaPlus className="mr-2 text-base" /> Create Quiz
+          </button>
+        </div>
         {/* Create Hackathon Button */}
         <div className="px-4 pb-6">
           <button
@@ -95,6 +103,8 @@ function Sidebar() {
             <FaPlus className="mr-2 text-base" /> Create Hackathon
           </button>
         </div>
+
+
         
       </aside>
     </>

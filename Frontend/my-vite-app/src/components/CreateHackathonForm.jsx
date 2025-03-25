@@ -26,6 +26,9 @@ const CreateHackathonForm = () => {
   const [dateError, setDateError] = useState("");
   const [imageUrl, setImageUrl] = useState(""); // Stores S3 URL of uploaded image
   const [fileUrl, setFileUrl] = useState("");
+  const [sponsors, setSponsors] = useState([]);
+  const [sponsorInput, setSponsorInput] = useState("");
+  const [allowMultipleSolutions, setAllowMultipleSolutions] = useState(false);
 
   // Step 2 State
   const suggestedParameters = ["Innovation", "Complexity", "Technical Skill", "Presentation"];
@@ -139,7 +142,17 @@ const CreateHackathonForm = () => {
       toast.error("File upload failed.");
     }
   };
+  const handleAddSponsor = () => {
+    if (sponsorInput.trim()) {
+      setSponsors([...sponsors, sponsorInput.trim()]);
+      setSponsorInput("");
+    }
+  };
   
+  // Function to remove a sponsor
+  const handleRemoveSponsor = (index) => {
+    setSponsors(sponsors.filter((_, i) => i !== index));
+  };
 
 
   const handleNextStep = (e) => {
@@ -261,7 +274,7 @@ const CreateHackathonForm = () => {
       const formData = {
         title: hackathonName,
         description,
-        context,
+        context: context,
         problem_statement: problemStatement,
         start_date: startDate,
         end_date: submissionDeadline,
@@ -272,12 +285,18 @@ const CreateHackathonForm = () => {
         image_url: imageUrl, // ✅ S3 URL
         file_attachment_url: fileUrl, // ✅ S3 URL
         custom_prompt: additionalInstructions,
+        sponsors, // ✅ Sending sponsors as an array
+        allow_multiple_solutions: allowMultipleSolutions,
       };
-
+      console.log(formData);
       const response = await createHackathon(formData, navigate);
-      toast.success("Hackathon created successfully!");
-      console.log("Hackathon Created:", response);
-      navigate("/dashboard");
+      if (response?.hackathon?._id) { // ✅ **Check if Hackathon ID exists in response**
+        toast.success("Hackathon created successfully!");
+        console.log("Hackathon Created:", response);
+        navigate(`/hackathon/${response.hackathon._id}`); // ✅ **Redirect to View Hackathon**
+      } else {
+        throw new Error("Hackathon ID not found in response.");
+      }
     } catch (error) {
       // console.log(response);
       console.error("Hackathon Creation Error:", error);
@@ -499,6 +518,43 @@ const CreateHackathonForm = () => {
               />
             </div>
           )}
+          <div className="space-y-2 col-span-2">
+  <label className="block font-medium">Sponsors</label>
+  <div className="flex gap-2">
+    <input
+      type="text"
+      className="w-full p-3 border rounded-md"
+      placeholder="Enter sponsor name"
+      value={sponsorInput}
+      onChange={(e) => setSponsorInput(e.target.value)}
+    />
+    <button
+      type="button"
+      className="px-4 py-2 bg-blue-600 text-white rounded-md"
+      onClick={handleAddSponsor}
+    >
+      Add
+    </button>
+  </div>
+
+  {/* Display added sponsors */}
+  {sponsors.length > 0 && (
+    <div className="mt-2 flex flex-wrap gap-2">
+      {sponsors.map((sponsor, index) => (
+        <div key={index} className="px-3 py-1 bg-gray-200 rounded-md flex items-center">
+          {sponsor}
+          <button
+            type="button"
+            className="ml-2 text-red-500"
+            onClick={() => handleRemoveSponsor(index)}
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 
           {/* Select Parameters */}
           <div className="space-y-2 col-span-2">
@@ -575,6 +631,18 @@ const CreateHackathonForm = () => {
               onChange={(e) => setAdditionalInstructions(e.target.value)}
             />
           </div>
+          <div className="space-y-2 col-span-2 flex items-center gap-2">
+  <input
+    type="checkbox"
+    id="allowMultipleSolutions"
+    checked={allowMultipleSolutions}
+    onChange={() => setAllowMultipleSolutions(!allowMultipleSolutions)}
+    className="w-5 h-5"
+  />
+  <label htmlFor="allowMultipleSolutions" className="block font-medium">
+    Allow Multiple Solutions per Participant
+  </label>
+</div>
 
           {/* Buttons */}
           <div className="col-span-2 flex justify-end gap-3 mt-4">
