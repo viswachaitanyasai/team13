@@ -5,14 +5,11 @@ const generateInviteCode = async () => {
   let isDuplicate = true;
 
   while (isDuplicate) {
-    inviteCode = (
-      Date.now().toString(36) + Math.random().toString(36).substr(2, 5)
-    ).toUpperCase();
-    const existingHackathon = await Hackathon.findOne({
-      invite_code: inviteCode,
-    });
+    inviteCode = Math.random().toString(36).substr(2, 5).toUpperCase(); // Generate 5-letter code
+    const existingHackathon = await Hackathon.findOne({ invite_code: inviteCode });
     if (!existingHackathon) isDuplicate = false; // Ensure it's unique
   }
+
 
   return inviteCode;
 };

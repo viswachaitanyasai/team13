@@ -128,15 +128,21 @@ const createHackathon = async (req, res) => {
     hackathon.judging_parameters = judgingParameterIds;
     await hackathon.save();
 
+    // ✅ Populate judging_parameters before sending response
+    const populatedHackathon = await Hackathon.findById(hackathon._id).populate(
+      "judging_parameters"
+    );
+
     res.status(201).json({
       message: "Hackathon created successfully",
-      hackathon,
+      hackathon: populatedHackathon,
     });
   } catch (error) {
     console.error("Error creating hackathon:", error);
     res.status(400).json({ error: error.message });
   }
 };
+
 
 const getHackathons = async (req, res) => {
   try {
@@ -414,6 +420,70 @@ const getHackathonSubmissions = async (req, res) => {
   }
 };
 
+const getHackathonEvaluations = async (req, res) => {
+  try {
+    const { hackathon_id } = req.params;
+
+    // 1. Fetch the hackathon with its `submissions` and `participants` fields
+    const hackathon = await Hackathon.findById(hackathon_id).populate({
+      path: "submissions",
+      populate: [
+        { path: "evaluation_id", select: "overall_score evaluation_category" },
+        { path: "student_id", select: "name grade" }, // Fetch student details
+      ],
+    });
+
+    if (!hackathon) {
+      return res.status(404).json({ error: "Hackathon not found" });
+    }
+
+    // 2. Optional: Verify teacher authorization
+    if (hackathon.teacher_id.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Unauthorized access" });
+    }
+
+    // 3. Filter out only evaluated submissions (evaluation_id is not null)
+    const evaluatedSubmissions = hackathon.submissions.filter(
+      (sub) => sub.evaluation_id
+    );
+
+    // 4. Map the required fields and calculate total score
+    let totalScore = 0;
+    const evaluations = evaluatedSubmissions
+      .map((sub) => {
+        const score = sub.evaluation_id?.overall_score || 0;
+        totalScore += score;
+        return {
+          studentName: sub.student_id?.name || "N/A",
+          grade: sub.student_id?.grade || "N/A",
+          overall_score: score,
+          evaluation_category: sub.evaluation_id?.evaluation_category || "N/A",
+        };
+      })
+      .sort((a, b) => b.overall_score - a.overall_score); // Sort by highest score first
+
+    // 5. Calculate the average score
+    const averageScore =
+      evaluations.length > 0
+        ? Math.round((totalScore / evaluations.length) * 100) / 100
+        : 0; // Round to 2 decimal places
+
+    // 6. Send total participants and total submissions
+    res.status(200).json({
+      totalParticipants: hackathon.participants.length,
+      totalSubmissions: hackathon.submissions.length,
+      evaluations,
+      averageScore,
+    });
+  } catch (error) {
+    console.error("Error fetching evaluations:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+
 module.exports = {
   createHackathon,
   getHackathons,
@@ -423,4 +493,5 @@ module.exports = {
   getHackathonsByTeacher,
   getHackathonSubmissions,
   getHackathonRegistrations,
+  getHackathonEvaluations,
 };
