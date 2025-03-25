@@ -2,6 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const API_BASE_URL = "https://team13-aajv.onrender.com/api/hackathons";
+// const API_BASE_URL="http://localhost:4000/api/hackathons";
 
 
 export const createHackathon = async (formData, navigate) => {
@@ -80,6 +81,38 @@ export const removeHackathon = async (hackathonId, token) => {
   }
 };
 
+export const getHackathonSubmissions = async (hackathonId, token) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/${hackathonId}/submissions`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Failed to fetch submissions." };
+  }
+};
+export const getSubmission = async (hackathonId, token) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/${hackathonId}/submissions`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Failed to fetch student submission." };
+  }
+};
+
+export const getHackathonRegistrations = async (hackathonId, token) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/${hackathonId}/registrations`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Failed to delete hackathon." };
+  }
+};
+
 export const getHackathonsByTeacher = async (teacherId, token) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/teacher/${teacherId}`, {
@@ -99,3 +132,4 @@ export const joinHackathon = async (inviteCode) => {
     throw error.response?.data || { error: "Failed to join hackathon." };
   }
 };
+//  /hackathonid/submissions
