@@ -8,7 +8,7 @@ const { uploadFileToS3 } = require("../utils/s3Uploader");
 const Submission = require("../models/Submission");
 const Evaluation = require("../models/Evaluation");
 const Hackathon = require("../models/Hackathon");
-const { updateSkillGap } = require("../utils/geminiAnalysis");
+const { updateHackathonData } = require("../utils/geminiAnalysis");
 // ✅ Process File (Extract Text / Convert Audio)
 const processFile = async (
   filePath,
@@ -167,7 +167,11 @@ const submitSolution = async (req, res) => {
       await evaluation.save();
       // console.log(evaluation);
       // ✅ Link Submission with Evaluation
-      await updateSkillGap(hackathon_id, evaluationResult.skill_gap);
+      await updateHackathonData(
+        hackathon_id,
+        evaluationResult.skill_gap,
+        evaluationResult.keywords
+      );
       submission.evaluation_id = evaluation._id;
       await submission.save();
     } finally {
