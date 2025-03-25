@@ -1,12 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Trophy, Lightbulb, Users } from "lucide-react";
-import UpcomingHackathons from './UpcomingHackathons';
-import PastHackathons from "./PastHackathons";
-import OngoingHackathons from "./OngoingHackathons";
+// import UpcomingHackathons from './UpcomingHackathons';
+// import PastHackathons from "./PastHackathons";
+// import OngoingHackathons from "./OngoingHackathons";
+import HackathonCard from "./HackathonCard";
+import { getHackathons } from "../apis/hackathonapi";
 
 
 const AboutHackathons = () => { 
-  const [activeSection, setActiveSection] = useState('past');
+  const [hackathons, setHackathons] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchHackathons = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("authToken");
+      const teacherId = localStorage.getItem("teacherId"); // ✅ Assuming teacher ID is stored in localStorage
+
+      if (!token || !teacherId) {
+        toast.error("Unauthorized access. Please log in.");
+        return;
+      }
+
+      const allHackathons = await getHackathons(token); // ✅ Fetch all hackathons
+      const teacherHackathons = allHackathons.filter(
+        (hackathon) => hackathon.teacher_id === teacherId
+      ); // ✅ Filter hackathons by teacher ID
+
+      setHackathons(teacherHackathons);
+    } catch (error) {
+      console.error("Error fetching hackathons:", error);
+      toast.error(error.error || "Failed to fetch hackathons.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHackathons();
+  }, []);
 
   return (
     <div className="bg-gradient-to-b from-indigo-50 to-white min-h-screen p-8 text-gray-900">
@@ -66,8 +98,8 @@ const AboutHackathons = () => {
           ))}
         </div>
 
-        {/* Buttons */}
-        <div className="flex justify-center flex-wrap gap-6 mb-16">
+        
+        {/* <div className="flex justify-center flex-wrap gap-6 mb-16">
           {[
             { label: "Past Hackathons", value: "past" },
             { label: "Ongoing Hackathons", value: "ongoing" },
@@ -90,13 +122,43 @@ const AboutHackathons = () => {
         </div>
       </div>
 
-     {/* Display Selected Section */}
+     Display Selected Section
      <div className="mt-6">
         {activeSection === "past" && <PastHackathons />}
         {activeSection === "ongoing" && <OngoingHackathons />}
-        {activeSection === "upcoming" && <UpcomingHackathons />}
+        {ButtonsactiveSection === "upcoming" && <UpcomingHackathons />}
       </div>
-    </div> 
+    </div>  */}
+    <div className="max-w-5xl mx-auto">
+        <h2 className="text-2xl font-bold text-indigo-700 mb-6">Your Hackathons</h2>
+
+        {loading ? (
+          // ✅ Skeleton Loader for Loading State
+          <div className="grid gap-6">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="p-5 bg-gray-200 rounded-md animate-pulse">
+                <div className="h-6 bg-gray-300 w-3/4 rounded mb-4"></div>
+                <div className="h-4 bg-gray-300 w-1/2 rounded mb-3"></div>
+                <div className="h-20 bg-gray-300 rounded"></div>
+              </div>
+            ))}
+          </div>
+        ) : hackathons.length > 0 ? (
+          <div className="grid gap-6 text-left">
+            {hackathons.map((hackathon) => (
+              <HackathonCard
+                key={hackathon._id}
+                event={hackathon}
+                refreshHackathons={fetchHackathons} // ✅ Pass refresh function
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">You have not created any hackathons yet.</p>
+        )}
+      </div>
+    </div>
+    </div>
   );
 };
 
