@@ -13,7 +13,11 @@ const EvaluationSchema = new mongoose.Schema(
       enum: ["pending", "in_progress", "completed"],
       default: "pending",
     },
-    
+    evaluation_category: {
+      type: String,
+      enum: ["shortlisted", "revisit", "rejected"],
+      default:"revisit",
+    },
     parameter_feedback: [
       {
         // judgement_param_id: {
