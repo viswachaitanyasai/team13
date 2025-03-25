@@ -8,7 +8,7 @@ const { uploadFileToS3 } = require("../utils/s3Uploader");
 const Submission = require("../models/Submission");
 const Evaluation = require("../models/Evaluation");
 const Hackathon = require("../models/Hackathon");
-const { updateSkillGap } = require("../utils/geminiAnalysis");
+const { updateHackathonData } = require("../utils/geminiAnalysis");
 // ✅ Process File (Extract Text / Convert Audio)
 const processFile = async (
   filePath,
@@ -103,15 +103,7 @@ const submitSolution = async (req, res) => {
 
     // ✅ Update Submission with uploaded file
     await submission.save();
-    // Add submission to Hackathon's submissions array
-    await Hackathon.findByIdAndUpdate(
-      hackathon_id,
-      {
-        $push: { submissions: submission._id },
-        $addToSet: { participants: student_id }, // Ensures unique student IDs
-      },
-      { new: true }
-    );
+    
 
     res.status(200).json({
       message: "Submission recorded successfully",
@@ -144,30 +136,51 @@ const submitSolution = async (req, res) => {
 
       evaluationResult = evalRes;
       // console.log("Evaluation Result1:", evaluationResult);
+      const max = evaluationResult.parameter_feedback.length * 2 || 0;
+      const score = (evaluationResult.overall_score / max) * 10;
 
       // ✅ Create Evaluation Entry with the exact return structure and update status to "completed"
       const evaluation = new Evaluation({
         submission_id: submission._id,
         evaluation_status: "completed", // set status to completed
         evaluation_category:
-          evaluationResult.overall_score < 4
-            ? "rejected"
-            : evaluationResult.overall_score < 7
-            ? "revisit"
-            : "shortlisted",
+          score < 4 ? "rejected" : score < 7 ? "revisit" : "shortlisted",
         parameter_feedback: evaluationResult.parameter_feedback,
         improvement: evaluationResult.improvement,
         actionable_steps: evaluationResult.actionable_steps,
         strengths: evaluationResult.strengths,
-        overall_score: evaluationResult.overall_score,
+        overall_score: score,
         overall_reason: evaluationResult.overall_reason,
         summary: evaluationResult.summary,
       });
 
       await evaluation.save();
+
+      let categoryField;
+      if (evaluation.evaluation_category === "shortlisted") {
+        categoryField = "shortlisted_students";
+      } else if (evaluation.evaluation_category === "revisit") {
+        categoryField = "revisit_students";
+      } else {
+        categoryField = "rejected_students";
+      }
+
+      // Add submission and student to the correct category
+      await Hackathon.findByIdAndUpdate(
+        hackathon_id,
+        {
+          $push: { submissions: submission._id, [categoryField]: student_id },
+          $addToSet: { participants: student_id }, // Ensures the student is uniquely tracked
+        },
+        { new: true }
+      );
       // console.log(evaluation);
       // ✅ Link Submission with Evaluation
-      await updateSkillGap(hackathon_id, evaluationResult.skill_gap);
+      await updateHackathonData(
+        hackathon_id,
+        evaluationResult.skill_gap,
+        evaluationResult.keywords
+      );
       submission.evaluation_id = evaluation._id;
       await submission.save();
     } finally {
@@ -186,12 +199,8 @@ const submitSolution = async (req, res) => {
 
 const updateEvaluationCategory = async (req, res) => {
   try {
-    
     const { submission_id } = req.params; // Get submission ID from request params
     const { evaluation_category } = req.body; // Get new category from request body
-
-    // console.log(submission_id);
-    // console.log(evaluation_category);
 
     // Validate category input
     const validCategories = ["shortlisted", "revisit", "rejected"];
@@ -199,11 +208,11 @@ const updateEvaluationCategory = async (req, res) => {
       return res.status(400).json({ error: "Invalid evaluation category" });
     }
 
-    // Find the submission to check if it has an evaluation
-    const submission = await Submission.findById(submission_id).populate(
-      "evaluation_id"
-    );
-    // console.log(submission)
+    // Find the submission along with its evaluation and hackathon
+    const submission = await Submission.findById(submission_id)
+      .populate("evaluation_id")
+      .populate("hackathon_id")
+      .populate("student_id");
 
     if (!submission || !submission.evaluation_id) {
       return res
@@ -218,6 +227,30 @@ const updateEvaluationCategory = async (req, res) => {
       { new: true }
     );
 
+    // Determine the correct student category
+    let categoryField;
+    if (evaluation_category === "shortlisted") {
+      categoryField = "shortlisted_students";
+    } else if (evaluation_category === "revisit") {
+      categoryField = "revisit_students";
+    } else {
+      categoryField = "rejected_students";
+    }
+
+    // Remove the student from all category lists
+    await Hackathon.findByIdAndUpdate(submission.hackathon_id._id, {
+      $pull: {
+        shortlisted_students: submission.student_id._id,
+        revisit_students: submission.student_id._id,
+        rejected_students: submission.student_id._id,
+      },
+    });
+
+    // Add the student to the correct category
+    await Hackathon.findByIdAndUpdate(submission.hackathon_id._id, {
+      $push: { [categoryField]: submission.student_id._id },
+    });
+
     res.status(200).json({
       message: "Evaluation category updated successfully",
       updatedEvaluation,
@@ -227,6 +260,7 @@ const updateEvaluationCategory = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 const bulkUpdateEvaluationCategory = async (req, res) => {
   try {
     const { hackathon_id } = req.params;
@@ -237,14 +271,32 @@ const bulkUpdateEvaluationCategory = async (req, res) => {
       return res.status(404).json({ error: "Hackathon not found" });
     }
 
-    // Directly update all evaluations linked to submissions in the hackathon where category is "revisit"
+    // Fetch all submissions that belong to this hackathon and are marked as "revisit"
+    const evaluations = await Evaluation.find({
+      _id: { $in: hackathon.submissions },
+      evaluation_category: "revisit",
+    }).populate("submission_id");
+
+    if (!evaluations.length) {
+      return res.status(200).json({ message: "No evaluations to update." });
+    }
+
+    // Extract student IDs from the evaluations
+    const studentIdsToReject = evaluations.map(
+      (eval) => eval.submission_id.student_id
+    );
+
+    // Update the evaluation category from "revisit" to "rejected"
     const result = await Evaluation.updateMany(
-      {
-        _id: { $in: hackathon.submissions }, // Use stored submission IDs
-        evaluation_category: "revisit", // Only update "revisit" evaluations
-      },
+      { _id: { $in: evaluations.map((eval) => eval._id) } },
       { $set: { evaluation_category: "rejected" } }
     );
+
+    // Remove students from the "revisit_students" list and add them to "rejected_students"
+    await Hackathon.findByIdAndUpdate(hackathon_id, {
+      $pull: { revisit_students: { $in: studentIdsToReject } },
+      $push: { rejected_students: { $each: studentIdsToReject } },
+    });
 
     res.status(200).json({
       message: `Successfully updated ${result.modifiedCount} evaluations from 'revisit' to 'rejected'.`,
@@ -255,6 +307,7 @@ const bulkUpdateEvaluationCategory = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 const editEvaluationScore = async (req, res) => {
@@ -279,22 +332,47 @@ const editEvaluationScore = async (req, res) => {
       evaluation_category = "shortlisted";
     }
 
-    // Directly update the evaluation in MongoDB without triggering "pre('save')"
-    const updatedEvaluation = await Evaluation.findOneAndUpdate(
-      { submission_id },
-      { $set: { overall_score: new_score, evaluation_category } }, // Ensure it updates correctly
-      { new: true, runValidators: true }
-    );
+    // Find the evaluation along with its submission, hackathon, and student
+    const evaluation = await Evaluation.findOne({ submission_id })
+      .populate("submission_id")
+      .populate({
+        path: "submission_id",
+        populate: { path: "hackathon_id student_id" },
+      });
 
-    if (!updatedEvaluation) {
+    if (!evaluation || !evaluation.submission_id) {
       return res.status(404).json({ error: "Evaluation not found." });
     }
 
-    // console.log("Updated overall_score:", updatedEvaluation.overall_score);
-    // console.log(
-    //   "Updated evaluation_category:",
-    //   updatedEvaluation.evaluation_category
-    // );
+    const { hackathon_id, student_id } = evaluation.submission_id;
+
+    // Update the evaluation score and category
+    const updatedEvaluation = await Evaluation.findOneAndUpdate(
+      { submission_id },
+      { $set: { overall_score: new_score, evaluation_category } },
+      { new: true, runValidators: true }
+    );
+
+    // Remove the student from all categories first
+    await Hackathon.findByIdAndUpdate(hackathon_id._id, {
+      $pull: {
+        shortlisted_students: student_id._id,
+        revisit_students: student_id._id,
+        rejected_students: student_id._id,
+      },
+    });
+
+    // Add the student to the correct category
+    const categoryField =
+      evaluation_category === "shortlisted"
+        ? "shortlisted_students"
+        : evaluation_category === "revisit"
+        ? "revisit_students"
+        : "rejected_students";
+
+    await Hackathon.findByIdAndUpdate(hackathon_id._id, {
+      $push: { [categoryField]: student_id._id },
+    });
 
     res.status(200).json({
       message: "Evaluation score updated successfully.",
@@ -306,6 +384,7 @@ const editEvaluationScore = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 
 

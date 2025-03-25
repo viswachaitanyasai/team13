@@ -40,22 +40,11 @@ const EvaluationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ✅ Automatically calculate `overall_score` based on parameter_feedback
-EvaluationSchema.pre("save", function (next) {
-  if (this.parameter_feedback?.length > 0) {
-    const obtainedScore = this.parameter_feedback.reduce(
-      (sum, param) => sum + param.score,
-      0
-    );
-    const maxScore = this.parameter_feedback.length * 2;
+// // ✅ Automatically calculate `overall_score` based on parameter_feedback
+// EvaluationSchema.pre("save", function (next) {
+  
 
-    this.overall_score =
-      Math.round((obtainedScore / maxScore) * 10 * 100) / 100; // Rounded to 2 decimal places
-  } else {
-    this.overall_score = 0;
-  }
-
-  next();
-});
+//   next();
+// });
 
 module.exports = mongoose.model("Evaluation", EvaluationSchema);
