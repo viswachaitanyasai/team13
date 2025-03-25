@@ -6,8 +6,8 @@ const HackathonSchema = new mongoose.Schema({
   problem_statement: { type: String, required: true },
   description: { type: String, required: true },
   context: { type: String, required: true },
-  image_url: { type: String },
-  file_attachment_url: { type: String },
+  image_url: { type: String, required: true },
+  file_attachment_url: { type: String, required: true },
   start_date: { type: Date, required: true },
   end_date: { type: Date, required: true },
   sponsors: [{ type: String }],
@@ -44,7 +44,7 @@ const HackathonSchema = new mongoose.Schema({
   judging_parameters: [
     { type: mongoose.Schema.Types.ObjectId, ref: "JudgingParameter" },
   ],
-  isResultPublished: { type: Boolean, default: false },
+  is_result_published: { type: Boolean, default: false },
   custom_prompt: { type: String },
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
 
