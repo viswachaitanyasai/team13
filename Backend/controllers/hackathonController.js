@@ -431,11 +431,13 @@ const getHackathonEvaluations = async (req, res) => {
     // 1. Fetch the hackathon with its `submissions` and `participants` fields
     const hackathon = await Hackathon.findById(hackathon_id).populate({
       path: "submissions",
+      select: "submission_url", // Include submission_url field
       populate: [
         { path: "evaluation_id" }, // Populate the entire evaluation object
         { path: "student_id", select: "name grade" }, // Fetch student details
       ],
     });
+
 
     if (!hackathon) {
       return res.status(404).json({ error: "Hackathon not found" });
@@ -463,6 +465,7 @@ const getHackathonEvaluations = async (req, res) => {
           overall_score: score,
           evaluation_category: sub.evaluation_id?.evaluation_category || "N/A",
           evaluation_id: sub?.evaluation_id,
+
         };
       })
       .sort((a, b) => b.overall_score - a.overall_score); // Sort by highest score first
