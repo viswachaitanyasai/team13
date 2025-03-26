@@ -27,7 +27,7 @@ const HackathonCard = ({ event, refreshHackathons, showDeleteButton, showEditBut
   }
 
   const handleViewSubmissions = () => {
-    navigate(`/submission/${event._id}`);
+    navigate(`/summary/${event._id}`);
   };
 
   const handleViewHackathon = () => {
