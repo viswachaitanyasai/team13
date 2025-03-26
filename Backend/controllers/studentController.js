@@ -59,7 +59,7 @@ exports.loginStudent = async (req, res) => {
     }
 
     // Generate JWT Token
-    const token = jwt.sign({ id: student._id }, process.env.JWT_SECRETKEY, {
+    const token = jwt.sign({ id: student._id,role:"student" }, process.env.JWT_SECRETKEY, {
       expiresIn: "7d",
     });
 
