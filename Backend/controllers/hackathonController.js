@@ -439,8 +439,6 @@ const getHackathonEvaluations = async (req, res) => {
     });
     console.log(hackathon);
 
-
-    
     if (!hackathon) {
       return res.status(404).json({ error: "Hackathon not found" });
     }
@@ -466,7 +464,7 @@ const getHackathonEvaluations = async (req, res) => {
           overall_score: score,
           evaluation_category: sub.evaluation_id?.evaluation_category || "N/A",
           evaluation_id: sub?.evaluation_id._id,
-          submission_url:sub.submission_url,
+          submission_url: sub.submission_url,
         };
       })
       .sort((a, b) => b.overall_score - a.overall_score); // Sort by highest score first
@@ -510,7 +508,9 @@ const getEvaluationById = async (req, res) => {
     }
 
     // Find the submission linked to this evaluation and populate student details
-    const submission = await Submission.findById(evaluation.submission_id).populate("student_id");
+    const submission = await Submission.findById(
+      evaluation.submission_id
+    ).populate("student_id");
 
     if (!submission) {
       return res.status(404).json({
@@ -522,9 +522,9 @@ const getEvaluationById = async (req, res) => {
     res.json({
       success: true,
       data: {
-        evaluation: evaluation.toObject(),  // Includes student_id (populated)
+        evaluation: evaluation.toObject(), // Includes student_id (populated)
         student: submission?.student_id, // Populated student details
-        submissionUrl:submission?.submission_url
+        submissionUrl: submission?.submission_url,
       },
     });
   } catch (error) {
@@ -532,7 +532,6 @@ const getEvaluationById = async (req, res) => {
     res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
-
 
 const getHackathonSummary = async (req, res) => {
   try {
@@ -594,8 +593,15 @@ const getHackathonEvaluationSummary = async (hackathon_id) => {
     const keywordsArray = Object.entries(hackathon.keywords || {}); // Convert object to Map
 
     // console.log(skillGapArray);
-    const skillGapSummary = await summarizeSkillGaps(skillGapArray, problem_statement);
-    const solutionSummary = await summarizeSolutionKeywords(keywordsArray, problem_statement);
+    const skillGapSummary = await summarizeSkillGaps(
+      skillGapArray,
+      problem_statement
+    );
+    console.log(skillGapSummary);
+    const solutionSummary = await summarizeSolutionKeywords(
+      keywordsArray,
+      problem_statement
+    );
 
     hackathon.skill_gap_analysis = skillGapSummary;
     hackathon.summary_analysis = solutionSummary;
