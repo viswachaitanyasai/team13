@@ -8,6 +8,7 @@ const {
   summarizeSolutionKeywords,
 } = require("../utils/test");
 const bcrypt = require("bcrypt");
+const Evaluation = require("../models/Evaluation");
 
 // Create a new hackathon with judging parameters
 const createHackathon = async (req, res) => {
@@ -461,6 +462,7 @@ const getHackathonEvaluations = async (req, res) => {
           grade: sub.student_id?.grade || "N/A",
           overall_score: score,
           evaluation_category: sub.evaluation_id?.evaluation_category || "N/A",
+          evaluation_id: sub?.evaluation_id,
         };
       })
       .sort((a, b) => b.overall_score - a.overall_score); // Sort by highest score first
@@ -485,26 +487,21 @@ const getHackathonEvaluations = async (req, res) => {
 };
 const getStudentEvaluations = async (req, res) => {
   try {
-    const { hackathon_id, student_id } = req.params;
+    const { evaluation_id } = req.params;
 
     // Find the student's submission for the hackathon and populate evaluation details
-    const submission = await Submission.findOne({
-      student_id,
-      hackathon_id,
-    }).populate("evaluation_id"); // Populating the referenced evaluation data
+    const evaluation = Evaluation.findById(evaluation_id); // Populating the referenced evaluation data
 
-    if (!submission) {
+    if (!evaluation) {
       return res.status(404).json({
         success: false,
-        error: "Submission not found for this student",
+        error: "Evaluation not found for this student",
       });
     }
 
     res.json({
       success: true,
-      hackathon_id,
-      student_id,
-      evaluation: submission.evaluation_id || {}, // Sending evaluation details if available
+      evaluation: evaluation || {}, // Sending evaluation details if available
     });
   } catch (error) {
     console.error("Error fetching student evaluation:", error);
