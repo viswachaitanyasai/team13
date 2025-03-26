@@ -40,6 +40,9 @@ const StudentSchema = new mongoose.Schema({
   joined_hackathons: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Hackathon" },
   ],
+  submissions: [
+    { type: mongoose.Schema.Types.ObjectId, ref: "Submission", select: false },
+  ],
 
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },

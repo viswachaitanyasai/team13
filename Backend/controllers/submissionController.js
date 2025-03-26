@@ -7,6 +7,7 @@ const { extractAudioFromVideo } = require("../utils/videoProcessor");
 const { uploadFileToS3 } = require("../utils/s3Uploader");
 const Submission = require("../models/Submission");
 const Evaluation = require("../models/Evaluation");
+const Student = require("../models/Student");
 const Hackathon = require("../models/Hackathon");
 const { updateHackathonData } = require("../utils/geminiAnalysis");
 // ✅ Process File (Extract Text / Convert Audio)
@@ -72,10 +73,19 @@ const submitSolution = async (req, res) => {
     if (!hackathon_id) {
       return res.status(400).json({ error: "Hackathon ID is required." });
     }
+    const hackathon = await Hackathon.findById(hackathon_id);
+    if (!hackathon)
+      return res.status(404).json({ error: "Hackathon not found." });
+
 
     if (!student_id) {
       return res.status(400).json({ error: "Student ID is required." });
     }
+
+    const student = await Student.findById(student_id);
+    if (!student)
+      return res.status(404).json({ error: "Student not found." });
+
 
     const fileBuffer = req.file.buffer;
     const fileType = req.file.mimetype;
@@ -103,18 +113,19 @@ const submitSolution = async (req, res) => {
 
     // ✅ Update Submission with uploaded file
     await submission.save();
-    
 
     res.status(200).json({
       message: "Submission recorded successfully",
     });
     // console.log("submission saved");
     // ✅ Fetch Hackathon details
-    const hackathon = await Hackathon.findById(hackathon_id);
     const problemStatement = `Title: ${hackathon.title}\nDescription: ${hackathon.description}\nProblem Statement: ${hackathon.problem_statement}\nContext: ${hackathon.context}`;
     const judgement_parameters = hackathon.judging_parameters;
     const custom_prompt = hackathon.custom_prompt;
-
+    // console.log(student_id);
+    await Student.findByIdAndUpdate(student_id, {
+      $push: { submissions: submission._id },
+    });
     // Declare evaluationResult in the outer scope
     let evaluationResult;
 
@@ -176,6 +187,7 @@ const submitSolution = async (req, res) => {
       );
       // console.log(evaluation);
       // ✅ Link Submission with Evaluation
+      // console.log("in submit func", evaluationResult.keywords);
       await updateHackathonData(
         hackathon_id,
         evaluationResult.skill_gap,
@@ -308,8 +320,6 @@ const bulkUpdateEvaluationCategory = async (req, res) => {
   }
 };
 
-
-
 const editEvaluationScore = async (req, res) => {
   try {
     const { submission_id } = req.params;
@@ -384,11 +394,6 @@ const editEvaluationScore = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
-
-
-
 
 module.exports = {
   submitSolution,

@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Hackathon = require("../models/Hackathon");
 const Submission = require("../models/Submission");
+const Evaluation = require("../models/Evaluation");
 // @desc Register a new student
 // @route POST /api/students/register
 // @access Public
@@ -58,7 +59,7 @@ exports.loginStudent = async (req, res) => {
     }
 
     // Generate JWT Token
-    const token = jwt.sign({ id: student._id }, process.env.JWT_SECRETKEY, {
+    const token = jwt.sign({ id: student._id,role:"student" }, process.env.JWT_SECRETKEY, {
       expiresIn: "7d",
     });
 
@@ -237,5 +238,41 @@ exports.joinHackathon = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, error: error.message });
+  }
+};
+exports.getEvaluation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ error: "Missing studentId or hackathonId" });
+    }
+    const studentId = req.student.id;
+    console.log(req.student);
+    const submission = await Submission.findOne({
+      student: studentId,
+      hackathon: id,
+    });
+
+    if (!submission) {
+      return res
+        .status(404)
+        .json({ error: "No submission found for this hackathon" });
+    }
+
+    // Find the evaluation based on submission_id
+    const evaluation = await Evaluation.findOne({
+      submission_id: submission._id,
+    });
+
+    if (!evaluation) {
+      return res.status(404).json({ error: "Evaluation not found" });
+    }
+
+    res.json(evaluation);
+  } catch (error) {
+    console.error("Error fetching evaluation:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -7,6 +7,7 @@ const {
   getHackathonById,
   getPublicHackathons,
   joinHackathon,
+  getEvaluation,
 } = require("../controllers/studentController");
 const submissionController = require("../controllers/submissionController");
 const { uploadMiddleware } = require("../controllers/uploadController");
@@ -27,6 +28,8 @@ router.get("/myhackathons", studentAuthMiddleware, getMyHackathons);
 router.get("/hackathon/:id", getHackathonById);
 router.get("/hackathons", getPublicHackathons);
 router.post("/join", studentAuthMiddleware, joinHackathon);
+router.post("/results/:id", studentAuthMiddleware, getEvaluation);
+
 router.post(
   "/submit",
   uploadMiddleware,
