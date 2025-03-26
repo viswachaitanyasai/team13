@@ -187,6 +187,7 @@ const submitSolution = async (req, res) => {
       );
       // console.log(evaluation);
       // ✅ Link Submission with Evaluation
+      // console.log("in submit func", evaluationResult.keywords);
       await updateHackathonData(
         hackathon_id,
         evaluationResult.skill_gap,
