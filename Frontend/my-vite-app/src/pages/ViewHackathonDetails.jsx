@@ -40,7 +40,7 @@ const ViewHackathon = () => {
       const token = localStorage.getItem("authToken");
       await removeHackathon(hackathonId, token);
       toast.success("Hackathon deleted successfully!");
-      navigate("/dashboard"); // ✅ Redirect to dashboard after deletion
+      navigate("/hackathons"); // ✅ Redirect to dashboard after deletion
     } catch (error) {
       console.error("Hackathon Deletion Error:", error);
       toast.error(error.error || "Failed to delete hackathon.");
@@ -68,7 +68,7 @@ const ViewHackathon = () => {
       </div>
     );
   }
-
+  
   return (
     <div className="min-h-screen flex justify-center bg-gray-900 p-6 text-white w-full">
       <div className="w-full h-full bg-gray-800 rounded-xl shadow-lg p-6">
@@ -80,11 +80,18 @@ const ViewHackathon = () => {
             <button
               onClick={handleCopyInviteCode}
               className="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md text-white text-sm flex items-center gap-1"
-            >
+              >
               <FaCopy /> Copy
             </button>
           </div>
         </div>
+              {/* 📷 Display Banner */}
+              {hackathon.image_url && (
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold text-white">Hackathon Banner:</h3>
+        <img src={hackathon.image_url} alt="Hackathon Banner" className="w-full max-w-lg rounded-lg" />
+      </div>
+    )}
 
         {/* 🔥 Hackathon Title */}
         <h2 className="text-3xl font-bold text-orange-400">{hackathon.title}</h2>
@@ -173,13 +180,6 @@ const ViewHackathon = () => {
           </div>
         )}
 
-        {/* 📷 Display Banner */}
-        {hackathon.image_url && (
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold text-white">Hackathon Banner:</h3>
-            <img src={hackathon.image_url} alt="Hackathon Banner" className="w-full max-w-lg rounded-lg" />
-          </div>
-        )}
         {hackathon.status === "upcoming" && (
           <div className="mt-6 flex gap-4">
             {/* Edit Button */}

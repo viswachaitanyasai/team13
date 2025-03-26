@@ -42,6 +42,7 @@ const ViewEvaluation = () => {
           link: "#",
           status: evalItem.evaluation_category,
           score: evalItem.overall_score,
+          evalId:evalItem.evaluation_id
         }));
 
         setSubmissions(formattedSubmissions);
@@ -170,7 +171,7 @@ const ViewEvaluation = () => {
                       >
                         View
                       </a>
-                      <button className="px-4 py-2 flex-auto bg-green-600 hover:bg-green-700 rounded-full font-medium shadow-md transition">
+                      <button onClick={()=>{navigate(`/analysis/${submission.evalId}`)}} className="px-4 py-2 flex-auto bg-green-600 hover:bg-green-700 rounded-full font-medium shadow-md transition">
                         Analysis
                       </button>
                       <select

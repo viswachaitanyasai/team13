@@ -79,7 +79,7 @@ const AuthPage = () => {
         localStorage.removeItem("rememberMe");
       }
       toast.success("Login successful!");
-      navigate("/dashboard");
+      navigate("/hackathons");
     } catch (error) {
       console.error("Login Error:", error);
       toast.error(error.response?.data?.error || "Login failed. Please try again.");

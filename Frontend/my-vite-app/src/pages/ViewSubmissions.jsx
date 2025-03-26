@@ -29,9 +29,10 @@ const ViewSubmission = () => {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("authToken");
   const navigate = useNavigate();
-const publishResult=()=>{
+const publishResult=async()=>{
+
+  await publishResults(hackathonId,token);
   window.location.reload();
-  publishResults(hackathonId,token);
   
 }
   useEffect(() => {

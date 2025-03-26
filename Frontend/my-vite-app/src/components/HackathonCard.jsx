@@ -7,7 +7,7 @@ const HackathonCard = ({ event, refreshHackathons, showDeleteButton, showEditBut
   const navigate = useNavigate();
 
   if (!event) return null;
-
+console.log(event);
   const today = new Date();
   const startDate = new Date(event.start_date);
   const endDate = new Date(event.end_date);
@@ -97,13 +97,13 @@ const HackathonCard = ({ event, refreshHackathons, showDeleteButton, showEditBut
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex flex-wrap gap-2">
             <span className="px-3 py-1.5 bg-gray-400 text-gray-700 rounded-lg text-sm">
-              Registrations: {event.stats?.registrations ?? 0}
+              Registrations: {event?.participants?.length}
             </span>
             <span className="px-3 py-1.5 bg-gray-400 text-gray-700 rounded-lg text-sm">
-              Participants: {event.stats?.participants ?? 0}
+              Participants: {event?.submissions?.length ?? 0}
             </span>
           </div>
-          {/* <button
+          {/* <butto
               onClick={handleViewHackathon}
               className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
             >

@@ -33,10 +33,8 @@ const EmailVerification = () => {
       const response = await verifyEmail({ email, otp: otp.join("") });
 
       // If OTP verification is successful
-      localStorage.setItem("teacherName", response.teacher.name);
-      localStorage.setItem("authToken", response.token);
       toast.success("OTP verification successful!");
-      navigate("/dashboard");
+      navigate("/login");
     } catch (error) {
       toast.error(error.error || "Invalid OTP. Please try again.");
     } finally {
