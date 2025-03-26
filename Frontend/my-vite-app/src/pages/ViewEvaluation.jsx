@@ -1,9 +1,11 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { getEvaluations } from "../apis/hackathonapi";
 
 const ViewEvaluation = () => {
+  const location = useLocation();
+  const data = location.state;
   const navigate = useNavigate();
   const { hackathonId } = useParams();
   const [submissions, setSubmissions] = useState([]);
@@ -93,6 +95,7 @@ const ViewEvaluation = () => {
         >
           &larr; Back
         </button>
+        <h1 className="text-3xl text-center font-bold text-gray-100 mb-4">{data.title}</h1>
         <p className="text-gray-400 text-center mt-2">
           {hackathonStats.totalParticipants} Participants |{" "}
           {hackathonStats.totalSubmissions} Submissions | Avg Score:{" "}
@@ -120,14 +123,15 @@ const ViewEvaluation = () => {
             ))}
           </Tabs.List>
         </Tabs.Root>
-
+      <div className="flex justify-center">
         <input
           type="text"
           placeholder="Search by name..."
-          className="mt-6 w-full p-2 rounded-xl bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:outline-none"
+          className="mt-6 w-50 p-2 text-center rounded-xl bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:outline-none"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
+      </div>
 
         {filteredSubmissions.length > 0 ? (
           <div className="overflow-x-auto md:overflow-hidden max-w-full mt-6">

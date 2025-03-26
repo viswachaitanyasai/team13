@@ -436,7 +436,7 @@ const getHackathonEvaluations = async (req, res) => {
         { path: "student_id", select: "name grade" }, // Fetch student details
       ],
     });
-
+    
     if (!hackathon) {
       return res.status(404).json({ error: "Hackathon not found" });
     }
@@ -450,7 +450,6 @@ const getHackathonEvaluations = async (req, res) => {
     const evaluatedSubmissions = hackathon.submissions.filter(
       (sub) => sub.evaluation_id
     );
-
     // 4. Map the required fields and calculate total score
     let totalScore = 0;
     const evaluations = evaluatedSubmissions
@@ -462,7 +461,7 @@ const getHackathonEvaluations = async (req, res) => {
           grade: sub.student_id?.grade || "N/A",
           overall_score: score,
           evaluation_category: sub.evaluation_id?.evaluation_category || "N/A",
-          evaluation_id: sub?.evaluation_id,
+          evaluation_id: sub?.evaluation_id._id,
         };
       })
       .sort((a, b) => b.overall_score - a.overall_score); // Sort by highest score first
@@ -485,23 +484,30 @@ const getHackathonEvaluations = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-const getStudentEvaluations = async (req, res) => {
+const getEvaluationById = async (req, res) => {
   try {
     const { evaluation_id } = req.params;
+    if (!evaluation_id) {
+      return res.status(400).json({
+        success: false,
+        error: "Evaluation ID is required",
+      });
+    }
 
-    // Find the student's submission for the hackathon and populate evaluation details
-    const evaluation = Evaluation.findById(evaluation_id); // Populating the referenced evaluation data
+
+    // Use await to get the evaluation document
+    const evaluation = await Evaluation.findById(evaluation_id);
 
     if (!evaluation) {
       return res.status(404).json({
         success: false,
-        error: "Evaluation not found for this student",
+        error: "Evaluation not found",
       });
     }
 
     res.json({
       success: true,
-      evaluation: evaluation || {}, // Sending evaluation details if available
+      evaluation: evaluation.toObject(), // Convert to plain object
     });
   } catch (error) {
     console.error("Error fetching student evaluation:", error);
@@ -656,7 +662,7 @@ module.exports = {
   getHackathonSubmissions,
   getHackathonRegistrations,
   getHackathonEvaluations,
-  getStudentEvaluations,
+  getEvaluationById,
   getHackathonSummary,
   isResultPublished,
   publishResult,

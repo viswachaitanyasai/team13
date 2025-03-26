@@ -185,10 +185,10 @@ const publishResult=()=>{
             </button>
 
             <button
-              onClick={() => navigate(`/evaluation/${hackathonId}`)}
+              onClick={() => navigate(`/submissions/${hackathonId}`, {state: hackathonData})}
               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md"
             >
-              View Analysis
+              View Evaluations
             </button>
 
           </div>
