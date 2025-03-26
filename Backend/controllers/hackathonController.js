@@ -462,6 +462,7 @@ const getHackathonEvaluations = async (req, res) => {
           grade: sub.student_id?.grade || "N/A",
           overall_score: score,
           evaluation_category: sub.evaluation_id?.evaluation_category || "N/A",
+          evaluation_id: sub?.evaluation_id,
         };
       })
       .sort((a, b) => b.overall_score - a.overall_score); // Sort by highest score first
