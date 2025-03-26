@@ -50,7 +50,7 @@ connectDB();
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/hackathons", hackathonRoutes);
-app.use("/api/student", studentRoutes);
+app.use("/api/students", studentRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/files", uploadRoutes);

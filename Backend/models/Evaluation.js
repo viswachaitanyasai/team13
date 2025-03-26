@@ -20,11 +20,7 @@ const EvaluationSchema = new mongoose.Schema(
     },
     parameter_feedback: [
       {
-        // judgement_param_id: {
-        //   type: mongoose.Schema.Types.ObjectId,
-        //   ref: "JudgingParameter",
-        //   required: true,
-        // },
+        
         name: { type: String, required: true },
         score: { type: Number, required: true, enum: [0, 0.5, 1, 2] },
         reason: { type: String, required: true },
