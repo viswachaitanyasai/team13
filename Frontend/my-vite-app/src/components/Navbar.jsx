@@ -49,7 +49,7 @@ function Navbar({ teacherName }) {
     }
   };
   return (
-    <nav className="flex  items-center justify-between py-3 px-4 bg-gradient-to-r from-gray-900 to-gray-800 shadow-lg w-full fixed top-0 z-50 border-b border-gray-700">
+    <nav className="flex  items-center justify-between py-3 px-4 bg-gradient-to-r from-indigo-100 to-white shadow-md w-full fixed top-0 z-50 border-gray-700">
       {/* Logo & Title */}
       <div className="flex items-center gap-2">
         <img
@@ -57,7 +57,7 @@ function Navbar({ teacherName }) {
           alt="Logo"
           className="h-10 drop-shadow-lg"
         />
-        <h1 className="text-lg font-semibold text-white tracking-wide m-0">
+        <h1 className="text-lg font-bold text-indigo-600 tracking-wide m-0">
           EduHack
         </h1>
       </div>
@@ -66,7 +66,7 @@ function Navbar({ teacherName }) {
       <div className="relative">
         <div
           ref={buttonRef}
-          className="flex items-center cursor-pointer px-3 py-1 gap-2 rounded-full border border-gray-600 bg-gray-700 hover:bg-gray-600 transition-all shadow-lg backdrop-blur-lg"
+          className="flex items-center cursor-pointer px-3 py-1 gap-2 rounded-full border border-gray-600 bg-white hover:bg-gray-600 transition-all shadow-sm backdrop-blur-lg"
           onClick={toggleDropdown}
         >
           <img
@@ -74,7 +74,7 @@ function Navbar({ teacherName }) {
             alt="Profile"
             className="h-8 w-8 rounded-full border border-indigo-400 shadow-lg"
           />
-          <span className="text-white font-medium text-sm">
+          <span className="text-indigo-600 font-semibold text-sm">
             {teacherName || storedTeacherName}
           </span>
           <FaChevronDown

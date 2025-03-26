@@ -307,364 +307,474 @@ const CreateHackathonForm = () => {
   };
 
   return (
-    <div className="min-h-screen w-full p-8">
-      <h2 className="text-3xl font-bold mb-6 text-center text-indigo-700">
-        {step === 1 ? "Create a Hackathon" : "Select Hackathon Parameters"}
-      </h2>
-      {step === 1 ? (
-        <form onSubmit={handleNextStep} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg mb-20">
-          {/* Hackathon Name */}
-          <div className="space-y">
-            <label className="block font-medium">
-              Hackathon Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              className="w-full p-3 border rounded-md"
-              placeholder="Enter Hackathon name"
-              value={hackathonName}
-              onChange={(e) => setHackathonName(e.target.value)}
-            />
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2 col-span-2">
-            <label className="block font-medium">
-              Description <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              className="w-full p-3 border rounded-md"
-              placeholder="What is this hackathon about..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2 col-span-2">
-            <label className="block font-medium">
-              Problem Statement <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              className="w-full p-3 border rounded-md"
-              placeholder="Give your Problem Statement"
-              value={problemStatement}
-              onChange={(e) => setProblemStatement(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2 col-span-2">
-            <label className="block font-medium">
-              Context<span className="text-red-500">*</span>
-            </label>
-            <textarea
-              className="w-full p-3 border rounded-md"
-              placeholder="What is this hackathon about..."
-              value={context}
-              onChange={(e) => setContext(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block font-medium">
-              Hackathon Eligibility<span className="text-red-500">*</span>
-            </label>
-            <select
-              className="w-full p-3 border rounded-md"
-              value={eligibility}
-              onChange={(e) => setEligibility(e.target.value)}
-            >
-              <option value="">Select</option>
-              <option value="1st">1st</option>
-              <option value="2nd">2nd</option>
-              <option value="3rd">3rd</option>
-              <option value="4th">4th</option>
-              <option value="5th">5th</option>
-              <option value="6th">6th</option>
-              <option value="7th">7th</option>
-              <option value="8th">8th</option>
-              <option value="9th">9th</option>
-              <option value="10th">10th</option>
-              <option value="11th">11th</option>
-              <option value="12th">12th</option>
-              <option value="UG">Undergraduate (UG)</option>
-              <option value="PG">Postgraduate (PG)</option>
-            </select>
-          </div>
-
-          {/* File Upload */}
-          <div className="space-y-2">
-  <label className="block font-medium">Relevant Files (If Any)</label>
-  <input
-    type="file"
-    id="fileUploadInput"
-    onChange={handleFileChange}
-    className="p-2 border rounded-md"
-  />
-  {fileUrl && (  // ✅ Show only if uploaded to S3
-    <div className="flex items-center gap-2 mt-2">
-      <a href={fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-        {uploadedFileName}
-      </a>
-      <button
-        onClick={handleRemoveFile}
-        className="px-3 py-1 bg-red-500 text-white rounded-md text-sm"
-      >
-        Remove
-      </button>
-    </div>
-  )}
-</div>
-
-
-
-<div className="space-y-2 col-span-2">
-  <label className="block font-medium">Upload Banner (Image Files Only)</label>
-  <input
-    type="file"
-    accept="image/*"
-    id="imageUploadInput"
-    onChange={handleImageChange}
-    className="p-2 border rounded-md"
-  />
-
-  {/* Show Image Preview & Remove Button */}
-  {imageUrl && (  // ✅ Show only if uploaded to S3
-    <div className="mt-2 flex items-center gap-4">
-      <img src={imageUrl} alt="Preview" className="w-40 h-auto rounded-md border" />
-      <button
-        onClick={handleRemoveImage}
-        className="px-3 py-1 bg-red-500 text-white rounded-md text-sm"
-      >
-        Remove
-      </button>
-    </div>
-  )}
-</div>
-
-
-
-
-
-          {/* Start Date */}
-          <div className="space-y-2">
-            <label className="block font-medium">
-              Start Date<span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              className="w-full p-3 border rounded-md"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              min={today}
-            />
-          </div>
-
-          {/* Submission Deadline */}
-          <div className="space-y-2">
-            <label className="block font-medium">
-              Submission Deadline<span className="text-red-500">*</span>
-            </label>
-            <input
-              type="date"
-              className="w-full p-3 border rounded-md"
-              value={submissionDeadline}
-              onChange={(e) => setSubmissionDeadline(e.target.value)}
-              min={startDate || today}
-            />
-          </div>
-
-          {/* Buttons */}
-          <div className="col-span-2 flex justify-end gap-3 mt-4">
-            <button
-              type="submit"
-              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Next Step
-            </button>
-          </div>
-        </form>
-      ) : (
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6 bg-white p-8 shadow-lg rounded-lg">
-          {/* Hackathon Type Toggle */}
-          <div className="space-y-2 col-span-2">
-            <label className="block font-medium">Hackathon Type</label>
-            <div className="flex items-center gap-3">
-              <span>Public</span>
-              <label className="relative inline-flex cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  checked={hackathonType === "Private"}
-                  onChange={() =>
-                    setHackathonType(hackathonType === "Public" ? "Private" : "Public")
-                  }
-                />
-                <div className="w-14 h-7 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 peer-checked:after:translate-x-7 after:content-[''] after:absolute after:w-6 after:h-6 after:bg-white after:rounded-full after:transition-all"></div>
-              </label>
-              <span>Private</span>
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header Section */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+            {step === 1 ? "Create a Hackathon" : "Configure Evaluation"}
+          </h2>
+          <div className="flex justify-center">
+            <div className="w-full max-w-xs bg-gray-200 rounded-full h-2.5">
+              <div 
+                className={`bg-indigo-600 h-2.5 rounded-full transition-all duration-300 ${step === 1 ? 'w-1/2' : 'w-full'}`}
+              ></div>
             </div>
           </div>
-
-          {/* Passkey Input for Private Hackathon */}
-          {hackathonType === "Private" && (
-            <div className="space-y-2 col-span-2">
-              <label className="block font-medium">Enter Passkey</label>
-              <input
-                type="password"
-                className="w-full p-3 border rounded-md"
-                placeholder="Enter passkey"
-                value={passKey}
-                onChange={(e) => setPassKey(e.target.value)}
-                required
-              />
-            </div>
-          )}
-          <div className="space-y-2 col-span-2">
-  <label className="block font-medium">Sponsors</label>
-  <div className="flex gap-2">
-    <input
-      type="text"
-      className="w-full p-3 border rounded-md"
-      placeholder="Enter sponsor name"
-      value={sponsorInput}
-      onChange={(e) => setSponsorInput(e.target.value)}
-    />
-    <button
-      type="button"
-      className="px-4 py-2 bg-blue-600 text-white rounded-md"
-      onClick={handleAddSponsor}
-    >
-      Add
-    </button>
-  </div>
-
-  {/* Display added sponsors */}
-  {sponsors.length > 0 && (
-    <div className="mt-2 flex flex-wrap gap-2">
-      {sponsors.map((sponsor, index) => (
-        <div key={index} className="px-3 py-1 bg-gray-200 rounded-md flex items-center">
-          {sponsor}
-          <button
-            type="button"
-            className="ml-2 text-red-500"
-            onClick={() => handleRemoveSponsor(index)}
-          >
-            ✕
-          </button>
         </div>
-      ))}
-    </div>
-  )}
-</div>
-
-          {/* Select Parameters */}
-          <div className="space-y-2 col-span-2">
-            <label className="block font-medium">Select Parameters</label>
-            <select
-              className="w-full p-3 border rounded-md"
-              onChange={handleSelectChange}
-              defaultValue=""
-            >
-              <option value="" disabled selected>
-                Choose a parameter
-              </option>
-              {suggestedParameters.map((param, index) => (
-                <option key={index} value={param}>
-                  {param}
-                </option>
-              ))}
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          {/* Input for Other Parameter */}
-          {showOtherInput && (
-            <div className="flex gap-2 col-span-2">
-              <input
-                type="text"
-                className="w-full p-3 border rounded-md"
-                placeholder="Specify other parameter"
-                value={otherParameter}
-                onChange={(e) => setOtherParameter(e.target.value)}
-              />
-              <button
-                type="button"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md"
-                onClick={handleAddOtherParameter}
-              >
-                Add
-              </button>
-            </div>
-          )}
-
-          {/* Display Selected Parameters */}
-          {selectedParameters.length > 0 && (
-            <div className="col-span-2">
-              <h3 className="font-medium">Selected Parameters:</h3>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {selectedParameters.map((param, index) => (
-                  <div
-                    key={index}
-                    className="px-3 py-2 bg-gray-200 rounded-md flex items-center"
+  
+        {/* Form Content */}
+        {step === 1 ? (
+          <form onSubmit={handleNextStep} className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Hackathon Name */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Hackathon Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Enter Hackathon name"
+                  value={hackathonName}
+                  onChange={(e) => setHackathonName(e.target.value)}
+                  required
+                />
+              </div>
+  
+              {/* Description */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[120px]"
+                  placeholder="What is this hackathon about..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  required
+                />
+              </div>
+  
+              {/* Problem Statement */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Problem Statement <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[120px]"
+                  placeholder="Describe the problem participants will solve..."
+                  value={problemStatement}
+                  onChange={(e) => setProblemStatement(e.target.value)}
+                  required
+                />
+              </div>
+  
+              {/* Context */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Context <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[120px]"
+                  placeholder="Provide background information..."
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  required
+                />
+              </div>
+  
+              {/* Eligibility */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Eligibility <span className="text-red-500">*</span>
+                </label>
+                <select
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  value={eligibility}
+                  onChange={(e) => setEligibility(e.target.value)}
+                  required
+                >
+                  <option value="">Select eligibility</option>
+                  {[...Array(12)].map((_, i) => (
+                    <option key={i+1} value={`${i+1}th`}>{i+1}{getOrdinalSuffix(i+1)} Grade</option>
+                  ))}
+                  <option value="UG">Undergraduate (UG)</option>
+                  <option value="PG">Postgraduate (PG)</option>
+                </select>
+              </div>
+  
+              {/* File Upload */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Relevant Files
+                </label>
+                <div className="flex items-center gap-2">
+                  <label 
+                    htmlFor="fileUploadInput"
+                    className="cursor-pointer px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg border border-gray-300 transition-colors"
                   >
-                    {param}
-                    <button
-                      type="button"
-                      className="ml-2 text-red-500"
-                      onClick={() => handleRemoveParameter(param)}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+                    <span>Choose File</span>
+                    <input
+                      type="file"
+                      id="fileUploadInput"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {fileUrl && (
+                    <div className="flex items-center gap-2">
+                      <a 
+                        href={fileUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:underline text-sm truncate max-w-[120px]"
+                        title={uploadedFileName}
+                      >
+                        {uploadedFileName}
+                      </a>
+                      <button
+                        type="button"
+                        onClick={handleRemoveFile}
+                        className="text-red-500 hover:text-red-700"
+                        title="Remove file"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+  
+              {/* Banner Upload */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Upload Banner (Image)
+                </label>
+                <div className="flex flex-col gap-3">
+                  <label 
+                    htmlFor="imageUploadInput"
+                    className="cursor-pointer px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg border border-gray-300 transition-colors w-fit"
+                  >
+                    <span>Choose Image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="imageUploadInput"
+                      onChange={handleImageChange}
+                      className="hidden"
+                    />
+                  </label>
+                  {imageUrl && (
+                    <div className="flex items-start gap-4">
+                      <img 
+                        src={imageUrl} 
+                        alt="Banner preview" 
+                        className="w-full max-w-xs h-auto rounded-lg border border-gray-200" 
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="text-red-500 hover:text-red-700 mt-2"
+                        title="Remove image"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+  
+              {/* Dates */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Start Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  min={today}
+                  required
+                />
+              </div>
+  
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Submission Deadline <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  value={submissionDeadline}
+                  onChange={(e) => setSubmissionDeadline(e.target.value)}
+                  min={startDate || today}
+                  required
+                />
               </div>
             </div>
-          )}
-
-          <div className="space-y-2 col-span-2">
-            <label className="block font-medium">
-              Additional Instructions (Optional)
-            </label>
-            <textarea
-              className="w-full p-3 border rounded-md"
-              placeholder="Enter any additional details..."
-              value={additionalInstructions}
-              onChange={(e) => setAdditionalInstructions(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2 col-span-2 flex items-center gap-2">
-  <input
-    type="checkbox"
-    id="allowMultipleSolutions"
-    checked={allowMultipleSolutions}
-    onChange={() => setAllowMultipleSolutions(!allowMultipleSolutions)}
-    className="w-5 h-5"
-  />
-  <label htmlFor="allowMultipleSolutions" className="block font-medium">
-    Allow Multiple Solutions per Participant
-  </label>
-</div>
-
-          {/* Buttons */}
-          <div className="col-span-2 flex justify-end gap-3 mt-4">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="px-6 py-3 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-            >
-              Previous Page
-            </button>
-            <button
-              type="submit"
-              className={`px-6 py-3 rounded-md text-white ${loading ? "bg-gray-500 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
-              disabled={loading}
-            >
-              {loading ? "Submitting..." : "Submit"}
-            </button>
-          </div>
-        </form>
-      )}
+  
+            {/* Navigation */}
+            <div className="flex justify-end mt-8">
+              <button
+                type="submit"
+                className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center"
+              >
+                Continue to Parameters
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Hackathon Type Toggle */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Hackathon Type
+                </label>
+                <div className="flex items-center gap-4">
+                  <div className={`px-4 py-2 rounded-lg ${hackathonType === 'Public' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-500'} transition-colors`}>
+                    Public
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={hackathonType === "Private"}
+                      onChange={() => setHackathonType(hackathonType === "Public" ? "Private" : "Public")}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  </label>
+                  <div className={`px-4 py-2 rounded-lg ${hackathonType === 'Private' ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-500'} transition-colors`}>
+                    Private
+                  </div>
+                </div>
+              </div>
+  
+              {/* Passkey Input */}
+              {hackathonType === "Private" && (
+                <div className="space-y-2 md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Passkey <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Enter passkey for private access"
+                    value={passKey}
+                    onChange={(e) => setPassKey(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
+  
+              {/* Sponsors */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Sponsors
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Enter sponsor name"
+                    value={sponsorInput}
+                    onChange={(e) => setSponsorInput(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddSponsor}
+                    className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                    disabled={!sponsorInput.trim()}
+                  >
+                    Add
+                  </button>
+                </div>
+                {sponsors.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {sponsors.map((sponsor, index) => (
+                      <div 
+                        key={index} 
+                        className="px-3 py-1.5 bg-indigo-50 text-indigo-800 rounded-full flex items-center text-sm"
+                      >
+                        {sponsor}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSponsor(index)}
+                          className="ml-2 text-indigo-400 hover:text-indigo-600"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+  
+              {/* Evaluation Parameters */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Evaluation Parameters <span className="text-red-500">*</span>
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    onChange={handleSelectChange}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Choose a parameter</option>
+                    {suggestedParameters.map((param, index) => (
+                      <option key={index} value={param}>{param}</option>
+                    ))}
+                    <option value="Other">Other (Custom)</option>
+                  </select>
+                  <button
+                    type="button"
+                    onClick={handleSelectChange}
+                    className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                  >
+                    Add
+                  </button>
+                </div>
+  
+                {/* Other Parameter Input */}
+                {showOtherInput && (
+                  <div className="mt-3 flex gap-2">
+                    <input
+                      type="text"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      placeholder="Specify custom parameter"
+                      value={otherParameter}
+                      onChange={(e) => setOtherParameter(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddOtherParameter}
+                      className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                      disabled={!otherParameter.trim()}
+                    >
+                      Add
+                    </button>
+                  </div>
+                )}
+  
+                {/* Selected Parameters */}
+                {selectedParameters.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Selected Parameters:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedParameters.map((param, index) => (
+                        <div
+                          key={index}
+                          className="px-3 py-1.5 bg-gray-100 text-gray-800 rounded-full flex items-center text-sm"
+                        >
+                          {param}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveParameter(param)}
+                            className="ml-2 text-gray-400 hover:text-gray-600"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+  
+              {/* Additional Instructions */}
+              <div className="space-y-2 md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Additional Instructions
+                </label>
+                <textarea
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 min-h-[100px]"
+                  placeholder="Enter any additional details for participants..."
+                  value={additionalInstructions}
+                  onChange={(e) => setAdditionalInstructions(e.target.value)}
+                />
+              </div>
+  
+              {/* Multiple Solutions Toggle */}
+              <div className="space-y-2 md:col-span-2 flex items-center">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    id="allowMultipleSolutions"
+                    checked={allowMultipleSolutions}
+                    onChange={() => setAllowMultipleSolutions(!allowMultipleSolutions)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+                <label 
+                  htmlFor="allowMultipleSolutions" 
+                  className="ml-3 text-sm font-medium text-gray-700 cursor-pointer"
+                >
+                  Allow Multiple Solutions per Participant
+                </label>
+              </div>
+            </div>
+  
+            {/* Navigation */}
+            <div className="flex justify-between mt-8">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                </svg>
+                Back
+              </button>
+              <button
+                type="submit"
+                className={`px-6 py-3 text-white font-medium rounded-lg shadow-sm transition-colors flex items-center ${
+                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+                }`}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creating Hackathon...
+                  </>
+                ) : (
+                  <>
+                    Create Hackathon
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 };
-
+function getOrdinalSuffix(n) {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return s[(v - 20) % 10] || s[v] || s[0];
+}
 export default CreateHackathonForm;

@@ -25,19 +25,19 @@ function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`h-full pt-20 sm:w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white shadow-xl flex flex-col justify-between border-r border-gray-700 fixed left-0 top-0 transition-transform transform lg:translate-x-0 ${
+        className={`h-full pt-20 sm:w-[240px] bg-gradient-to-b from-white to-gray-100 text-white shadow-lg flex flex-col justify-between border-gray-700 fixed left-0 top-0 transition-transform transform lg:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         } lg:flex-col`}
       >
         {/* Navigation Items */}
-        <ul className="flex-grow px-4">
+        <ul className="flex-grow px-2 pt-3">
           <li>
             <button
               onClick={() => handleItemClick("hackathons", "/hackathons")}
               className={`flex items-center w-full p-3 rounded-lg transition-all font-medium text-sm ${
                 active === "hackathons"
                   ? "bg-indigo-500 text-white shadow-md"
-                  : "text-gray-300 hover:bg-gray-700"
+                  : "text-black hover:bg-gray-200"
               }`}
             >
               <FaHome className="mr-3 text-base" /> Home
@@ -49,7 +49,7 @@ function Sidebar() {
               className={`flex items-center w-full p-3 mt-2 rounded-lg transition-all font-medium text-sm ${
                 active === "past"
                   ? "bg-indigo-500 text-white shadow-md"
-                  : "text-gray-300 hover:bg-gray-700"
+                  : "text-black hover:bg-gray-200"
               }`}
             >
               <FaHistory className="mr-3 text-base" /> Past Hackathons
@@ -61,7 +61,7 @@ function Sidebar() {
               className={`flex items-center w-full p-3 mt-2 rounded-lg transition-all font-medium text-sm ${
                 active === "ongoing"
                   ? "bg-indigo-500 text-white shadow-md"
-                  : "text-gray-300 hover:bg-gray-700"
+                  : "text-black hover:bg-gray-200"
               }`}
             >
               <FaPlayCircle className="mr-3 text-base" /> Ongoing Hackathons
@@ -73,7 +73,7 @@ function Sidebar() {
               className={`flex items-center w-full p-3 mt-2 rounded-lg transition-all font-medium text-sm ${
                 active === "upcoming"
                   ? "bg-indigo-500 text-white shadow-md"
-                  : "text-gray-300 hover:bg-gray-700"
+                  : "text-black hover:bg-gray-200"
               }`}
             >
               <FaCalendarAlt className="mr-3 text-base" /> Upcoming Hackathons
@@ -85,7 +85,7 @@ function Sidebar() {
         <div className="px-4 pb-6">
           <button
             onClick={() => navigate("/create-hackathon")}
-            className="flex items-center justify-center w-full p-3 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-md font-semibold"
+            className="flex items-center justify-center w-full p-3 text-sm bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-md font-semibold"
           >
             <FaPlusCircle className="mr-2 text-base" /> Create Hackathon
           </button>
