@@ -111,6 +111,7 @@ const EditHackathon = () => {
   };
 
   const handleSubmit = async (e) => {
+    const token= localStorage.getItem("authToken");
     e.preventDefault();
     setLoading(true);
 
@@ -121,7 +122,7 @@ const EditHackathon = () => {
     }
 
     try {
-      await editHackathon(hackathonId, formData);
+      await editHackathon(hackathonId, formData, token);
       toast.success("Hackathon updated successfully!");
       navigate(`/hackathon/${hackathonId}`);
     } catch (error) {

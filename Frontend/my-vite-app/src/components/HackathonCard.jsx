@@ -27,7 +27,7 @@ const HackathonCard = ({ event, refreshHackathons, showDeleteButton, showEditBut
   }
 
   const handleViewSubmissions = () => {
-    navigate(`/submission/${event._id}`);
+    navigate(`/summary/${event._id}`);
   };
 
   const handleViewHackathon = () => {
@@ -59,9 +59,9 @@ const HackathonCard = ({ event, refreshHackathons, showDeleteButton, showEditBut
     <div className="mb-10 ">
       {/* Icon circle */}
       {/* Card */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5 ml-2 shadow-md transition-transform duration-300 hover:shadow-lg ">
+      <div className="bg-gray-800 rounded-xl border border-gray-700 p-5 ml-2 shadow-md transition-transform duration-300 hover:shadow-lg ">
       <h2
-          className="text-indigo-700 text-xl md:text-2xl font-bold cursor-pointer hover:underline"
+          className="text-indigo-400 text-xl md:text-2xl font-bold cursor-pointer hover:underline"
           onClick={handleViewHackathon}
         >
           {event.title}
@@ -71,7 +71,7 @@ const HackathonCard = ({ event, refreshHackathons, showDeleteButton, showEditBut
 
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           <div className="flex-1">
-            <p className="text-gray-700">{event.description} <span className="text-base">{event.emoji}</span></p>
+            <p className="text-gray-400">{event.description} <span className="text-base">{event.emoji}</span></p>
           </div>
           <div className="flex-shrink-0 h-32 w-full md:w-48 overflow-hidden rounded-lg bg-gray-100 border border-gray-200">
             <img 
@@ -96,10 +96,10 @@ const HackathonCard = ({ event, refreshHackathons, showDeleteButton, showEditBut
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div className="flex flex-wrap gap-2">
-            <span className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm">
+            <span className="px-3 py-1.5 bg-gray-400 text-gray-700 rounded-lg text-sm">
               Registrations: {event.stats?.registrations ?? 0}
             </span>
-            <span className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm">
+            <span className="px-3 py-1.5 bg-gray-400 text-gray-700 rounded-lg text-sm">
               Participants: {event.stats?.participants ?? 0}
             </span>
           </div>
