@@ -39,7 +39,7 @@ const ViewEvaluation = () => {
           id: index + 1,
           name: evalItem.studentName,
           class: evalItem.grade,
-          link: "#",
+          link: evalItem.submission_url,
           status: evalItem.evaluation_category,
           score: evalItem.overall_score,
           evalId:evalItem.evaluation_id
@@ -174,17 +174,7 @@ const ViewEvaluation = () => {
                       <button onClick={()=>{navigate(`/analysis/${submission.evalId}`)}} className="px-4 py-2 flex-auto bg-green-600 hover:bg-green-700 rounded-full font-medium shadow-md transition">
                         Analysis
                       </button>
-                      <select
-                        className="pl-2 pr-1 py-2 flex-auto bg-gray-600 text-white rounded-lg shadow-md transition"
-                        value={submission.status}
-                        onChange={(e) =>
-                          handleStatusUpdate(submission.id, e.target.value)
-                        }
-                      >
-                        <option value="shortlisted">Shortlisted</option>
-                        <option value="revisit">Revisit</option>
-                        <option value="rejected">Rejected</option>
-                      </select>
+                     
                     </td>
                   </tr>
                 ))}
