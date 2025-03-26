@@ -428,7 +428,7 @@ const getHackathonEvaluations = async (req, res) => {
     const hackathon = await Hackathon.findById(hackathon_id).populate({
       path: "submissions",
       populate: [
-        { path: "evaluation_id", select: "overall_score evaluation_category" },
+        { path: "evaluation_id" }, // Populate the entire evaluation object
         { path: "student_id", select: "name grade" }, // Fetch student details
       ],
     });
@@ -480,6 +480,37 @@ const getHackathonEvaluations = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const getStudentEvaluations = async (req, res) => {
+  try {
+    const { hackathon_id, student_id } = req.params;
+
+    // Find the student's submission for the hackathon and populate evaluation details
+    const submission = await Submission.findOne({
+      student_id,
+      hackathon_id,
+    }).populate("evaluation_id"); // Populating the referenced evaluation data
+
+    if (!submission) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+          error: "Submission not found for this student",
+        });
+    }
+
+    res.json({
+      success: true,
+      hackathon_id,
+      student_id,
+      evaluation: submission.evaluation_id || {}, // Sending evaluation details if available
+    });
+  } catch (error) {
+    console.error("Error fetching student evaluation:", error);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
 
 const getHackathonSummary = async (req, res) => {
   try {
@@ -624,6 +655,7 @@ module.exports = {
   getHackathonSubmissions,
   getHackathonRegistrations,
   getHackathonEvaluations,
+  getStudentEvaluations,
   getHackathonSummary,
   getHackathonEvaluationSummary,
   isResultPublished,

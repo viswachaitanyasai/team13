@@ -132,8 +132,8 @@ exports.getHackathonById = async (req, res) => {
       req.student = student;
       hasJoined = hackathon.participants.includes(req.student.id);
       hasSubmitted = await Submission.exists({
-        student: req.student.id,
-        hackathon: id,
+        student_id: req.student.id,
+        hackathon_id: id,
       });
     }
 
