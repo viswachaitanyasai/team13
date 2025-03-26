@@ -80,36 +80,27 @@ const submitSolution = async (req, res) => {
     const fileBuffer = req.file.buffer;
     const fileType = req.file.mimetype;
     const originalFileName = req.file.originalname;
-
-    // ✅ Save file locally with submission ID
     const fileExtension = path.extname(originalFileName);
     const fileName = `${hackathon_id}${student_id}${fileExtension}`;
     const tempFilePath = await saveFileLocally(fileBuffer, fileName);
 
-    // ✅ Upload file to S3
-    // console.log("uploading to s3");
     const fileUrl = await uploadFileToS3(
       fileBuffer,
       `uploads/${fileName}`,
       fileType
     );
 
-    // ✅ Create Submission Entry First
     const submission = new Submission({
       hackathon_id,
       student_id,
-      submission_url: fileUrl, // Will be updated after S3 upload
+      submission_url: fileUrl, 
     });
 
-    // ✅ Update Submission with uploaded file
     await submission.save();
-    
 
     res.status(200).json({
       message: "Submission recorded successfully",
     });
-    // console.log("submission saved");
-    // ✅ Fetch Hackathon details
     const hackathon = await Hackathon.findById(hackathon_id);
     const problemStatement = `Title: ${hackathon.title}\nDescription: ${hackathon.description}\nProblem Statement: ${hackathon.problem_statement}\nContext: ${hackathon.context}`;
     const judgement_parameters = hackathon.judging_parameters;
@@ -164,8 +155,6 @@ const submitSolution = async (req, res) => {
       } else {
         categoryField = "rejected_students";
       }
-
-      // Add submission and student to the correct category
       await Hackathon.findByIdAndUpdate(
         hackathon_id,
         {
@@ -174,8 +163,6 @@ const submitSolution = async (req, res) => {
         },
         { new: true }
       );
-      // console.log(evaluation);
-      // ✅ Link Submission with Evaluation
       await updateHackathonData(
         hackathon_id,
         evaluationResult.skill_gap,

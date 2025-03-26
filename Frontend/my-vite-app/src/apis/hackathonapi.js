@@ -95,7 +95,7 @@ export const getHackathonSubmissions = async (hackathonId, token) => {
 export const getHackathonSummary = async (hackathonId, token) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/${hackathonId}/summary`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { "Authorization": `Bearer ${token}` },
     });
     return response.data;
   } catch (error) {
@@ -111,6 +111,16 @@ export const getSubmission = async (hackathonId, token) => {
     return response.data;
   } catch (error) {
     throw error.response?.data || { error: "Failed to fetch student submission." };
+  }
+};
+export const getEvaluations = async (hackathonId, token) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/${hackathonId}/evaluations`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { error: "Failed to fetch evaluations." };
   }
 };
 
@@ -144,4 +154,15 @@ export const joinHackathon = async (inviteCode) => {
     throw error.response?.data || { error: "Failed to join hackathon." };
   }
 };
+export const publishResults=async(hackathonId, token)=>{
+  try{
+    const response = await axios.post(`${API_BASE_URL}/${hackathonId}/publish-result`,{hackathonId}, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  }
+  catch (error) {
+    throw error.response?.data || { error: "Failed to join hackathon." };
+  }
+}
 //  /hackathonid/submissions
