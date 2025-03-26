@@ -13,7 +13,7 @@ const {
   getHackathonEvaluationSummary,
   isResultPublished,
   publishResult,
-  getStudentEvaluations,
+  getEvaluationById,
 } = require("../controllers/hackathonController");
 const authMiddleware = require("../middlewares/authMiddleware");
 const { getEvaluation } = require("../controllers/studentController");
@@ -26,7 +26,7 @@ router.get("/:hackathon_id", getHackathonById);
 router.get("/:hackathon_id/registrations",authMiddleware,getHackathonRegistrations);
 router.get("/:hackathon_id/submissions",authMiddleware,getHackathonSubmissions);
 router.get("/:hackathon_id/evaluations", authMiddleware, getHackathonEvaluations);
-router.get("/:hackathon_id/:student_id/evaluations", authMiddleware, getStudentEvaluations);
+router.get("/evaluations/:evaluation_id", authMiddleware, getEvaluationById);
 router.put("/:hackathon_id", authMiddleware, editHackathon);
 router.delete("/:hackathon_id", authMiddleware, removeHackathon); // Protected delete route
 router.get("/teacher/:teacher_id", authMiddleware, getHackathonsByTeacher);

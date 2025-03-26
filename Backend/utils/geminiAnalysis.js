@@ -109,14 +109,14 @@ async function analyzeAudio(
   }
 }
 
-async function analyzeText({
+async function analyzeText(
   problemStatement,
   parameters,
   submissionText,
-  additionalInstructions = "",
-}) {
+  additionalInstructions = ""
+) {
   const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-  console.log(problemStatement);
+
   const fullPrompt = `
     You are an AI agent evaluating hackathon submissions. STRICTLY follow these rules:
     
