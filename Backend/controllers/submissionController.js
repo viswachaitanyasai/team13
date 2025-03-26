@@ -106,8 +106,9 @@ const submitSolution = async (req, res) => {
 
     // ✅ Save file locally with submission ID
     const fileExtension = path.extname(originalFileName);
-    // const fileName = `${hackathon_id}${student_id}${fileExtension}`;
-    const tempFilePath = await saveFileLocally(fileBuffer, originalFileName);
+    let fileName = `${hackathon_id}${student_id}${fileExtension}`;
+    fileName = originalFileName;
+    const tempFilePath = await saveFileLocally(fileBuffer, fileName);
     // console.log(originalFileName);
 
     // ✅ Upload file to S3
