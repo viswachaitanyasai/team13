@@ -5,7 +5,6 @@ import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AboutHackathons from "./components/AboutHackathons";
-import CreateHackathonForm2 from "./components/CreateHackathonForm2";
 import OTPVerification from "./components/OTPVerification";
 import Statistics from "./components/Statistics";
 import Layout from "./components/layouts/layout";
@@ -16,7 +15,6 @@ import ErrorBoundary from "./pages/ErrorBoundary";
 import Landing from "./pages/Landing";
 import Profile from "./pages/Profile";
 import SubmissionAnalysis from "./pages/SubmissionAnalysis";
-import DashboardPage from "./pages/TeacherDashboard";
 import ViewSubmission from "./pages/ViewSubmissions";
 import ViewEvaluation from "./pages/ViewEvaluation";
 import SecuredRoute from "./components/SecuredRoute";
@@ -25,7 +23,7 @@ import UpcomingHackathons from "./components/UpcomingHackathons";
 import PastHackathons from "./components/PastHackathons";
 import ViewHackathon from "./pages/ViewHackathonDetails";
 import EditHackathon from "./pages/EditHackathon";
-import CreateQuiz from "./pages/CreateQuiz";
+
 function App() {
   return (
     <>
@@ -39,12 +37,7 @@ function App() {
 
           <Route element={<SecuredRoute />}>
           <Route element={<Layout />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/create-hackathon" element={<CreateHackathon />} />
-            <Route
-              path="/create-hackathon2"
-              element={<CreateHackathonForm2 />}
-            />
             <Route path="/profile" element={<Profile />} />
             <Route path="/hackathons" element={<AboutHackathons />} />
             <Route path="/hackathon/:hackathonId" element={<ViewHackathon />} />
@@ -56,9 +49,9 @@ function App() {
             <Route path="/summary/:hackathonId" element={<ViewSubmission />} />
             {/* <Route path="/submissions" element={View}></Route> */}
             <Route path="/submissions/:hackathonId" element={<ViewEvaluation />} />
-            <Route path="/analysis" element={<SubmissionAnalysis/>} />
+            <Route path="/analysis/:evaluation_id" element={<SubmissionAnalysis/>} />
             <Route path="/edit-hackathon/:hackathonId" element={<EditHackathon/>} />
-            <Route path="/createquiz" element={<CreateQuiz/>} />
+
             
 
           </Route>

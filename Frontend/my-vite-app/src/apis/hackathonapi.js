@@ -166,3 +166,17 @@ export const publishResults=async(hackathonId, token)=>{
   }
 }
 //  /hackathonid/submissions
+export const getAnalysis=async(evaluation_id,token)=>{
+  console.log(token)
+  const response=await axios.get(`${API_BASE_URL}/evaluations/${evaluation_id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.data;
+}
+export const handleCategoryChange=async(submission_id,token,category)=>
+{
+  const response=await axios.put(`https://team13-aajv.onrender.com/api/submissions/${submission_id}/category`,{evaluation_category:category} ,{
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response;
+}

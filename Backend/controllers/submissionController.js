@@ -161,7 +161,6 @@ const submitSolution = async (req, res) => {
 
       evaluationResult = evalRes;
       // console.log("Evaluation Result1:", evaluationResult);
-
       const max = evaluationResult.parameter_feedback.length * 2 || 0;
       // console.log(overall_score, typeof overall_score);
       const score = (evaluationResult.overall_score / max) * 10;

@@ -1,3 +1,5 @@
+import axios from "axios";
+import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import {
     FaArrowLeft,
@@ -13,93 +15,73 @@ import {
     FaTimesCircle,
     FaTrophy, FaUser
 } from "react-icons/fa";
-
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-
-function SubmissionAnalysis() {
+import { getAnalysis, handleCategoryChange } from "../apis/hackathonapi";
+const SubmissionAnalysis=()=> {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
+  const {evaluation_id}=useParams();
 
+  const token = localStorage.getItem("authToken");
   // Simulated loading effect
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-      setStatus(submissionData.currentStatus);
-    }, 1500); // Simulating API call delay
-  }, []);
-const data={
-  "success": true,
-  "evaluation": {
-      "_id": "67e39969bd7efd8539cee82a",
-      "submission_id": "67e39961bd7efd8539cee827",
-      "evaluation_status": "completed",
-      "evaluation_category": "rejected",
-      "parameter_feedback": [
-          {
-              "name": "67e398d5bd7efd8539cee816",
-              "score": 0,
-              "reason": "No relevance to the problem statement. The text focuses on communication, not AI or disease detection.",
-              "_id": "67e39969bd7efd8539cee82b"
-          },
-          {
-              "name": "67e398d5bd7efd8539cee817",
-              "score": 0,
-              "reason": "No valid solution proposed. The submission lacks any mention of AI, machine learning models, or disease detection techniques.",
-              "_id": "67e39969bd7efd8539cee82c"
-          },
-          {
-              "name": "67e398d5bd7efd8539cee818",
-              "score": 0,
-              "reason": "The submission is unclear and does not relate to the problem statement.  The description is vague and offers no technical details.",
-              "_id": "67e39969bd7efd8539cee82d"
-          }
-      ],
-      "improvement": [
-          "Address the problem statement directly.",
-          "Propose a specific AI model and methodology for early disease detection."
-      ],
-      "actionable_steps": [
-          "Research relevant AI techniques for disease detection.",
-          "Develop a detailed plan outlining the model, data requirements, and evaluation metrics."
-      ],
-      "strengths": [],
-      "overall_score": 0,
-      "overall_reason": "The submission is irrelevant to the problem statement. It discusses communication in a room, which has no connection to AI-based early disease detection in healthcare.",
-      "summary": [
-          "Irrelevant submission.",
-          "No attempt to address the problem statement."
-      ],
-      "createdAt": "2025-03-26T06:06:33.355Z",
-      "updatedAt": "2025-03-26T06:06:33.355Z",
-      "__v": 0
-  }
-}
-  // Sample Data (Replace with API Data)
-  const submissionData = {
+  const [submissionData, setSubmissionData] = useState({
+    submission_id:"",
     participant: {
-      name: "Alice Johnson",
-      email: "alice.johnson@example.com",
-      grade: "10th Grade",
-      district: "District A",
-      state: "State X",
+      name: "",
+      email: "",
+      grade: "",
+      district: "",
+      state: "",
     },
-    submissionLink: "https://example.com/submission/123",
-    totalScore: 8.5,
-    reason:"The reason for overall score is this",
-    avgScore: 7.2,
-    evaluation: {
-      creativity: { score: 8, reason: "Creative and original concept." },
-      presentation: { score: 9, reason: "Clear and professional presentation." },
-      technicalSkill: { score: 7, reason: "Strong coding, but lacked some optimizations." },
-      impact: { score: 9, reason: "High impact on the target audience." },
-    },
-    strengths: ["Strong technical skills.", "Great presentation skills.", "Innovative approach."],
-    improvements: ["Optimize code for better performance.", "Improve testing coverage."],
-    overallSummary: "Alice demonstrated strong skills and creativity, but there's room for improvement in performance optimization.",
-    currentStatus: "shortlisted",
-  };
-
+    submissionLink: "",
+    totalScore: "",
+    reason: "",
+    evaluation: [],
+    strengths: [],
+    improvements: [],
+    overallSummary: "",
+    currentStatus: "",
+  });
+  
+  useEffect(() => {
+    const fetchAnalysis = async () => {
+      try {
+        const res = await getAnalysis(evaluation_id, token);  
+        // Update submissionData state
+        setSubmissionData({
+          submission_id:res.evaluation.submission_id||'',
+          participant: {
+            name: res?.student?.name || "",
+            email: res?.student?.email || "",
+            grade: res?.student?.grade || "",
+            district: res?.student?.district || "",
+            state: res?.student?.state || "",
+          },
+          submissionLink: res?.submissionUrl || "",
+          totalScore: res?.evaluation?.overall_score,
+          reason: res?.evaluation?.overall_reason || "",
+          evaluation: res?.evaluation?.parameter_feedback || [],
+          strengths: res?.evaluation?.strengths || [],
+          improvements: res?.evaluation?.improvement || [],
+          overallSummary: res?.evaluation?.summary || "",
+          currentStatus: res?.evaluation?.evaluation_category,
+        });
+  
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching analysis:", error);
+        setLoading(false);
+      }
+    };
+  
+    fetchAnalysis();
+  }, [evaluation_id]);
+  const handleSave=async()=>{
+    await handleCategoryChange(submissionData.submission_id,token,status);
+    window.location.reload();
+  }
   const getScoreColor = (score) => {
     if (score >= 8) return "text-green-400";
     if (score >= 6) return "text-yellow-400";
@@ -135,20 +117,21 @@ const data={
                 <FaTrophy className="mr-2" /> Performance Overview
               </h2>
               <div className="space-y-2">
-                <p className="text-xl font-bold text-green-400">Total Score: {submissionData.totalScore} / 10</p>
-                <p className="text-xl font-bold text-yellow-400">Avg Score: {submissionData.avgScore} / 10</p>
-               
+                <p className="text-xl font-bold text-green-400">Total Score: {submissionData.totalScore} / 10</p>           
+              </div>
+              <div className="space-y-2">
+                <p className="text-xl font-bold">Status : {submissionData.currentStatus.toUpperCase()}</p>           
               </div>
             </div>
 
             {/* Submission Status */}
             <div className="bg-gray-800 p-6 rounded-xl shadow-xl w-full">
       <h2 className="text-2xl font-semibold text-blue-400 mb-4">Edit Submission Status</h2>
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-1">
         {["shortlisted", "revisit", "rejected"].map((option) => (
           <button
             key={option}
-            className={`px-6 py-2 rounded-full transition-all duration-300 ${
+            className={`px-4 py-2 rounded-full transition-all duration-300 ${
               status === option
                 ? option === "shortlisted"
                   ? "bg-green-500 text-white"
@@ -159,9 +142,6 @@ const data={
             }`}
             onClick={() => setStatus(option)}
           >
-            {option === "shortlisted" ? <FaCheckCircle className="mr-2" /> 
-            : option === "revisit" ? <FaExclamationCircle className="mr-2" /> 
-            : <FaTimesCircle className="mr-2" />} 
             {option.charAt(0).toUpperCase() + option.slice(1)}
           </button>
         ))}
@@ -169,7 +149,7 @@ const data={
 
       {/* Save Button */}
       <button
-        onClick={()=>console.log("saved")}
+        onClick={handleSave}
         className="mt-4 px-6 py-2 bg-blue-500 text-white font-semibold rounded-full flex items-center gap-2 transition hover:bg-blue-600"
       >
         <FaSave /> Save Status
@@ -185,13 +165,13 @@ const data={
               <FaChartLine className="mr-2" /> Parameter-wise Breakdown
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Object.entries(submissionData.evaluation).map(([param, details]) => (
-                <div key={param} className="bg-gray-700 p-4 rounded-lg shadow">
-                  <h3 className="text-lg font-medium text-gray-200 capitalize">{param.replace(/([A-Z])/g, " $1")}</h3>
+              {submissionData?.evaluation.map((param,idx) => (
+                <div key={idx} className="bg-gray-700 p-4 rounded-lg shadow">
+                  <h3 className="text-lg font-medium text-gray-200 capitalize">{param.name}</h3>
                   <div className="mt-2 flex justify-between text-gray-300">
-                    <p className={`text-lg font-semibold ${getScoreColor(details.score)}`}>Score: {details.score}</p>
+                    <p className={`text-lg font-semibold ${getScoreColor(param.score)}`}>Score: {param.score}</p>
                   </div>
-                  <p className="text-gray-400 text-sm mt-2">{details.reason}</p>
+                  <p className="text-gray-400 text-sm mt-2">{param.reason}</p>
                 </div>
               ))}
             </div>
@@ -207,7 +187,7 @@ const data={
                 <ul className="list-disc pl-6 space-y-2">
                   {submissionData.strengths.map((strength, index) => (
                     <li key={index} className="flex items-center">
-                      <FaCheckCircle className="text-green-500 mr-2" /> {strength}
+                      <FaCheckCircle className="text-green-500 mr-2 w-5 h-5" /> <p className="mb-0 w-full h-full">{strength}</p>
                     </li>
                   ))}
                 </ul>
@@ -216,8 +196,8 @@ const data={
                 <h3 className="text-lg font-medium text-gray-300">Areas for Improvement</h3>
                 <ul className="list-disc pl-6 space-y-2">
                   {submissionData.improvements.map((improvement, index) => (
-                    <li key={index} className="flex items-center">
-                      <FaExclamationCircle className="text-yellow-500 mr-2" /> {improvement}
+                    <li key={index} className="flex gap-2">
+                      <FaExclamationCircle className="text-yellow-500 mr-2 max-w-5 max-h-5 w-5 h-5 mt-1 ml-1" /> <p className="mb-0 w-full h-full">{improvement}</p>
                     </li>
                   ))}
                 </ul>
@@ -236,23 +216,23 @@ const data={
       <div className="space-y-3 text-gray-300">
         <p className="flex items-center">
           <FaUser className="mr-2 text-blue-400" /> 
-          <span className="font-medium">Name:</span> {submissionData.participant.name}
+          <span className="font-medium">Name : {" "}</span> {submissionData.participant.name}
         </p>
         <p className="flex items-center">
           <FaEnvelope className="mr-2 text-yellow-400" /> 
-          <span className="font-medium">Email:</span> {submissionData.participant.email}
+          <span className="font-medium">Email :{" "} </span> {submissionData.participant.email}
         </p>
         <p className="flex items-center">
           <FaSchool className="mr-2 text-green-400" /> 
-          <span className="font-medium">Grade:</span> {submissionData.participant.grade}
+          <span className="font-medium">Grade :{" "} </span> {submissionData.participant.grade}
         </p>
         <p className="flex items-center">
           <FaMapMarkerAlt className="mr-2 text-red-400" /> 
-          <span className="font-medium">District:</span> {submissionData.participant.district}
+          <span className="font-medium">District :{" "} </span> {submissionData.participant.district}
         </p>
         <p className="flex items-center">
           <FaMapMarkerAlt className="mr-2 text-purple-400" /> 
-          <span className="font-medium">State:</span> {submissionData.participant.state}
+          <span className="font-medium">State :{" "} </span> {submissionData.participant.state}
         </p>
       </div>
     </div>
