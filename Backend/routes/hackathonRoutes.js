@@ -10,8 +10,12 @@ const {
   getHackathonSubmissions,
   getHackathonEvaluations,
   getHackathonSummary,
+  getHackathonEvaluationSummary,
+  isResultPublished,
+  publishResult,
 } = require("../controllers/hackathonController");
 const authMiddleware = require("../middlewares/authMiddleware");
+const { getEvaluation } = require("../controllers/studentController");
 
 const router = express.Router();
 
@@ -25,5 +29,9 @@ router.put("/:hackathon_id", authMiddleware, editHackathon);
 router.delete("/:hackathon_id", authMiddleware, removeHackathon); // Protected delete route
 router.get("/teacher/:teacher_id", authMiddleware, getHackathonsByTeacher);
 router.get("/:hackathon_id/summary", authMiddleware, getHackathonSummary);
+router.get("/:hackathon_id/evaluation-summary", authMiddleware, getHackathonEvaluationSummary);
+router.get("/:hackathon_id/is-result-published",authMiddleware, isResultPublished);
+router.post("/:hackathon_id/publish-result", authMiddleware,publishResult);
+
 
 module.exports = router;

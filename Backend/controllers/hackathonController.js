@@ -524,7 +524,93 @@ const getHackathonSummary = async (req, res) => {
   }
 };
 
+const getHackathonEvaluationSummary = async (req, res) => {
+  try {
+    const { hackathon_id } = req.params;
 
+    // Fetch only summary_analysis and skill_gap_analysis fields
+    const hackathon = await Hackathon.findById(hackathon_id).select(
+      "summary_analysis skill_gap_analysis"
+    );
+
+    if (!hackathon) {
+      return res.status(404).json({ error: "Hackathon not found" });
+    }
+
+    // Construct response
+    const evaluationSummary = {
+      summary_analysis: hackathon.summary_analysis,
+      skill_gap_analysis: hackathon.skill_gap_analysis,
+    };
+
+    res.status(200).json(evaluationSummary);
+  } catch (error) {
+    console.error("Error fetching hackathon evaluation summary:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const isResultPublished = async (req,res) => {
+  try {
+    const { hackathon_id } = req.params;
+
+    // Find the hackathon
+    const hackathon = await Hackathon.findById(hackathon_id).select(
+      "is_result_published"
+    );
+
+    if (!hackathon) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Hackathon not found" });
+    }
+
+    res.json({
+      success: true,
+      hackathon_id: hackathon._id,
+      is_result_published: hackathon.is_result_published,
+    });
+  } catch (error) {
+    console.error("Error checking result status:", error);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+}
+
+const publishResult = async (req, res) => {
+  try {
+    const { hackathon_id } = req.params;
+
+    // Find and update the hackathon
+    const hackathon = await Hackathon.findByIdAndUpdate(
+      hackathon_id,
+      { is_result_published: true },
+      { new: true } // Returns the updated document
+    );
+
+    if (!hackathon) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Hackathon not found" });
+    }
+
+    // Check if update was successful
+    if (!hackathon.is_result_published) {
+      return res
+        .status(500)
+        .json({ success: false, error: "Failed to publish results" });
+    }
+
+    res.json({
+      success: true,
+      message: "Results published successfully",
+      hackathon_id: hackathon._id,
+      is_result_published: hackathon.is_result_published,
+    });
+  } catch (error) {
+    console.error("Error publishing results:", error);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
 
 
 
@@ -539,4 +625,7 @@ module.exports = {
   getHackathonRegistrations,
   getHackathonEvaluations,
   getHackathonSummary,
+  getHackathonEvaluationSummary,
+  isResultPublished,
+  publishResult,
 };

@@ -246,13 +246,13 @@ exports.getEvaluation = async (req, res) => {
     if (!id) {
       return res
         .status(400)
-        .json({ error: "Missing studentId or hackathonId" });
+        .json({ error: "Missing HackathonId" });
     }
     const studentId = req.student.id;
     console.log(req.student);
     const submission = await Submission.findOne({
-      student: studentId,
-      hackathon: id,
+      student_id: studentId,
+      hackathon_id: id,
     });
 
     if (!submission) {

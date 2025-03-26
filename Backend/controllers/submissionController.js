@@ -86,6 +86,11 @@ const submitSolution = async (req, res) => {
     if (!student)
       return res.status(404).json({ error: "Student not found." });
 
+    if (hackathon.is_result_published) {
+      return res.status(400).json({ error: "Sorry Submission deadline already over." });
+
+    }
+
 
     const fileBuffer = req.file.buffer;
     const fileType = req.file.mimetype;
