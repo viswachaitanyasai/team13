@@ -18,6 +18,7 @@ const processFile = async (
   judgement_parameters,
   custom_prompt
 ) => {
+
   if (fileType.startsWith("audio/")) {
     return {
       evaluationResult: await analyzeAudio(
@@ -42,7 +43,12 @@ const processFile = async (
 
   // ✅ Extract Text for Text-Based Files
   const extractedText = await extractText(filePath, fileType);
-  const evaluationResult = await analyzeText(extractedText);
+  const evaluationResult = await analyzeText(
+    problemStatement,
+    judgement_parameters,
+    extractedText,
+    custom_prompt
+  );
   return { evaluationResult };
 };
 // console.log("Starting");
@@ -73,7 +79,9 @@ const submitSolution = async (req, res) => {
     if (!hackathon_id) {
       return res.status(400).json({ error: "Hackathon ID is required." });
     }
-    const hackathon = await Hackathon.findById(hackathon_id);
+    const hackathon = await Hackathon.findById(hackathon_id)
+      .populate("judging_parameters", "name") // Populate only the 'name' field
+      .exec();
     if (!hackathon)
       return res.status(404).json({ error: "Hackathon not found." });
 
@@ -98,8 +106,9 @@ const submitSolution = async (req, res) => {
 
     // ✅ Save file locally with submission ID
     const fileExtension = path.extname(originalFileName);
-    const fileName = `${hackathon_id}${student_id}${fileExtension}`;
-    const tempFilePath = await saveFileLocally(fileBuffer, fileName);
+    // const fileName = `${hackathon_id}${student_id}${fileExtension}`;
+    const tempFilePath = await saveFileLocally(fileBuffer, originalFileName);
+    // console.log(originalFileName);
 
     // ✅ Upload file to S3
     // console.log("uploading to s3");
@@ -125,7 +134,7 @@ const submitSolution = async (req, res) => {
     // console.log("submission saved");
     // ✅ Fetch Hackathon details
     const problemStatement = `Title: ${hackathon.title}\nDescription: ${hackathon.description}\nProblem Statement: ${hackathon.problem_statement}\nContext: ${hackathon.context}`;
-    const judgement_parameters = hackathon.judging_parameters;
+    const judgement_parameters = hackathon.judging_parameters.map(param => param.name);
     const custom_prompt = hackathon.custom_prompt;
     // console.log(student_id);
     await Student.findByIdAndUpdate(student_id, {
@@ -151,8 +160,10 @@ const submitSolution = async (req, res) => {
       // JSON.parse(evalRes);
 
       evaluationResult = evalRes;
-      // console.log("Evaluation Result1:", evaluationResult);
+      console.log("Evaluation Result1:", evaluationResult);
+
       const max = evaluationResult.parameter_feedback.length * 2 || 0;
+// console.log(overall_score, typeof overall_score);
       const score = (evaluationResult.overall_score / max) * 10;
 
       // ✅ Create Evaluation Entry with the exact return structure and update status to "completed"
@@ -202,9 +213,9 @@ const submitSolution = async (req, res) => {
       await submission.save();
     } finally {
       // ✅ Delete temporary file in all cases
-      await fsPromises
-        .unlink(tempFilePath)
-        .catch((err) => console.error("File deletion error:", err));
+      // await fsPromises
+      //   .unlink(tempFilePath)
+      //   .catch((err) => console.error("File deletion error:", err));
     }
 
     // Send a structured response including evaluation details

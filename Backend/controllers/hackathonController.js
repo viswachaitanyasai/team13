@@ -3,6 +3,10 @@ const Student = require("../models/Student");
 const Submission = require("../models/Submission");
 const JudgingParameter = require("../models/JudgingParameter");
 const { generateInviteCode } = require("../utils/uniqueHackathonJoinId");
+const {
+  summarizeSkillGaps,
+  summarizeSolutionKeywords,
+} = require("../utils/test");
 const bcrypt = require("bcrypt");
 
 // Create a new hackathon with judging parameters
@@ -142,7 +146,6 @@ const createHackathon = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
 
 const getHackathons = async (req, res) => {
   try {
@@ -491,12 +494,10 @@ const getStudentEvaluations = async (req, res) => {
     }).populate("evaluation_id"); // Populating the referenced evaluation data
 
     if (!submission) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          error: "Submission not found for this student",
-        });
+      return res.status(404).json({
+        success: false,
+        error: "Submission not found for this student",
+      });
     }
 
     res.json({
@@ -511,10 +512,11 @@ const getStudentEvaluations = async (req, res) => {
   }
 };
 
-
 const getHackathonSummary = async (req, res) => {
   try {
     const { hackathon_id } = req.params;
+
+    await getHackathonEvaluationSummary(hackathon_id);
 
     // Fetch hackathon details with necessary fields populated
     const hackathon = await Hackathon.findById(hackathon_id)
@@ -532,7 +534,7 @@ const getHackathonSummary = async (req, res) => {
 
     // Construct response
     const summary = {
-      id:hackathon_id,
+      id: hackathon_id,
       title: hackathon.title,
       status: hackathon.status,
       judging_parameters: hackathon.judging_parameters.map(
@@ -555,33 +557,37 @@ const getHackathonSummary = async (req, res) => {
   }
 };
 
-const getHackathonEvaluationSummary = async (req, res) => {
+const getHackathonEvaluationSummary = async (hackathon_id) => {
   try {
-    const { hackathon_id } = req.params;
-
-    // Fetch only summary_analysis and skill_gap_analysis fields
-    const hackathon = await Hackathon.findById(hackathon_id).select(
-      "summary_analysis skill_gap_analysis"
-    );
+    const hackathon = await Hackathon.findById(hackathon_id);
+    // console.log(hackathon.skill_gap);
 
     if (!hackathon) {
-      return res.status(404).json({ error: "Hackathon not found" });
+      throw new Error("Hackathon not found");
     }
 
-    // Construct response
-    const evaluationSummary = {
-      summary_analysis: hackathon.summary_analysis,
-      skill_gap_analysis: hackathon.skill_gap_analysis,
-    };
+    const problem_statement = hackathon.problem_statement;
+    // console.log(hackathon.skill_gap);
+    const skillGapArray = Object.entries(hackathon.skill_gap || {});
+    const keywordsArray = Object.entries(hackathon.keywords || {}); // Convert object to Map
 
-    res.status(200).json(evaluationSummary);
+    // console.log(skillGapArray);
+    const skillGapSummary = await summarizeSkillGaps(skillGapArray, problem_statement);
+    const solutionSummary = await summarizeSolutionKeywords(keywordsArray, problem_statement);
+
+    hackathon.skill_gap_analysis = skillGapSummary;
+    hackathon.summary_analysis = solutionSummary;
+
+    await hackathon.save();
+
+    return;
   } catch (error) {
-    console.error("Error fetching hackathon evaluation summary:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error(error);
+    throw new Error("Internal server error");
   }
 };
 
-const isResultPublished = async (req,res) => {
+const isResultPublished = async (req, res) => {
   try {
     const { hackathon_id } = req.params;
 
@@ -605,7 +611,7 @@ const isResultPublished = async (req,res) => {
     console.error("Error checking result status:", error);
     res.status(500).json({ success: false, error: "Internal server error" });
   }
-}
+};
 
 const publishResult = async (req, res) => {
   try {
@@ -643,8 +649,6 @@ const publishResult = async (req, res) => {
   }
 };
 
-
-
 module.exports = {
   createHackathon,
   getHackathons,
@@ -657,7 +661,6 @@ module.exports = {
   getHackathonEvaluations,
   getStudentEvaluations,
   getHackathonSummary,
-  getHackathonEvaluationSummary,
   isResultPublished,
   publishResult,
 };

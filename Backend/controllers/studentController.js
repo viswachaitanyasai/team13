@@ -122,7 +122,7 @@ exports.getHackathonById = async (req, res) => {
         process.env.JWT_SECRETKEY
       );
       const student = await Student.findById(decoded.id).select("-password");
-      console.log(hackathon.passkey);
+      // console.log(hackathon.passkey);
       if (!student) {
         return res
           .status(401)
@@ -154,7 +154,7 @@ exports.getHackathonById = async (req, res) => {
       invite_code: hackathon.invite_code,
       grade: hackathon.grade,
       status: hackathon.status,
-      isResultPublished: hackathon.isResultPublished,
+      isResultPublished: hackathon.is_result_published,
       no_of_participants: hackathon.participants.length,
       created_at: hackathon.created_at,
       updated_at: hackathon.updated_at,
