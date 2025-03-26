@@ -44,7 +44,7 @@ async function analyzeAudio(
     - **If a submission lacks a clear explanation, effort, or relation to the problem statement, give a total score of 0.**
     - **If it only states a vague idea without detailed steps or implementation, give 0.**
     - **Do NOT provide confirmations or explanations outside of the JSON format.**
-    - Be very very harsh
+    - Be very harsh
     **Evaluation Guidelines:**
     - **Check if the solution is related to the problem statement**. If not, score = **0**.
     - **Check if the solution is detailed and actually proposes a valid solution**. If it is just an idea without implementation, score = **0**.
@@ -126,7 +126,6 @@ async function analyzeText(
     - *If a submission lacks a clear explanation, effort, or relation to the problem statement, give a total score of 0.*
     - *If it only states a vague idea without detailed steps or implementation, give 0.*
     - *Do NOT provide confirmations or explanations outside of the JSON format.*
-    -  Be very very harsh
     -  Analyse the skill gaps and return me an array of it.
     -  Give me keywords which summarize the solution in an array and return an array of it
     *Evaluation Guidelines:*
@@ -141,7 +140,7 @@ async function analyzeText(
     
     *Parameters:* ${parameters}
     
-    *Grading Basis:* ${"0/0.5/1/2"}
+    *Grading Basis: All parameters given to you can not get any other score than (0 or 0.5 or 1 or 2)
     
     ${additionalInstructions}
     
@@ -161,7 +160,7 @@ async function analyzeText(
       "skill_gap":["",""...],
       "keywords":["","",..]
     }
-    
+    Ensure that the overall score is the sum of scores of all parameters
     *Ensure the response is in pure JSON format with no extra formatting.*
   `;
 

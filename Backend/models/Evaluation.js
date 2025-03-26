@@ -16,13 +16,12 @@ const EvaluationSchema = new mongoose.Schema(
     evaluation_category: {
       type: String,
       enum: ["shortlisted", "revisit", "rejected"],
-      default:"revisit",
+      default: "revisit",
     },
     parameter_feedback: [
       {
-        
         name: { type: String, required: true },
-        score: { type: Number, required: true, enum: [0, 0.5, 1, 2] },
+        score: { type: Number, required: true, enum: [0, 0.5, 1, 1.5, 2] },
         reason: { type: String, required: true },
       },
     ],
@@ -38,7 +37,6 @@ const EvaluationSchema = new mongoose.Schema(
 
 // // ✅ Automatically calculate `overall_score` based on parameter_feedback
 // EvaluationSchema.pre("save", function (next) {
-  
 
 //   next();
 // });
