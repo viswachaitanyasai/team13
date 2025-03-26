@@ -28,7 +28,53 @@ function SubmissionAnalysis() {
       setStatus(submissionData.currentStatus);
     }, 1500); // Simulating API call delay
   }, []);
-
+const data={
+  "success": true,
+  "evaluation": {
+      "_id": "67e39969bd7efd8539cee82a",
+      "submission_id": "67e39961bd7efd8539cee827",
+      "evaluation_status": "completed",
+      "evaluation_category": "rejected",
+      "parameter_feedback": [
+          {
+              "name": "67e398d5bd7efd8539cee816",
+              "score": 0,
+              "reason": "No relevance to the problem statement. The text focuses on communication, not AI or disease detection.",
+              "_id": "67e39969bd7efd8539cee82b"
+          },
+          {
+              "name": "67e398d5bd7efd8539cee817",
+              "score": 0,
+              "reason": "No valid solution proposed. The submission lacks any mention of AI, machine learning models, or disease detection techniques.",
+              "_id": "67e39969bd7efd8539cee82c"
+          },
+          {
+              "name": "67e398d5bd7efd8539cee818",
+              "score": 0,
+              "reason": "The submission is unclear and does not relate to the problem statement.  The description is vague and offers no technical details.",
+              "_id": "67e39969bd7efd8539cee82d"
+          }
+      ],
+      "improvement": [
+          "Address the problem statement directly.",
+          "Propose a specific AI model and methodology for early disease detection."
+      ],
+      "actionable_steps": [
+          "Research relevant AI techniques for disease detection.",
+          "Develop a detailed plan outlining the model, data requirements, and evaluation metrics."
+      ],
+      "strengths": [],
+      "overall_score": 0,
+      "overall_reason": "The submission is irrelevant to the problem statement. It discusses communication in a room, which has no connection to AI-based early disease detection in healthcare.",
+      "summary": [
+          "Irrelevant submission.",
+          "No attempt to address the problem statement."
+      ],
+      "createdAt": "2025-03-26T06:06:33.355Z",
+      "updatedAt": "2025-03-26T06:06:33.355Z",
+      "__v": 0
+  }
+}
   // Sample Data (Replace with API Data)
   const submissionData = {
     participant: {

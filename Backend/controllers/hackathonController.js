@@ -494,8 +494,7 @@ const getEvaluationById = async (req, res) => {
       });
     }
 
-
-    // Use await to get the evaluation document
+    // Find the evaluation by ID
     const evaluation = await Evaluation.findById(evaluation_id);
 
     if (!evaluation) {
@@ -505,12 +504,26 @@ const getEvaluationById = async (req, res) => {
       });
     }
 
+    // Find the submission linked to this evaluation and populate student details
+    const submission = await Submission.findById(evaluation.submission_id).populate("student_id");
+
+    if (!submission) {
+      return res.status(404).json({
+        success: false,
+        error: "Submission not found for this evaluation",
+      });
+    }
+
     res.json({
       success: true,
-      evaluation: evaluation.toObject(), // Convert to plain object
+      data: {
+        evaluation: evaluation.toObject(),  // Includes student_id (populated)
+        student: submission?.student_id, // Populated student details
+        submissionUrl:submission?.submission_url
+      },
     });
   } catch (error) {
-    console.error("Error fetching student evaluation:", error);
+    console.error("Error fetching data:", error);
     res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
