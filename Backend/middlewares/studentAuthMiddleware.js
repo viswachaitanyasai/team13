@@ -3,7 +3,7 @@ const Student = require("../models/Student");
 
 const studentAuthMiddleware = async (req, res, next) => {
   try {
-    const token = req.header("Authorization");
+    const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
       return res
@@ -11,19 +11,18 @@ const studentAuthMiddleware = async (req, res, next) => {
         .json({ error: "Access denied. No token provided." });
     }
 
-    const decoded = jwt.verify(
-      token.replace("Bearer ", ""),
-      process.env.JWT_SECRETKEY
-    );
-    const student = await Student.findById(decoded.id).select("-password");
+    const decoded = jwt.verify(token, process.env.JWT_SECRETKEY);
 
-    if (!student) {
+    const studentExists = await Student.exists({ _id: decoded.id });
+
+    if (!studentExists) {
       return res
         .status(401)
         .json({ error: "Invalid token. Student not found." });
     }
+    
+    req.student = decoded;
 
-    req.student = student; // Attach student data to request object
     next();
   } catch (error) {
     res.status(401).json({ error: "Invalid or expired token." });

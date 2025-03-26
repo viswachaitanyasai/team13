@@ -52,6 +52,8 @@ async function analyzeAudio(
     - **Low-effort responses (short, generic, or superficial)** = **0 marks in all parameters**.
     - **A good solution should clearly describe the methodology, tools, and real-world applicability.**
  -  Analyse the skill gaps and return me an array of keywords of gaps.
+     -  Give me keywords which summarize the solution in an array and return an array of it
+
     **Problem Statement:** ${problemStatement}
     
     **Parameters:** ${parameters.join(", ")}
@@ -74,6 +76,8 @@ async function analyzeAudio(
       "strengths": ["", ""],
       "summary": ["", ""]
        "skill_gap":["",""...],
+      "keywords":["","",..]
+
     }
     
     **Ensure the response is in pure JSON format with no extra formatting.**
@@ -112,7 +116,7 @@ async function analyzeText({
   additionalInstructions = "",
 }) {
   const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-
+  console.log(problemStatement);
   const fullPrompt = `
     You are an AI agent evaluating hackathon submissions. STRICTLY follow these rules:
     
@@ -124,7 +128,7 @@ async function analyzeText({
     - *Do NOT provide confirmations or explanations outside of the JSON format.*
     -  Be very very harsh
     -  Analyse the skill gaps and return me an array of it.
-    -  Give me keywords which summarize the solution in an array
+    -  Give me keywords which summarize the solution in an array and return an array of it
     *Evaluation Guidelines:*
     - evaluation is done as 0(low) or 0.5(medium) or 1(average) or 2(perfect). These are the only categories of grading
     - *Check if the solution is related to the problem statement. If not, score = **0*.
@@ -135,7 +139,7 @@ async function analyzeText({
 
     *Problem Statement:* ${problemStatement}
     
-    *Parameters:* ${parameters.join(", ")}
+    *Parameters:* ${parameters}
     
     *Grading Basis:* ${"0/0.5/1/2"}
     
@@ -202,10 +206,12 @@ async function updateHackathonData(
     let currentKeywords = hackathon.keywords || new Map();
 
     // Update skill gaps
+    // console.log("skillgaps",newSkillGaps);
     newSkillGaps.forEach((skill) => {
       currentSkillGap.set(skill, (currentSkillGap.get(skill) || 0) + 1);
     });
 
+    // console.log("keywords",newKeywords);
     // Update keywords
     newKeywords.forEach((keyword) => {
       currentKeywords.set(keyword, (currentKeywords.get(keyword) || 0) + 1);

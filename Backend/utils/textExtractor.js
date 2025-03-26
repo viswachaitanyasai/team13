@@ -1,15 +1,14 @@
 const fs = require("fs");
-const path = require("path");
 const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
 const xlsx = require("xlsx");
 const pptx2json = require("pptx2json");
 const Tesseract = require("tesseract.js");
 
-// Extract text based on file type
+// Function to determine file type and extract text accordingly
 async function extractText(filePath, fileType) {
   if (!fs.existsSync(filePath)) {
-    return "File not found.";
+    throw new Error("File not found.");
   }
 
   try {
@@ -30,28 +29,28 @@ async function extractText(filePath, fileType) {
       case "image/bmp":
         return await extractTextFromImage(filePath);
       default:
-        return "Unsupported file format.";
+        throw new Error("Unsupported file format.");
     }
   } catch (error) {
-    return `Error extracting text: ${error.message}`;
+    throw new Error(`Error extracting text: ${error.message}`);
   }
 }
 
 // Extract text from a PDF file
 async function extractTextFromPDF(filePath) {
   const data = await pdfParse(fs.readFileSync(filePath));
-  return data.text || "No readable text found in the PDF.";
+  return data.text.trim() || "No readable text found in the PDF.";
 }
 
 // Extract text from a DOCX file
 async function extractTextFromDocx(filePath) {
   const data = await mammoth.extractRawText({ path: filePath });
-  return data.value || "No text found.";
+  return data.value.trim() || "No text found.";
 }
 
 // Extract text from a TXT file
 function extractTextFromTxt(filePath) {
-  return fs.readFileSync(filePath, "utf-8");
+  return fs.readFileSync(filePath, "utf-8").trim();
 }
 
 // Extract text from an Excel (XLSX) file
@@ -67,12 +66,9 @@ function extractTextFromXlsx(filePath) {
 // Extract text from a PowerPoint (PPTX) file
 async function extractTextFromPptx(filePath) {
   const slides = await pptx2json(filePath);
-  let text = "";
-  slides.slides.forEach((slide) => {
-    slide.texts.forEach((t) => {
-      text += t.text + "\n";
-    });
-  });
+  let text = slides.slides
+    .flatMap((slide) => slide.texts.map((t) => t.text))
+    .join("\n");
   return text.trim() || "No text found in the presentation.";
 }
 
@@ -82,11 +78,5 @@ async function extractTextFromImage(filePath) {
   return data.text.trim() || "No readable text found in the image.";
 }
 
-// Example Usage
-(async () => {
-  const filePath = "example.pdf";
-  const fileType = "application/pdf"; // Change as needed
-
-  const extractedText = await extractText(filePath, fileType);
-  console.log(extractedText);
-})();
+// Export the extractText function
+module.exports = { extractText };

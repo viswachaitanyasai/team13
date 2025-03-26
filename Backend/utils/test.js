@@ -7,7 +7,7 @@ async function analyzeStringsWithGemini(
   problemStatement
 ) {
   try {
-    const apiKey = process.env.API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error("Missing Gemini API key");
     }
@@ -24,11 +24,21 @@ async function analyzeStringsWithGemini(
       `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       data
     );
-    let contentText =
-      response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    return contentText;
+
+    if (
+      !response.data ||
+      !response.data.candidates ||
+      response.data.candidates.length === 0 ||
+      !response.data.candidates[0].content ||
+      !response.data.candidates[0].content.parts ||
+      response.data.candidates[0].content.parts.length === 0
+    ) {
+      throw new Error("Invalid or empty response from Gemini API");
+    }
+
+    return response.data.candidates[0].content.parts[0].text;
   } catch (error) {
-    console.log(
+    console.error(
       "Error analyzing data with Gemini:",
       error.response?.data || error.message
     );
@@ -37,45 +47,27 @@ async function analyzeStringsWithGemini(
 }
 
 // Function to summarize solution keywords
-async function summarizeSolutionKeywords(solutionSet, problemStatement) {
+async function summarizeSolutionKeywords(solutionArray, problemStatement) {
   const prompt =
-    "This is a set of keywords which were taken from solutions that the  students submitted in a hackathon. Each keyword is followed by its frequency. Provide a detailed summary highlighting about the solutions ang give summary in brief";
-  return await analyzeStringsWithGemini(solutionSet, prompt, problemStatement);
+    "This is a set of keywords taken from student solutions in a hackathon. Each keyword is followed by its frequency. Provide a detailed summary highlighting the most used solutions in brief.";
+  return await analyzeStringsWithGemini(
+    solutionArray,
+    prompt,
+    problemStatement
+  );
 }
 
 // Function to summarize skill gaps
-async function summarizeSkillGaps(skillGapSet, problemStatement) {
+async function summarizeSkillGaps(skillGapArray, problemStatement) {
   const prompt =
-    "This is a set of keywords for skill gaps which was found by analysing student submissions in a hackathon. Each keyword is accompanied by its frequency of occurrence. Provide a summary of what the students lack in skill with required steps";
-  return await analyzeStringsWithGemini(skillGapSet, prompt, problemStatement);
+    "This is a set of keywords for skill gaps found by analyzing student submissions in a hackathon. Each keyword is accompanied by its frequency. Provide a summary of the skills students lack and suggest required steps to improve.";
+    console.log(skillGapArray);
+
+  return await analyzeStringsWithGemini(
+    skillGapArray,
+    prompt,
+    problemStatement
+  );
 }
 
-// Example usage
-(async () => {
-  const problemStatement =
-    "Many students participating in the hackathon have demonstrated skill gaps in emerging technologies such as AI and machine learning. The challenge is to identify these gaps and propose effective solutions that can be implemented through education and training. Tell me about what type of solutions the students preffered the most. Keep it short and only send around 100 words and nothing else unrelated";
-
-  const skillGapSet = [
-    ["AI", 2],
-    ["Machine learning", 87],
-    ["Deep learning", 21],
-  ];
-
-  const solutionSet = [
-    ["Online Courses", 45],
-    ["Internships", 30],
-    ["Mentorship", 18],
-  ];
-
-  const skillGapSummary = await summarizeSkillGaps(
-    skillGapSet,
-    problemStatement
-  );
-  console.log("Skill Gap Summary:", skillGapSummary);
-
-  const solutionSummary = await summarizeSolutionKeywords(
-    solutionSet,
-    problemStatement
-  );
-  console.log("Solution Summary:", solutionSummary);
-})();
+module.exports = { summarizeSkillGaps, summarizeSolutionKeywords };
