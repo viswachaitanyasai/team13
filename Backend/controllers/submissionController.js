@@ -103,29 +103,23 @@ const submitSolution = async (req, res) => {
     const fileBuffer = req.file.buffer;
     const fileType = req.file.mimetype;
     const originalFileName = req.file.originalname;
-
-    // ✅ Save file locally with submission ID
     const fileExtension = path.extname(originalFileName);
     // const fileName = `${hackathon_id}${student_id}${fileExtension}`;
     const tempFilePath = await saveFileLocally(fileBuffer, originalFileName);
     // console.log(originalFileName);
 
-    // ✅ Upload file to S3
-    // console.log("uploading to s3");
     const fileUrl = await uploadFileToS3(
       fileBuffer,
       `uploads/${fileName}`,
       fileType
     );
 
-    // ✅ Create Submission Entry First
     const submission = new Submission({
       hackathon_id,
       student_id,
-      submission_url: fileUrl, // Will be updated after S3 upload
+      submission_url: fileUrl, 
     });
 
-    // ✅ Update Submission with uploaded file
     await submission.save();
 
     res.status(200).json({
@@ -191,8 +185,6 @@ const submitSolution = async (req, res) => {
       } else {
         categoryField = "rejected_students";
       }
-
-      // Add submission and student to the correct category
       await Hackathon.findByIdAndUpdate(
         hackathon_id,
         {

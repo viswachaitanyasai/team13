@@ -17,7 +17,7 @@ import Landing from "./pages/Landing";
 import Profile from "./pages/Profile";
 import SubmissionAnalysis from "./pages/SubmissionAnalysis";
 import DashboardPage from "./pages/TeacherDashboard";
-import ViewSubmissions from "./pages/ViewSubmissions";
+import ViewSubmission from "./pages/ViewSubmissions";
 import ViewEvaluation from "./pages/viewEvaluation";
 import SecuredRoute from "./components/SecuredRoute";
 import OngoingHackathons from "./components/OngoingHackathons";
@@ -53,8 +53,9 @@ function App() {
             <Route path="/hackathons/upcoming" element={<UpcomingHackathons />} />
             <Route path="/statistics" element={<Statistics />} />
             {/* <Route path="/submission" element={<ViewSubmissions />} /> */}
-            <Route path="/submission/:hackathonId" element={<ViewSubmissions />} />
-            <Route path="/evaluation" element={<ViewEvaluation />} />
+            <Route path="/submission/:hackathonId" element={<ViewSubmission />} />
+            {/* <Route path="/submissions" element={View}></Route> */}
+            <Route path="/evaluation/:hackathonId" element={<ViewEvaluation />} />
             <Route path="/analysis" element={<SubmissionAnalysis/>} />
             <Route path="/edit-hackathon/:hackathonId" element={<EditHackathon/>} />
             <Route path="/createquiz" element={<CreateQuiz/>} />

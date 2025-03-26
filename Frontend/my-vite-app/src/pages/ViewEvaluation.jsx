@@ -1,61 +1,57 @@
 import * as Tabs from "@radix-ui/react-tabs";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { getEvaluations } from "../apis/hackathonapi";
 
 const ViewEvaluation = () => {
   const navigate = useNavigate();
-  const hackathon = {
-    name: "AI Challenge 2025",
-    description:
-      "A cutting-edge AI competition for developers and researchers.",
-  };
-
-  const dummySubmissions = [
-    {
-      id: 1,
-      name: "Alice Johnson",
-      class: "10th Grade",
-      link: "#",
-      status: "shortlisted",
-      score: 85,
-    },
-    {
-      id: 2,
-      name: "Bob Smith",
-      class: "12th Grade",
-      link: "#",
-      status: "revisit",
-      score: 78,
-    },
-    {
-      id: 3,
-      name: "Charlie Brown",
-      class: "11th Grade",
-      link: "#",
-      status: "rejected",
-      score: 65,
-    },
-    {
-      id: 4,
-      name: "David White",
-      class: "10th Grade",
-      link: "#",
-      status: "shortlisted",
-      score: 90,
-    },
-    {
-      id: 5,
-      name: "Ella Green",
-      class: "9th Grade",
-      link: "#",
-      status: "revisit",
-      score: 72,
-    },
-  ];
-
-  const [submissions, setSubmissions] = useState(dummySubmissions);
+  const { hackathonId } = useParams();
+  const [submissions, setSubmissions] = useState([]);
   const [selectedTab, setSelectedTab] = useState("shortlisted");
   const [searchTerm, setSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [hackathonStats, setHackathonStats] = useState({
+    totalParticipants: 0,
+    totalSubmissions: 0,
+    averageScore: 0,
+  });
+
+  useEffect(() => {
+    const fetchEvaluations = async () => {
+      try {
+        // setLoading(true);
+        const token= localStorage.getItem("authToken");
+        const response = await getEvaluations(hackathonId, token);
+        console.log(response);
+        // if (!response.ok) throw new Error("Failed to fetch evaluations");
+        const data = await response;
+
+        setHackathonStats({
+          totalParticipants: data.totalParticipants,
+          totalSubmissions: data.totalSubmissions,
+          averageScore: data.averageScore,
+        });
+
+        const formattedSubmissions = data.evaluations.map((evalItem, index) => ({
+          id: index + 1,
+          name: evalItem.studentName,
+          class: evalItem.grade,
+          link: "#",
+          status: evalItem.evaluation_category,
+          score: evalItem.overall_score,
+        }));
+
+        setSubmissions(formattedSubmissions);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchEvaluations();
+  }, [hackathonId]);
 
   const handleStatusUpdate = (id, newStatus) => {
     setSubmissions((prev) =>
@@ -71,6 +67,23 @@ const ViewEvaluation = () => {
       submission.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const tabCounts = {
+    shortlisted: submissions.filter((s) => s.status === "shortlisted").length,
+    revisit: submissions.filter((s) => s.status === "revisit").length,
+    rejected: submissions.filter((s) => s.status === "rejected").length,
+  };
+
+  if (loading) return     <div className="min-h-screen flex justify-center bg-gray-900 p-2 text-white md:w-full w-screen">
+      <div className="w-full max-w-4xl bg-gray-800 rounded-xl shadow-lg md:p-8 p-3">
+          <div className="flex justify-center mt-4 space-x-4 animate-pulse">
+            <div className="h-5 w-20 bg-gray-600 rounded"></div>
+            <div className="h-5 w-20 bg-gray-600 rounded"></div>
+            <div className="h-5 w-20 bg-gray-600 rounded"></div>
+          </div>
+      </div>
+      </div>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+
   return (
     <div className="min-h-screen flex justify-center bg-gray-900 p-2 text-white md:w-full w-screen">
       <div className="w-full max-w-4xl bg-gray-800 rounded-xl shadow-lg md:p-8 p-3">
@@ -80,10 +93,11 @@ const ViewEvaluation = () => {
         >
           &larr; Back
         </button>
-        <h2 className="text-3xl font-bold text-blue-400 text-center">
-          {hackathon.name}
-        </h2>
-        
+        <p className="text-gray-400 text-center mt-2">
+          {hackathonStats.totalParticipants} Participants |{" "}
+          {hackathonStats.totalSubmissions} Submissions | Avg Score:{" "}
+          {hackathonStats.averageScore.toFixed(2)}
+        </p>
 
         <Tabs.Root
           className="mt-6"
@@ -91,7 +105,7 @@ const ViewEvaluation = () => {
           onValueChange={setSelectedTab}
         >
           <Tabs.List className="flex justify-center md:space-x-6 space-x-2 border-b border-gray-700 pb-4">
-            {[`shortlisted (count)`, "revisit (count)", "rejected (count) "].map((tab) => (
+            {["shortlisted", "revisit", "rejected"].map((tab) => (
               <Tabs.Trigger
                 key={tab}
                 value={tab}
@@ -101,7 +115,7 @@ const ViewEvaluation = () => {
                     : "bg-gray-700 text-gray-300 hover:bg-gray-600"
                 }`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                {`${tab.charAt(0).toUpperCase() + tab.slice(1)} (${tabCounts[tab]})`}
               </Tabs.Trigger>
             ))}
           </Tabs.List>
@@ -110,7 +124,7 @@ const ViewEvaluation = () => {
         <input
           type="text"
           placeholder="Search by name..."
-          className="mt-6 w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:outline-none"
+          className="mt-6 w-full p-2 rounded-xl bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:outline-none"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -120,10 +134,18 @@ const ViewEvaluation = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-700">
-                  <th className="p-2.5 px-4 text-left border-b border-gray-600">Name</th>
-                  <th className="p-2.5 px-4 text-left border-b border-gray-600">Class</th>
-                  <th className="p-2.5 px-4 text-left border-b border-gray-600">Score</th>
-                  <th className="p-2.5 px-4 text-left border-b border-gray-600">Actions</th>
+                  <th className="p-2.5 px-4 text-left border-b border-gray-600">
+                    Name
+                  </th>
+                  <th className="p-2.5 px-4 text-left border-b border-gray-600">
+                    Class
+                  </th>
+                  <th className="p-2.5 px-4 text-left border-b border-gray-600">
+                    Score
+                  </th>
+                  <th className="p-2.5 px-4 text-left border-b border-gray-600">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
