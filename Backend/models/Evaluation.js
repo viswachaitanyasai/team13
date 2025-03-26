@@ -35,10 +35,4 @@ const EvaluationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// // ✅ Automatically calculate `overall_score` based on parameter_feedback
-// EvaluationSchema.pre("save", function (next) {
-
-//   next();
-// });
-
 module.exports = mongoose.model("Evaluation", EvaluationSchema);

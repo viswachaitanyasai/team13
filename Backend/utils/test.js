@@ -47,7 +47,7 @@ async function analyzeStringsWithGemini(
 // Function to summarize solution keywords
 async function summarizeSolutionKeywords(solutionArray, problemStatement) {
   const prompt =
-    "This is a set of keywords taken from student solutions in a hackathon. Each keyword is followed by its frequency. Provide a detailed summary highlighting the most used solutions in brief.Send it in a string format and less than 60 words. DOnt speak anything else. dont try to send bold letters";
+    "This is a set of keywords taken from student solutions in a hackathon. Each keyword is followed by its frequency. Provide a detailed summary highlighting the most used solutions in brief.Send it in a string format and less than 120 words. DOnt speak anything else. dont try to send bold letters";
   return await analyzeStringsWithGemini(
     solutionArray,
     prompt,
@@ -58,7 +58,7 @@ async function summarizeSolutionKeywords(solutionArray, problemStatement) {
 // Function to summarize skill gaps
 async function summarizeSkillGaps(skillGapArray, problemStatement) {
   const prompt =
-    "This is a set of keywords for skill gaps found by analyzing student submissions in a hackathon. Each keyword is accompanied by its frequency. Give us insights about skill gap from the data. Send it in a string format it should strictly be less than 60 words. Dont send bold letters. Dont give answers in points. Answer in a very small paragraph. DOnt speak anything else";
+    "This is a set of keywords for skill gaps found by analyzing student submissions in a hackathon. Each keyword is accompanied by its frequency. Give us insights about skill gap from the data. Send it in a string format it should strictly be less than 120 words. Dont send bold letters. Dont give answers in points. Answer in a very small paragraph. DOnt speak anything else";
   console.log(skillGapArray);
 
   return await analyzeStringsWithGemini(

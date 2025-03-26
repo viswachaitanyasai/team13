@@ -1,6 +1,10 @@
 const Hackathon = require("../models/Hackathon");
 const Student = require("../models/Student");
 const Submission = require("../models/Submission");
+const Evaluation = require("../models/Evaluation");
+const { transporter } = require("../utils/emailService");
+
+
 const JudgingParameter = require("../models/JudgingParameter");
 const { generateInviteCode } = require("../utils/uniqueHackathonJoinId");
 const {
@@ -8,7 +12,6 @@ const {
   summarizeSolutionKeywords,
 } = require("../utils/test");
 const bcrypt = require("bcrypt");
-const Evaluation = require("../models/Evaluation");
 
 // Create a new hackathon with judging parameters
 const createHackathon = async (req, res) => {
@@ -641,41 +644,179 @@ const isResultPublished = async (req, res) => {
   }
 };
 
+
 const publishResult = async (req, res) => {
   try {
     const { hackathon_id } = req.params;
 
-    // Find and update the hackathon
-    const hackathon = await Hackathon.findByIdAndUpdate(
-      hackathon_id,
-      { is_result_published: true },
-      { new: true } // Returns the updated document
-    );
-
+    // Ensure the hackathon exists
+    const hackathon = await Hackathon.findById(hackathon_id);
     if (!hackathon) {
       return res
         .status(404)
         .json({ success: false, error: "Hackathon not found" });
     }
 
-    // Check if update was successful
-    if (!hackathon.is_result_published) {
-      return res
-        .status(500)
-        .json({ success: false, error: "Failed to publish results" });
+    // Fetch all submissions with "revisit" evaluations
+    const evaluationsRevisit = await Evaluation.find({
+      _id: { $in: hackathon.submissions },
+      evaluation_category: "revisit",
+    }).populate("submission_id");
+
+    if (evaluationsRevisit.length) {
+      // Extract student IDs from evaluations to be rejected
+      const studentIdsToReject = evaluationsRevisit.map(
+        (ev) => ev.submission_id.student_id
+      );
+
+      // Update evaluations from "revisit" to "rejected"
+      await Evaluation.updateMany(
+        { _id: { $in: evaluationsRevisit.map((ev) => ev._id) } },
+        { $set: { evaluation_category: "rejected" } }
+      );
+
+      // Remove from revisit_students and add to rejected_students
+      await Hackathon.findByIdAndUpdate(hackathon_id, {
+        $pull: { revisit_students: { $in: studentIdsToReject } },
+        $push: { rejected_students: { $each: studentIdsToReject } },
+      });
     }
+
+    // Publish the hackathon results
+    const updatedHackathon = await Hackathon.findByIdAndUpdate(
+      hackathon_id,
+      { is_result_published: true },
+      { new: true }
+    );
+
+    if (!updatedHackathon) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Hackathon not found" });
+    }
+
+    // Fetch evaluations for both shortlisted and rejected submissions
+    const evaluations = await Evaluation.find({
+      _id: { $in: hackathon.submissions },
+      evaluation_category: { $in: ["shortlisted", "rejected"] },
+    }).populate("submission_id");
+
+    // Create a map of student ID to evaluation feedback
+    const evaluationMap = {};
+    evaluations.forEach((ev) => {
+      const studentId = ev.submission_id.student_id.toString();
+      evaluationMap[studentId] = ev;
+    });
+
+    // Fetch student details for shortlisted and rejected students
+    const shortlistedStudents = await Student.find({
+      _id: { $in: updatedHackathon.shortlisted_students },
+    });
+    const rejectedStudents = await Student.find({
+      _id: { $in: updatedHackathon.rejected_students },
+    });
+
+    // Helper function to send an email using the configured transporter
+    const sendEmail = async (student, subject, text) => {
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: student.email,
+        subject,
+        text,
+      };
+      try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`Email sent to ${student.email}: ${info.response}`);
+        return info;
+      } catch (error) {
+        console.error(`Error sending email to ${student.email}:`, error);
+        throw error;
+      }
+    };
+
+    // Prepare email promises for shortlisted students
+    const shortlistedEmailPromises = shortlistedStudents.map(
+      async (student) => {
+        const ev = evaluationMap[student._id.toString()];
+        const strengths =
+          ev && ev.strengths.length ? ev.strengths.join(", ") : "Not available";
+        const improvement =
+          ev && ev.improvement.length
+            ? ev.improvement.join(", ")
+            : "Not available";
+        const actionableSteps =
+          ev && ev.actionable_steps.length
+            ? ev.actionable_steps.join(", ")
+            : "Not available";
+
+        const subject = `Congratulations! You've been shortlisted in ${updatedHackathon.title}`;
+        const text = `Dear ${student.name},
+
+Congratulations! You have been shortlisted in the hackathon "${updatedHackathon.title}".
+
+Feedback:
+- Strengths: ${strengths}
+- Areas for Improvement: ${improvement}
+- Actionable Steps: ${actionableSteps}
+
+Keep up the excellent work and get ready for the next steps!
+
+Best regards,
+Hackathon Team`;
+
+        return sendEmail(student, subject, text);
+      }
+    );
+
+    // Prepare email promises for rejected students
+    const rejectedEmailPromises = rejectedStudents.map(async (student) => {
+      const ev = evaluationMap[student._id.toString()];
+      const strengths =
+        ev && ev.strengths.length ? ev.strengths.join(", ") : "Not available";
+      const improvement =
+        ev && ev.improvement.length
+          ? ev.improvement.join(", ")
+          : "Not available";
+      const actionableSteps =
+        ev && ev.actionable_steps.length
+          ? ev.actionable_steps.join(", ")
+          : "Not available";
+
+      const subject = `Hackathon Results for ${updatedHackathon.title}`;
+      const text = `Dear ${student.name},
+
+Thank you for participating in the hackathon "${updatedHackathon.title}". Although you were not shortlisted this time, we truly appreciate your efforts.
+
+Feedback:
+- Strengths: ${strengths}
+- Areas for Improvement: ${improvement}
+- Actionable Steps: ${actionableSteps}
+
+We encourage you to keep honing your skills and try again in future challenges!
+
+Best regards,
+Hackathon Team`;
+
+      return sendEmail(student, subject, text);
+    });
+
+    // Wait for all emails to be sent
+    await Promise.all([...shortlistedEmailPromises, ...rejectedEmailPromises]);
 
     res.json({
       success: true,
-      message: "Results published successfully",
-      hackathon_id: hackathon._id,
-      is_result_published: hackathon.is_result_published,
+      message: "Results published and email notifications sent successfully",
+      hackathon_id: updatedHackathon._id,
+      is_result_published: updatedHackathon.is_result_published,
     });
   } catch (error) {
-    console.error("Error publishing results:", error);
+    console.error("Error publishing results and sending emails:", error);
     res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
+
+
+
 
 module.exports = {
   createHackathon,
