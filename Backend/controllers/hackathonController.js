@@ -492,8 +492,8 @@ const getStudentEvaluations = async (req, res) => {
   try {
     const { evaluation_id } = req.params;
 
-    // Find the student's submission for the hackathon and populate evaluation details
-    const evaluation = Evaluation.findById(evaluation_id); // Populating the referenced evaluation data
+    // Await the database query
+    const evaluation = await Evaluation.findById(evaluation_id);
 
     if (!evaluation) {
       return res.status(404).json({
@@ -504,13 +504,14 @@ const getStudentEvaluations = async (req, res) => {
 
     res.json({
       success: true,
-      evaluation: evaluation || {}, // Sending evaluation details if available
+      evaluation, // Send evaluation details
     });
   } catch (error) {
     console.error("Error fetching student evaluation:", error);
     res.status(500).json({ success: false, error: "Internal server error" });
   }
 };
+
 
 const getHackathonSummary = async (req, res) => {
   try {
