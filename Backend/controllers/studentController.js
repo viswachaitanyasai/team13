@@ -105,9 +105,9 @@ exports.getMyHackathons = async (req, res) => {
 };
 exports.getHackathonById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { hackathon_id } = req.params;
     const token = req.header("Authorization");
-    const hackathon = await Hackathon.findById(id);
+    const hackathon = await Hackathon.findById(hackathon_id);
 
     if (!hackathon) {
       return res.status(404).json({ error: "Hackathon not found" });
@@ -133,7 +133,7 @@ exports.getHackathonById = async (req, res) => {
       hasJoined = hackathon.participants.includes(req.student.id);
       hasSubmitted = await Submission.exists({
         student_id: req.student.id,
-        hackathon_id: id,
+        hackathon_id: hackathon_id,
       });
     }
 
@@ -242,17 +242,15 @@ exports.joinHackathon = async (req, res) => {
 };
 exports.getEvaluation = async (req, res) => {
   try {
-    const { id } = req.params;
-    if (!id) {
-      return res
-        .status(400)
-        .json({ error: "Missing HackathonId" });
+    const { hackathon_id } = req.params;
+    if (!hackathon_id) {
+      return res.status(400).json({ error: "Missing HackathonId" });
     }
     const studentId = req.student.id;
-    console.log(req.student);
+    // console.log(req.student);
     const submission = await Submission.findOne({
       student_id: studentId,
-      hackathon_id: id,
+      hackathon_id: hackathon_id,
     });
 
     if (!submission) {

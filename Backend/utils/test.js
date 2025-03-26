@@ -15,7 +15,6 @@ async function analyzeStringsWithGemini(
     const formattedInput = `Problem Statement: ${problemStatement}\n\nPrompt: ${prompt}\n\nData:\n${stringsArray
       .map(([keyword, frequency]) => `${keyword}: ${frequency}`)
       .join("\n")}`;
-
     const data = {
       contents: [{ parts: [{ text: formattedInput }] }],
     };
@@ -35,7 +34,6 @@ async function analyzeStringsWithGemini(
     ) {
       throw new Error("Invalid or empty response from Gemini API");
     }
-
     return response.data.candidates[0].content.parts[0].text;
   } catch (error) {
     console.error(
@@ -49,7 +47,7 @@ async function analyzeStringsWithGemini(
 // Function to summarize solution keywords
 async function summarizeSolutionKeywords(solutionArray, problemStatement) {
   const prompt =
-    "This is a set of keywords taken from student solutions in a hackathon. Each keyword is followed by its frequency. Provide a detailed summary highlighting the most used solutions in brief.";
+    "This is a set of keywords taken from student solutions in a hackathon. Each keyword is followed by its frequency. Provide a detailed summary highlighting the most used solutions in brief.Send it in a string format and less than 60 words. DOnt speak anything else. dont try to send bold letters";
   return await analyzeStringsWithGemini(
     solutionArray,
     prompt,
@@ -60,8 +58,8 @@ async function summarizeSolutionKeywords(solutionArray, problemStatement) {
 // Function to summarize skill gaps
 async function summarizeSkillGaps(skillGapArray, problemStatement) {
   const prompt =
-    "This is a set of keywords for skill gaps found by analyzing student submissions in a hackathon. Each keyword is accompanied by its frequency. Provide a summary of the skills students lack and suggest required steps to improve.";
-    console.log(skillGapArray);
+    "This is a set of keywords for skill gaps found by analyzing student submissions in a hackathon. Each keyword is accompanied by its frequency. Give us insights about skill gap from the data. Send it in a string format it should strictly be less than 60 words. Dont send bold letters. Dont give answers in points. Answer in a very small paragraph. DOnt speak anything else";
+  console.log(skillGapArray);
 
   return await analyzeStringsWithGemini(
     skillGapArray,

@@ -121,7 +121,7 @@ const submitSolution = async (req, res) => {
     const submission = new Submission({
       hackathon_id,
       student_id,
-      submission_url: fileUrl, 
+      submission_url: fileUrl,
     });
 
     await submission.save();
@@ -164,7 +164,7 @@ const submitSolution = async (req, res) => {
       const max = evaluationResult.parameter_feedback.length * 2 || 0;
       // console.log(overall_score, typeof overall_score);
       const score = (evaluationResult.overall_score / max) * 10;
-
+      console.log(evaluationResult);
       // ✅ Create Evaluation Entry with the exact return structure and update status to "completed"
       const evaluation = new Evaluation({
         submission_id: submission._id,
@@ -210,9 +210,9 @@ const submitSolution = async (req, res) => {
       await submission.save();
     } finally {
       // ✅ Delete temporary file in all cases
-      // await fsPromises
-      //   .unlink(tempFilePath)
-      //   .catch((err) => console.error("File deletion error:", err));
+      await fsPromises
+        .unlink(tempFilePath)
+        .catch((err) => console.error("File deletion error:", err));
     }
 
     // Send a structured response including evaluation details
