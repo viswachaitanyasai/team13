@@ -5,11 +5,11 @@ import { getHackathons } from "../apis/hackathonapi";
 import { toast } from "react-toastify";
 
 const SkeletonCard = () => (
-  <div  className="bg-gray-700 rounded-xl border border-gray-200 p-5 shadow-md animate-pulse">
-      <div className="h-6 bg-gray-900 rounded w-3/4 mb-2"></div>
-      <div className="h-4 bg-gray-900 rounded w-1/2 mb-4"></div>
-      <div className="h-20 bg-gray-800 rounded mb-4"></div>
-      <div className="h-6 bg-gray-900 rounded w-1/3"></div>
+  <div  className="bg-gray-200 rounded-xl border border-gray-200 p-5 shadow-md animate-pulse">
+      <div className="h-6 bg-gray-400 rounded w-3/4 mb-2"></div>
+      <div className="h-4 bg-gray-400 rounded w-1/2 mb-4"></div>
+      <div className="h-20 bg-gray-300 rounded mb-4"></div>
+      <div className="h-6 bg-gray-400 rounded w-1/3"></div>
   </div>
 );
 
@@ -99,9 +99,9 @@ const OngoingHackathons = () => {
   // ];
 
   return (
-    <div className="bg-gray-900 min-h-screen p-8 text-white">
+    <div className="bg-white min-h-screen p-8 text-white">
     <div className="max-w-4xl mx-auto mt-2 p-4">
-      <h2 className="text-2xl font-bold text-indigo-400 mb-6">Ongoing Hackathons</h2>
+      <h2 className="text-2xl font-bold text-indigo-600 mb-6">Ongoing Hackathons</h2>
       {loading ? (
         <div className="grid gap-6">
           {/* Render 3 Skeleton Cards while loading */}

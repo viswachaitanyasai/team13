@@ -34,7 +34,7 @@ const EmailVerification = () => {
 
       // If OTP verification is successful
       toast.success("OTP verification successful!");
-      navigate("/login");
+      navigate("/teacher-login");
     } catch (error) {
       toast.error(error.error || "Invalid OTP. Please try again.");
     } finally {

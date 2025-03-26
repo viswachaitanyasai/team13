@@ -27,7 +27,7 @@ function Layout({ onDashboardClick, onShowHackathonsClick }) {
         />
 
         {/* Main Content - Leaves space for other pages */}
-        <main className="flex-1 p-0 lg:ml-64 mt-[72px]">
+        <main className="flex-1 p-0 lg:ml-[240px] mt-[72px]">
           <Outlet />
         </main>
       </div>

@@ -23,7 +23,7 @@ import UpcomingHackathons from "./components/UpcomingHackathons";
 import PastHackathons from "./components/PastHackathons";
 import ViewHackathon from "./pages/ViewHackathonDetails";
 import EditHackathon from "./pages/EditHackathon";
-
+import Leaderboard from "./pages/ViewLeaderboard";
 function App() {
   return (
     <>
@@ -50,10 +50,8 @@ function App() {
             {/* <Route path="/submissions" element={View}></Route> */}
             <Route path="/submissions/:hackathonId" element={<ViewEvaluation />} />
             <Route path="/analysis/:evaluation_id" element={<SubmissionAnalysis/>} />
-            <Route path="/edit-hackathon/:hackathonId" element={<EditHackathon/>} />
-
-            
-
+            <Route path="/edit-hackathon/:hackathonId" element={<EditHackathon/>} />         
+            <Route path="/leaderboard/:hackathonId" element={<Leaderboard/>} />
           </Route>
           </Route>
         </Routes>
