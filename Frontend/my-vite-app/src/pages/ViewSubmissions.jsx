@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"; 
 import * as Dialog from "@radix-ui/react-dialog";
 import { useNavigate } from "react-router-dom";
+import { getHackathonSummary } from "../apis/hackathonapi";
 import {
   Bar,
   BarChart,
@@ -12,7 +13,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { getSubmission } from "../apis/hackathonapi";
 import { toast } from "react-toastify";
 
 // const SkeletonLoader = () => (
@@ -30,31 +30,34 @@ const ViewSubmissions = () => {
   const token = localStorage.getItem("authToken");
   const navigate = useNavigate();
 
-//   useEffect(() => {
-//     const fetchSubmissions = async () => {
-//       try {
-//         const response = await getSubmissionStats(token);
-//         console.log("API Response:", response);
-//         const selectedHackathon = response.stats.find(
-//           (hackathon) => hackathon._id === hackathonId
-//         );
-//         // console.log(hackathonId);
-//         // console.log(response);
+  useEffect(() => {
+    const fetchSubmissions = async () => {
+      try {
+        const token= localStorage.getItem("authToken");
+        const response = await getHackathonSummary(hackathonId, token);
+        console.log("API Response:", response);
+        // if(response.id===hackathonId){
+        //   console.log("success");
+        // }
+        const selectedHackathon = response.find((response) => response.id === hackathonId);
+        // console.log(hackathonId);
+        // console.log(response);
 
-//         if (selectedHackathon) {
-//           setHackathonData(selectedHackathon);
-//         } else {
-//           toast.error("No submission data found for this hackathon.");
-//         }
-//       } catch (error) {
-//         toast.error(error.error || "Failed to fetch submissions.");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
+        // if (selectedHackathon) {
+        //   setHackathonData(selectedHackathon);
+        // } else {
+        //   toast.error("No submission data found for this hackathon.");
+        // }
+      } catch (error) {
+        console.error(error);
+        toast.error(error.error || "Failed to fetch submissions.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-//     fetchSubmissions();
-//   }, [hackathonId, token]);
+    fetchSubmissions();
+  }, [hackathonId, token]);
 
 //   if (loading) {
 //     return (
@@ -66,15 +69,15 @@ const ViewSubmissions = () => {
 //     );
 //   }
 
-//   if (!hackathonData) {
-//     return (
-//       <div className="mt-10 flex justify-center">
-//         <div className="bg-gray-800 text-purple-200 border border-red-500 px-6 py-3 rounded-lg shadow-lg">
-//           No submission data available.
-//         </div>
-//       </div>
-//     );
-//   }
+  // if (!hackathonData) {
+  //   return (
+  //     <div className="mt-10 flex justify-center">
+  //       <div className="bg-gray-800 text-purple-200 border border-red-500 px-6 py-3 rounded-lg shadow-lg">
+  //         No submission data available.
+  //       </div>
+  //     </div>
+  //   );
+  // }
 //   const data = [
 //     { name: "Shortlisted", count: hackathonData.total_submissions, color: "#22C55E" },
 //     { name: "Participants", count: hackathonData.total_participants, color: "#FACC15" },
