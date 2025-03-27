@@ -1,7 +1,7 @@
 import axios from "axios";
 
- const API_BASE_URL = "http://localhost:4000/api/files/upload";
-// const API_BASE_URL="http://localhost:4000/api/files/upload"
+ const API_BASE_URL = "https://team131.onrender.com/api/files/upload";
+// const API_BASE_URL="https://team131.onrender.com/api/files/upload"
 
 export const fileUpload = async(file) => {
     try {

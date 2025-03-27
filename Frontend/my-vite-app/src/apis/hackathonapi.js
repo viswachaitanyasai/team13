@@ -1,8 +1,8 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const API_BASE_URL = "http://localhost:4000/api/hackathons";
-// const API_BASE_URL="http://localhost:4000/api/hackathons";
+const API_BASE_URL = "https://team131.onrender.com/api/hackathons";
+// const API_BASE_URL="https://team131.onrender.com/api/hackathons";
 
 
 export const createHackathon = async (formData, navigate) => {
@@ -175,7 +175,7 @@ export const getAnalysis=async(evaluation_id,token)=>{
 }
 export const handleCategoryChange=async(submission_id,token,category)=>
 {
-  const response=await axios.put(`http://localhost:4000/api/submissions/${submission_id}/category`,{evaluation_category:category} ,{
+  const response=await axios.put(`https://team131.onrender.com/api/submissions/${submission_id}/category`,{evaluation_category:category} ,{
     headers: { Authorization: `Bearer ${token}` },
   });
   return response;

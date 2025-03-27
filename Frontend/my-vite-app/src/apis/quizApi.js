@@ -1,8 +1,8 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const API_BASE_URL = "http://localhost:4000/api/quiz";
-// const API_BASE_URL="http://localhost:4000/api/quiz";
+const API_BASE_URL = "https://team131.onrender.com/api/quiz";
+// const API_BASE_URL="https://team131.onrender.com/api/quiz";
 
 
 export const createQuiz = async (formData, navigate) => {

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:4000/api/auth";
+const API_BASE_URL = "https://team131.onrender.com/api/auth";
 
 
 // 📌 Register a New User
