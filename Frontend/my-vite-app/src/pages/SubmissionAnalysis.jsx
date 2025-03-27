@@ -329,7 +329,7 @@ const SubmissionAnalysis = () => {
                   <p className="text-3xl font-bold text-gray-900">
                     {metrics.averageParameterScore} <span className="text-lg text-gray-500">/ 2</span>
                   </p>
-                  <p className="text-sm text-gray-500 mt-1">{metrics.aboveAverageParameters} above average</p>
+                 
                 </div>
               </div>
 
@@ -505,7 +505,7 @@ const SubmissionAnalysis = () => {
                   <h4 className="font-medium text-blue-800 mb-2">Performance Summary</h4>
                   <ul className="list-disc pl-5 space-y-1 text-blue-700">
                     <li>Scored {submissionData.totalScore}/10 overall</li>
-                    <li>{metrics.aboveAverageParameters} out of {submissionData.evaluation.length} parameters above average</li>
+  
                     <li>Strongest in {metrics.strongestParameter}</li>
                     <li>Needs work on {metrics.weakestParameter}</li>
                   </ul>

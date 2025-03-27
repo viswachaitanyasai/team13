@@ -44,7 +44,7 @@ async function analyzeAudio(
     - **If a submission lacks a clear explanation, effort, or relation to the problem statement, give a total score of 0.**
     - **If it only states a vague idea without detailed steps or implementation, give 0.**
     - **Do NOT provide confirmations or explanations outside of the JSON format.**
-    - Be very harsh
+    - Analyse the responses effectivrly please about whi is deserving to win
     **Evaluation Guidelines:**
     - **Check if the solution is related to the problem statement**. If not, score = **0**.
     - **Check if the solution is detailed and actually proposes a valid solution**. If it is just an idea without implementation, score = **0**.
@@ -66,7 +66,7 @@ async function analyzeAudio(
 
     **Return Structure (strictly JSON):**
     {
-      "overall_score": "",   // Total score (must be sum of all parameter scores)
+      "overall_score": "",   // Total score (must be strictly sum of all parameter scores)
       "overall_reason": "",  // Detailed reasoning for the total score
       "parameter_feedback": [
         { "name": "", "score": "", "reason": "" }
@@ -79,7 +79,7 @@ async function analyzeAudio(
       "keywords":["","",..]
 
     }
-    
+    IMPORTANT: THE SUM OF ALL SCORES IN DIFERENT PARAMETERS IS THE overall_score
     **Ensure the response is in pure JSON format with no extra formatting.**
   `;
 
@@ -129,6 +129,7 @@ async function analyzeText(
     -  Analyse the skill gaps and return me an array of it.
     -  Give me keywords which summarize the solution in an array and return an array of it
     *Evaluation Guidelines:*
+    GRADE THE SOLUTION EFFECTIVELY ON THE BASIS OF PARAMETERS AND GIVE DESERVING MARKS
     - evaluation is done as 0(low) or 0.5(medium) or 1(average) or 2(perfect). These are the only categories of grading
     - *Check if the solution is related to the problem statement. If not, score = **0*.
     - *Check if the solution is detailed and actually proposes a valid solution. If it is just an idea without implementation, score = **0*.
@@ -160,7 +161,7 @@ async function analyzeText(
       "skill_gap":["",""...],
       "keywords":["","",..]
     }
-    Ensure that the overall score is the sum of scores of all parameters
+    Ensure that the overall score is the sum of scores of all parameters in all the cases.
     *Ensure the response is in pure JSON format with no extra formatting.*
   `;
 
