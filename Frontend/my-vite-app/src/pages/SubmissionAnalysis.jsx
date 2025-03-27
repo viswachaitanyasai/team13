@@ -309,11 +309,11 @@ const SubmissionAnalysis = () => {
                 </div>
                 <div className="mt-4">
                   <p className="text-3xl font-bold text-gray-900">
-                    {submissionData.totalScore} <span className="text-lg text-gray-500">/ 10</span>
+                    {Math.round(submissionData.totalScore * 100) / 100} <span className="text-lg text-gray-500">/ 10</span>
                   </p>
                   <div className="mt-2">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(submissionData.currentStatus)}`}>
-                      {submissionData.currentStatus}
+                      {submissionData.currentStatus.toUpperCase()}
                     </span>
                   </div>
                 </div>

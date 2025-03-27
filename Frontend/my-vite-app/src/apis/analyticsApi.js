@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://team13-aajv.onrender.com/api/analytics";
+const API_BASE_URL = "http://localhost:4000/api/analytics";
 
 export const getHackathonStats = async (token) => {
   try {

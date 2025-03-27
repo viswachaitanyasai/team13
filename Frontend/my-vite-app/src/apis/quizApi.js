@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const API_BASE_URL = "https://team13-aajv.onrender.com/api/quiz";
+const API_BASE_URL = "http://localhost:4000/api/quiz";
 // const API_BASE_URL="http://localhost:4000/api/quiz";
 
 
