@@ -40,7 +40,7 @@ async function evaluateSubmission({
 
     **Return Structure (strictly JSON):**
     {
-      "score": "",   // Total score (must be sum of all parameter scores)
+      "score": "",   // Total score (must be strictly the sum of all parameter scores)
       "reason": "",  // Detailed reasoning for the total score
       "parameter": [
         { "name": "", "score": "", "reason": "" }  // Breakdown of parameter scores
@@ -51,7 +51,7 @@ async function evaluateSubmission({
       "solutionSummary": ["", ""] // Key takeaway from submission
     }
     
-    **Ensure the response is in pure JSON format with no extra formatting.**
+    **Ensure the response is in pure JSON format with no extra formatting. and overall_score is sum of score of all parameters at any cost IMPORTANT**
   `;
 
   const data = {
